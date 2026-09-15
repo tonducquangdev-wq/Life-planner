@@ -1,33 +1,28 @@
 <?php
-
+use App\Http\Controllers\MonHocController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect trang chủ mặc định sang Dashboard
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return view('welcome');
 });
 
-// Các Route Giao diện Nền tảng (Sử dụng Closures render View)
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-})->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-Route::get('/subjects', function () {
-    return view('subjects.index');
-})->name('subjects');
+Route::middleware('auth')->group(function () {
+    Route::resource('mon-hoc', MonHocController::class);
 
-Route::get('/schedule', function () {
-    return view('schedule.index');
-})->name('schedule');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-Route::get('/workout', function () {
-    return view('workout.index');
-})->name('workout');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-Route::get('/profile', function () {
-    return view('profile.index');
-})->name('profile');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+});
 
-Route::get('/settings', function () {
-    return view('settings.index');
-})->name('settings');
+require __DIR__.'/auth.php';

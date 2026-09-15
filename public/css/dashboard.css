@@ -1,0 +1,420 @@
+/* ==========================================================================
+   TÙY CHỈNH CHUẨN 100VH TOÀN MÀN HÌNH (FULL VIEWPORT DASHBOARD)
+   ========================================================================== */
+:root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --secondary-bg: #f8fafc;
+    --sidebar-width: 260px;
+    --sidebar-bg: #0f172a;
+    --header-height: 70px;
+    --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+html, body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f1f5f9;
+    color: #334155;
+    overflow: hidden; /* Cố định chuẩn 100vh trên Desktop */
+}
+
+/* ==========================================================================
+   1. LAYOUT: SIDEBAR BÊN TRÁI (100VH)
+   ========================================================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--sidebar-bg);
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .brand-logo {
+    height: var(--header-height);
+    padding: 0 1.5rem;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.sidebar .brand-logo i {
+    font-size: 1.6rem;
+    color: #818cf8;
+}
+
+.sidebar-menu {
+    padding: 1rem 0.8rem;
+    list-style: none;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar-menu .nav-item {
+    margin-bottom: 0.3rem;
+}
+
+.sidebar-menu .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-menu .nav-link i {
+    font-size: 1.15rem;
+    width: 24px;
+}
+
+.sidebar-menu .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-menu .nav-link.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+/* ==========================================================================
+   2. MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH 100VH)
+   ========================================================================== */
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* HEADER CỐ ĐỊNH PHÍA TRÊN */
+.top-header {
+    height: var(--header-height);
+    background-color: #ffffff;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+    z-index: 1030;
+}
+
+.search-box {
+    position: relative;
+    width: 320px;
+}
+
+.search-box input {
+    padding-left: 2.5rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 30px;
+    font-size: 0.9rem;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.notification-btn {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.notification-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.notification-btn .badge-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 9px;
+    height: 9px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #818cf8, #6366f1);
+    color: #ffffff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+/* NỘI DUNG CUỘN ĐỘC LẬP TRONG MÀN HÌNH 100VH */
+.content-body {
+    flex-grow: 1;
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+}
+
+/* ==========================================================================
+   3. CARDS VÀ THÀNH PHẦN
+   ========================================================================== */
+.custom-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 1.25rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.custom-card:hover {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.07);
+}
+
+.card-header-custom {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+}
+
+.card-title-custom {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* LỊCH THÁNG (CALENDAR) */
+.calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+.calendar-table th {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    padding: 4px 0;
+}
+
+.calendar-day {
+    text-align: center;
+    vertical-align: middle;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover:not(.empty) {
+    background-color: #f1f5f9;
+}
+
+.calendar-day.active {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+}
+
+.calendar-day.active.has-event::after {
+    background-color: #ffffff;
+}
+
+.calendar-day.other-month {
+    color: #cbd5e1;
+}
+
+/* DANH SÁCH SỰ KIỆN TRONG NGÀY */
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 0.9rem;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    margin-bottom: 0.6rem;
+    border-left: 4px solid #3b82f6;
+    transition: all 0.2s;
+}
+
+.event-item:hover {
+    background-color: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.event-item.hoc-tap { border-left-color: #6366f1; }
+.event-item.the-chat { border-left-color: #10b981; }
+.event-item.ca-nhan { border-left-color: #f59e0b; }
+
+/* TIMELINE HÔM NAY */
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background-color: #e2e8f0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #6366f1;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+/* BADGES VÀ TASKS */
+.badge-priority {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.badge-priority.cao { background-color: #fee2e2; color: #ef4444; }
+.badge-priority.trung_binh { background-color: #fef3c7; color: #d97706; }
+.badge-priority.thap { background-color: #d1fae5; color: #059669; }
+
+.task-checkbox:checked + label {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+/* CARD SỰ KIỆN NỔI BẬT */
+.featured-card {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-card::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+/* ==========================================================================
+   4. RESPONSIVE MÀN HÌNH NHỎ (MOBILE & TABLET)
+   ========================================================================== */
+@media (max-width: 991.98px) {
+    html, body {
+        overflow: auto; /* Trên di động cuộn tự nhiên */
+    }
+    .sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+    .sidebar.show {
+        margin-left: 0;
+    }
+    .main-wrapper {
+        margin-left: 0;
+        height: auto;
+        min-height: 100vh;
+    }
+    .content-body {
+        height: auto;
+        overflow-y: visible;
+        padding: 1rem;
+    }
+}
