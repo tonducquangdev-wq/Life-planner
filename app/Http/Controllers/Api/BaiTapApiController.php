@@ -3,47 +3,110 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BaiTap;
 use Illuminate\Http\Request;
 
 class BaiTapApiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * 1. GET /api/bai-tap : Lấy danh sách bài tập
      */
     public function index()
     {
-        //
+        $danhSach = BaiTap::all();
+        return response()->json([
+            'success' => true,
+            'data' => $danhSach
+        ], 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 2. POST /api/bai-tap : Thêm bài tập mới
      */
     public function store(Request $request)
     {
-        //
+        // Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'tieu_de' => 'required|string|max:255',
+            'mo_ta'       => 'nullable|string',
+        ]);
+
+        $baiTap = BaiTap::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thêm bài tập thành công!',
+            'data'    => $baiTap
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * 3. GET /api/bai-tap/{id} : Lấy chi tiết 1 bài tập
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $baiTap = BaiTap::find($id);
+
+        if (!$baiTap) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài tập'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $baiTap
+        ], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * 4. PUT /api/bai-tap/{id} : Cập nhật thông tin bài tập
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $baiTap = BaiTap::find($id);
+
+        if (!$baiTap) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài tập'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'tieu_de' => 'sometimes|required|string|max:255',
+            'mo_ta'       => 'nullable|string',
+        ]);
+
+        $baiTap->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật thành công!',
+            'data'    => $baiTap
+        ], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 5. DELETE /api/bai-tap/{id} : Xóa bài tập
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $baiTap = BaiTap::find($id);
+
+        if (!$baiTap) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài tập'
+            ], 404);
+        }
+
+        $baiTap->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Xóa bài tập thành công!'
+        ], 200);
     }
 }
