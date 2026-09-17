@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\MonHocController;
+use App\Http\Controllers\TapLuyenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::middleware('auth')->group(function () {
     Route::resource('mon-hoc', MonHocController::class);
+    Route::get('/tap-luyen', [TapLuyenController::class, 'index'])->name('tap-luyen.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');

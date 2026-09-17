@@ -1,0 +1,97 @@
+/* ==========================================================================
+   MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS) - STUDENT-LIFE / LIFE PLANNER
+   Tương thích 100% ngôn ngữ thiết kế Dashboard hiện có
+   ========================================================================== */
+
+/* Khung hiển thị đồng hồ tập luyện trung tâm */
+.workout-timer-box {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+}
+
+/* Con số đồng hồ bấm giờ to rõ ràng, cố định khoảng cách chữ số (tabular-nums) */
+.timer-display {
+    font-size: clamp(2.8rem, 6vw, 4.2rem);
+    font-weight: 800;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+}
+
+/* Lưới lịch tập Heatmap 7 cột */
+.calendar-heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+/* Từng ô ngày trong lưới Heatmap */
+.calendar-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-heatmap-cell:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    z-index: 2;
+}
+
+/* Tab phân loại nhanh buổi tập (Push / Pull / Legs / Khác) */
+.workout-type-tab {
+    cursor: pointer;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.workout-type-tab:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.workout-type-tab.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+/* Dòng bài tập trong modal quản lý danh sách */
+.exercise-item-row {
+    transition: all 0.2s ease;
+}
+
+.exercise-item-row:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1 !important;
+}
+
+/* Hộp icon chỉ số sức khỏe */
+.metric-icon-box {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.3rem;
+}
+
+/* Card hover animation tương thích dashboard */
+.kpi-card-hover {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.kpi-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+}

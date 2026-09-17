@@ -39,8 +39,8 @@
 
         <!-- 4. Thể chất (Bài tập & Kế hoạch tập luyện) -->
         <li class="nav-item">
-            <a href="#" 
-               class="nav-link {{ request()->routeIs('the-chat.*') || request()->routeIs('buoi-tap.*') ? 'active' : '' }}">
+            <a href="{{ route('tap-luyen.index') }}" 
+               class="nav-link {{ request()->routeIs('tap-luyen.*') || request()->routeIs('the-chat.*') || request()->routeIs('buoi-tap.*') ? 'active' : '' }}">
                 <i class="bi bi-activity"></i>
                 <span>Thể chất</span>
             </a>
