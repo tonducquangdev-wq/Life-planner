@@ -87,7 +87,12 @@
                     <h4 class="fw-bold text-dark mb-1">Theo dõi Thể chất & Rèn luyện</h4>
                     <p class="text-muted mb-0">Quản lý kế hoạch tập luyện, theo dõi thời gian và lịch sử rèn luyện mỗi ngày.</p>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-secondary rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2"
+                        data-bs-toggle="modal" data-bs-target="#manageScheduleModal">
+                        <i class="bi bi-calendar3"></i>
+                        <span class="fw-semibold">Quản lý lịch tập</span>
+                    </button>
                     <button class="btn btn-outline-primary rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2"
                         data-bs-toggle="modal" data-bs-target="#editWorkoutModal">
                         <i class="bi bi-pencil-square"></i>
@@ -175,23 +180,32 @@
                 </div>
             </div>
 
-            <!-- BANNER ĐỊNH HƯỚNG KẾ HOẠCH TUẦN (PHÂN BIỆT RÕ VỚI LỊCH SỬ ĐÃ TẬP) -->
+            <!-- BANNER LỊCH TẬP TUẦN TỰ DO THEO DATABASE (CUSTOM WORKOUT SCHEDULE) -->
             <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4 schedule-orientation-card">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
                         <span class="badge bg-indigo-subtle text-indigo px-3 py-2 rounded-pill fw-semibold">
-                            <i class="bi bi-calendar-week me-1"></i> Định hướng kế hoạch
+                            <i class="bi bi-calendar-week me-1"></i> {{ $activePlan->ten_ke_hoach ?? 'Kế hoạch cá nhân' }}
                         </span>
-                        <span class="text-muted small">Khung phân chia nhóm cơ trong tuần (chưa ghi nhận là đã tập cho đến khi bạn hoàn thành)</span>
+                        <span class="text-muted small">Lịch trình tự thiết lập theo ngày trong tuần (bấm vào ngày có buổi tập để chuyển nhanh)</span>
                     </div>
-                    <div class="d-flex flex-wrap gap-1 align-items-center">
-                        @foreach($dinhHuongTuan as $idx => $dh)
+                    <div class="d-flex flex-wrap gap-1 align-items-center" id="weekly-schedule-pills">
+                        @foreach($lichTuan as $dayIso => $dh)
                             @php
-                                $isToday = ($idx === \Illuminate\Support\Carbon::now()->dayOfWeek);
+                                $isToday = ($dayIso === $todayIso);
                             @endphp
-                            <div class="schedule-day-pill {{ $isToday ? 'active-today' : '' }}" title="{{ $dh['thu'] }}: {{ $dh['mo_ta'] }}">
+                            <div class="schedule-day-pill {{ $isToday ? 'active-today' : '' }} {{ $dh['is_rest'] ? 'rest-day-pill' : 'workout-day-pill' }}"
+                                title="{{ $dh['thu'] }}: {{ $dh['mo_ta'] }}"
+                                data-day="{{ $dayIso }}"
+                                data-buoi-tap-id="{{ $dh['buoi_tap_id'] ?? '' }}"
+                                data-name="{{ $dh['ten'] }}">
                                 <span class="day-label">{{ $dh['thu'] }}</span>
-                                <span class="split-name">{{ $dh['ten'] }}</span>
+                                <span class="split-name {{ $dh['is_rest'] ? 'text-muted fst-italic' : '' }}">
+                                    @if($dh['is_rest'])
+                                        <i class="bi bi-cup-hot me-1 text-secondary"></i>
+                                    @endif
+                                    {{ $dh['ten'] }}
+                                </span>
                                 @if($isToday)
                                     <span class="today-marker">Hôm nay</span>
                                 @endif
@@ -208,30 +222,46 @@
                 <div class="col-12 col-xl-8">
                     <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100 d-flex flex-column">
 
-                        <!-- Header card & Tabs phân loại -->
+                        <!-- Header card & Tabs chọn buổi tập trong kế hoạch -->
                         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
                             <div>
                                 <div class="d-flex align-items-center gap-2 mb-1">
                                     <h5 class="fw-bold text-dark mb-0">Buổi tập hôm nay</h5>
-                                    @if($currentBuoiTap)
-                                        <span class="badge bg-light text-secondary border rounded-pill small">Từ Kế hoạch DB</span>
+                                    @if($currentBuoiTap && $currentBuoiTap->ten_thu)
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill small">
+                                            {{ $currentBuoiTap->ten_thu }}
+                                        </span>
+                                    @endif
+                                    @if($dinhHuongHomNay['is_rest'])
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill small">
+                                            <i class="bi bi-moon-stars me-1"></i> Hôm nay là ngày nghỉ
+                                        </span>
                                     @endif
                                 </div>
                                 <span class="text-muted small" id="workout-title-display">
-                                    {{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : 'Tập tự do — ' . $dinhHuongHomNay['ten'] }}
+                                    {{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : ($dinhHuongHomNay['ten'] ?? 'Tập tự do') }}
                                 </span>
                             </div>
 
-                            <!-- Tabs chọn loại buổi tập (Push / Pull / Legs / Khác) -->
+                            <!-- Tabs chọn loại buổi tập (Được sinh tự động từ các buổi tập trong Kế hoạch DB) -->
                             <div class="d-flex flex-wrap gap-2" id="workout-tabs-container">
-                                <button type="button" class="workout-type-tab workout-tab {{ mb_strtolower($dinhHuongHomNay['ten']) === 'push' ? 'active' : '' }}" data-type="Push">Push</button>
-                                <button type="button" class="workout-type-tab workout-tab {{ mb_strtolower($dinhHuongHomNay['ten']) === 'pull' ? 'active' : '' }}" data-type="Pull">Pull</button>
-                                <button type="button" class="workout-type-tab workout-tab {{ mb_strtolower($dinhHuongHomNay['ten']) === 'legs' ? 'active' : '' }}" data-type="Legs">Legs</button>
-                                <button type="button" class="workout-type-tab workout-tab {{ !in_array(mb_strtolower($dinhHuongHomNay['ten']), ['push', 'pull', 'legs']) ? 'active' : '' }}" data-type="Other">Khác</button>
+                                @forelse($buoiTapList as $session)
+                                    <button type="button"
+                                            class="workout-type-tab workout-tab {{ ($currentBuoiTap && $currentBuoiTap->id === $session['id']) ? 'active' : '' }}"
+                                            data-id="{{ $session['id'] }}"
+                                            data-type="{{ $session['title'] }}">
+                                        {{ $session['title'] }}
+                                        @if(!empty($session['ten_thu']))
+                                            <span class="badge bg-light text-dark rounded-pill ms-1 fs-9">{{ $session['ten_thu'] }}</span>
+                                        @endif
+                                    </button>
+                                @empty
+                                    <button type="button" class="workout-type-tab workout-tab active" data-id="" data-type="Tập tự do">Tập tự do</button>
+                                @endforelse
                             </div>
                         </div>
 
-                        <!-- Khung tập luyện trung tâm (Workout Box) Theo đúng thứ tự ưu tiên Section 9 -->
+                        <!-- Khung tập luyện trung tâm (Workout Box) Theo đúng thứ tự ưu tiên -->
                         <div class="workout-timer-box p-4 p-md-5 flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center">
 
                             <!-- 1. [TRẠNG THÁI] -->
@@ -250,7 +280,6 @@
                                 <span class="badge exercise-type-badge badge-type-strength px-3 py-1 rounded-pill small" id="active-ex-type-badge">Strength</span>
                             </div>
                             <h2 class="fw-bold text-dark mb-1 exercise-title-text" id="active-ex-name">
-                                <!-- Điền tự động bởi JS hoặc hiển thị empty state nếu chưa có bài tập -->
                                 Chưa có bài tập
                             </h2>
 
@@ -351,7 +380,7 @@
                         <!-- Vùng hiển thị danh sách hoặc Empty State -->
                         <div id="recent-activities-container">
                             @if($hoatDongGanDay->isEmpty())
-                                <!-- EMPTY STATE: Khi người dùng chưa có hoạt động tập luyện -->
+                                <!-- EMPTY STATE -->
                                 <div class="text-center py-4 px-2 empty-activity-box">
                                     <div class="empty-icon-wrapper mb-3">
                                         <i class="bi bi-clock-history fs-2 text-muted"></i>
@@ -390,7 +419,7 @@
 
             </div>
 
-            <!-- CARD: CÁC CHỈ SỐ SỨC KHỎE (HIỂN THỊ TRẠNG THÁI THỰC TẾ, KHÔNG DÙNG SỐ ẢO) -->
+            <!-- CARD: CÁC CHỈ SỐ SỨC KHỎE -->
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
                 <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                     <h6 class="fw-bold text-dark mb-0">
@@ -400,7 +429,6 @@
                 </div>
 
                 <div class="row g-3">
-                    <!-- 1. Nhịp tim -->
                     <div class="col-6 col-lg-3">
                         <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3">
                             <div class="metric-icon-box bg-danger-subtle text-danger">
@@ -414,7 +442,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. Cân nặng -->
                     <div class="col-6 col-lg-3">
                         <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3">
                             <div class="metric-icon-box bg-success-subtle text-success">
@@ -428,7 +455,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. Tỷ lệ mỡ -->
                     <div class="col-6 col-lg-3">
                         <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3">
                             <div class="metric-icon-box bg-warning-subtle text-warning">
@@ -442,7 +468,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. Lượng nước -->
                     <div class="col-6 col-lg-3">
                         <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3">
                             <div class="metric-icon-box bg-info-subtle text-info">
@@ -461,7 +486,175 @@
         </main>
     </div>
 
-    <!-- MODAL CHỈNH SỬA / THÊM BÀI TẬP (MODAL BOOTSTRAP 5) -->
+    <!-- MODAL 1: QUẢN LÝ LỊCH TẬP & KẾ HOẠCH (MANAGE SCHEDULE MODAL) -->
+    <div class="modal fade" id="manageScheduleModal" tabindex="-1" aria-labelledby="manageScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark" id="manageScheduleModalLabel">
+                        <i class="bi bi-calendar3 me-2 text-primary"></i>Quản lý Lịch tập & Kế hoạch
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <ul class="nav nav-pills mb-3 border-bottom pb-2" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill fw-semibold px-3 py-2 small" id="pills-sessions-tab" data-bs-toggle="pill" data-bs-target="#pills-sessions" type="button" role="tab">
+                                <i class="bi bi-card-checklist me-1"></i> Các buổi tập trong tuần
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill fw-semibold px-3 py-2 small" id="pills-plans-tab" data-bs-toggle="pill" data-bs-target="#pills-plans" type="button" role="tab">
+                                <i class="bi bi-layers-half me-1"></i> Danh sách Kế hoạch
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <!-- TAB 1: CÁC BUỔI TẬP TRONG TUẦN -->
+                        <div class="tab-pane fade show active" id="pills-sessions" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">Kế hoạch hiện tại: <span class="text-primary">{{ $activePlan->ten_ke_hoach ?? 'Chưa đặt tên' }}</span></h6>
+                                    <small class="text-muted">Gán thứ trong tuần (1=Thứ 2 ... 7=Chủ Nhật). Ngày trống sẽ tự tính là Ngày Nghỉ.</small>
+                                </div>
+                            </div>
+
+                            <!-- Form Thêm buổi tập mới -->
+                            <div class="card border-0 bg-light rounded-4 p-3 mb-3">
+                                <h6 class="fw-bold text-dark mb-2 small"><i class="bi bi-plus-circle-fill text-primary me-1"></i>Thêm buổi tập mới vào kế hoạch này</h6>
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-12 col-sm-5">
+                                        <label class="form-label fs-8 text-muted mb-1 fw-semibold">Tên buổi tập</label>
+                                        <input type="text" class="form-control form-control-sm rounded-3" id="new-session-name" placeholder="VD: Upper Body, Full Body...">
+                                    </div>
+                                    <div class="col-6 col-sm-4">
+                                        <label class="form-label fs-8 text-muted mb-1 fw-semibold">Ngày tập trong tuần</label>
+                                        <select class="form-select form-select-sm rounded-3" id="new-session-day">
+                                            <option value="">Không cố định</option>
+                                            <option value="1">Thứ 2</option>
+                                            <option value="2">Thứ 3</option>
+                                            <option value="3">Thứ 4</option>
+                                            <option value="4">Thứ 5</option>
+                                            <option value="5">Thứ 6</option>
+                                            <option value="6">Thứ 7</option>
+                                            <option value="7">Chủ Nhật</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <button type="button" class="btn btn-primary btn-sm rounded-3 w-100 fw-semibold d-flex align-items-center justify-content-center gap-1" id="btn-add-session">
+                                            <i class="bi bi-plus-lg"></i>
+                                            <span>Thêm buổi</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng danh sách buổi tập -->
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr class="fs-8 text-muted">
+                                            <th>Buổi tập</th>
+                                            <th>Ngày trong tuần</th>
+                                            <th>Số bài tập</th>
+                                            <th class="text-end">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sessions-table-body">
+                                        @forelse($buoiTapList as $bt)
+                                            <tr data-session-id="{{ $bt['id'] }}">
+                                                <td>
+                                                    <div class="fw-bold text-dark">{{ $bt['title'] }}</div>
+                                                    <small class="text-muted">{{ $bt['mo_ta'] ?: 'Không có mô tả' }}</small>
+                                                </td>
+                                                <td>
+                                                    @if(!empty($bt['ten_thu']))
+                                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1">{{ $bt['ten_thu'] }}</span>
+                                                    @else
+                                                        <span class="badge bg-light text-muted border rounded-pill px-2 py-1">Tùy chọn</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border rounded-pill">{{ count($bt['exercises']) }} bài</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <button type="button" class="btn btn-sm btn-light border rounded-pill text-danger btn-delete-session" data-id="{{ $bt['id'] }}" title="Xóa buổi tập">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-3">Chưa có buổi tập nào trong kế hoạch này.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: QUẢN LÝ CÁC KẾ HOẠCH -->
+                        <div class="tab-pane fade" id="pills-plans" role="tabpanel">
+                            <div class="card border-0 bg-light rounded-4 p-3 mb-3">
+                                <h6 class="fw-bold text-dark mb-2 small"><i class="bi bi-folder-plus text-primary me-1"></i>Tạo kế hoạch tập luyện mới</h6>
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label fs-8 text-muted mb-1 fw-semibold">Tên kế hoạch</label>
+                                        <input type="text" class="form-control form-control-sm rounded-3" id="new-plan-name" placeholder="VD: Upper/Lower Split, Full Body...">
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label fs-8 text-muted mb-1 fw-semibold">Mô tả (tùy chọn)</label>
+                                        <input type="text" class="form-control form-control-sm rounded-3" id="new-plan-desc" placeholder="VD: Tập 4 buổi mỗi tuần">
+                                    </div>
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold" id="btn-create-plan">
+                                            <i class="bi bi-plus-lg me-1"></i>Tạo kế hoạch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2" id="plans-list-container">
+                                @foreach($keHoachList as $kh)
+                                    <div class="d-flex align-items-center justify-content-between p-3 rounded-4 border bg-white {{ $kh->is_active ? 'border-primary shadow-xs' : '' }}">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-bold text-dark">{{ $kh->ten_ke_hoach }}</span>
+                                                @if($kh->is_active)
+                                                    <span class="badge bg-primary text-white rounded-pill fs-8">Đang áp dụng</span>
+                                                @endif
+                                            </div>
+                                            <small class="text-muted">{{ $kh->mo_ta ?: 'Không có mô tả' }} • {{ $kh->buoiTaps->count() }} buổi tập</small>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if(!$kh->is_active)
+                                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-activate-plan" data-id="{{ $kh->id }}">
+                                                    Kích hoạt
+                                                </button>
+                                                @if($keHoachList->count() > 1)
+                                                    <button type="button" class="btn btn-sm btn-light border text-danger rounded-circle btn-delete-plan" data-id="{{ $kh->id }}" title="Xóa kế hoạch">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal" onclick="window.location.reload();">Đóng & Tải lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CHỈNH SỬA / THÊM BÀI TẬP (MODAL BOOTSTRAP 5) -->
     <div class="modal fade" id="editWorkoutModal" tabindex="-1" aria-labelledby="editWorkoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -473,20 +666,26 @@
                 </div>
 
                 <div class="modal-body py-3">
-                    <!-- Chọn loại buổi tập và nhập tiêu đề -->
+                    <input type="hidden" id="modal-buoi-tap-id" value="{{ $currentBuoiTap ? $currentBuoiTap->id : '' }}">
+
+                    <!-- Chọn hoặc nhập tên buổi tập -->
                     <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-5">
-                            <label class="form-label fw-semibold small text-muted">Loại buổi tập</label>
-                            <select class="form-select rounded-3" id="modal-workout-type">
-                                <option value="Push">Push (Ngực, Vai, Tay sau)</option>
-                                <option value="Pull">Pull (Lưng, Tay trước)</option>
-                                <option value="Legs">Legs (Chân, Mông)</option>
-                                <option value="Other">Khác (Cardio, Core, Tự do)</option>
-                            </select>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold small text-muted">Tên buổi tập</label>
+                            <input type="text" class="form-control rounded-3" id="modal-workout-title" placeholder="VD: Push, Upper Body, Chân...">
                         </div>
-                        <div class="col-12 col-md-7">
-                            <label class="form-label fw-semibold small text-muted">Tiêu đề buổi tập</label>
-                            <input type="text" class="form-control rounded-3" id="modal-workout-title" placeholder="VD: Push — Tập ngực và tay sau">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-semibold small text-muted">Ngày trong tuần</label>
+                            <select class="form-select rounded-3" id="modal-workout-day">
+                                <option value="">Không cố định</option>
+                                <option value="1">Thứ 2</option>
+                                <option value="2">Thứ 3</option>
+                                <option value="3">Thứ 4</option>
+                                <option value="4">Thứ 5</option>
+                                <option value="5">Thứ 6</option>
+                                <option value="6">Thứ 7</option>
+                                <option value="7">Chủ Nhật</option>
+                            </select>
                         </div>
                     </div>
 
@@ -531,27 +730,23 @@
                             </div>
                         </div>
 
-                        <!-- 3. Khu vực nhập thông số động phù hợp từng loại -->
+                        <!-- 3. Khu vực nhập thông số động -->
                         <div class="row g-2 align-items-end">
-                            <!-- Sets Input (hiển thị khi Strength hoặc Core/Other chọn reps) -->
                             <div class="col-6 col-sm-4" id="field-group-sets">
                                 <label class="form-label fw-semibold fs-8 text-muted mb-1">Số sets</label>
                                 <input type="number" class="form-control form-control-sm rounded-3" id="new-ex-sets" placeholder="VD: 3" min="1" max="20" value="3">
                             </div>
 
-                            <!-- Reps Input (hiển thị khi Strength hoặc Core/Other chọn reps) -->
                             <div class="col-6 col-sm-5" id="field-group-reps">
                                 <label class="form-label fw-semibold fs-8 text-muted mb-1">Reps</label>
                                 <input type="text" class="form-control form-control-sm rounded-3" id="new-ex-reps" placeholder="VD: 8-10 hoặc 10-12" value="8-12">
                             </div>
 
-                            <!-- Duration Input (hiển thị khi Cardio hoặc Core/Other chọn duration) -->
                             <div class="col-7 col-sm-5 d-none" id="field-group-duration">
                                 <label class="form-label fw-semibold fs-8 text-muted mb-1">Thời lượng</label>
                                 <input type="number" class="form-control form-control-sm rounded-3" id="new-ex-duration" placeholder="VD: 30" min="1" max="600">
                             </div>
 
-                            <!-- Unit Input (hiển thị khi Duration được kích hoạt) -->
                             <div class="col-5 col-sm-4 d-none" id="field-group-unit">
                                 <label class="form-label fw-semibold fs-8 text-muted mb-1">Đơn vị</label>
                                 <select class="form-select form-select-sm rounded-3" id="new-ex-unit">
@@ -560,7 +755,6 @@
                                 </select>
                             </div>
 
-                            <!-- Nút Thêm vào danh sách tạm -->
                             <div class="col-12 col-sm-3 ms-auto">
                                 <button type="button" class="btn btn-primary btn-sm rounded-3 w-100 fw-semibold d-flex align-items-center justify-content-center gap-1" id="add-exercise-btn">
                                     <i class="bi bi-plus-lg"></i>
@@ -588,7 +782,7 @@
                     <button type="button" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2" id="save-workout-btn">
                         <span class="spinner-border spinner-border-sm d-none" id="save-workout-spinner" role="status" aria-hidden="true"></span>
                         <i class="bi bi-check-lg" id="save-workout-icon"></i>
-                        <span>Áp dụng vào buổi tập</span>
+                        <span>Lưu & Áp dụng bài tập</span>
                     </button>
                 </div>
             </div>
@@ -600,13 +794,21 @@
         window.FITNESS_CONFIG = {
             currentMonth: {{ $currentMonth }},
             currentYear: {{ $currentYear }},
-            currentType: "{{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : $dinhHuongHomNay['ten'] }}",
+            currentType: "{{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : ($dinhHuongHomNay['ten'] ?? 'Tập tự do') }}",
             currentBuoiTapId: {{ $currentBuoiTap ? $currentBuoiTap->id : 'null' }},
+            activePlanId: {{ $activePlan ? $activePlan->id : 'null' }},
             danhSachBaiTap: @json($danhSachBaiTap),
+            buoiTapList: @json($buoiTapList ?? []),
             workoutPlansByType: @json($workoutPlansByType ?? []),
+            lichTuan: @json($lichTuan ?? []),
             monthlyHeatmap: @json($monthlyHeatmap),
             completeRoute: "{{ route('tap-luyen.hoan-thanh') }}",
-            updateWorkoutRoute: "{{ route('tap-luyen.cap-nhat-buoi-tap') }}"
+            updateWorkoutRoute: "{{ route('tap-luyen.cap-nhat-buoi-tap') }}",
+            createPlanRoute: "{{ route('tap-luyen.ke-hoach.store') }}",
+            activatePlanUrl: "{{ url('/tap-luyen/ke-hoach') }}",
+            deletePlanUrl: "{{ url('/tap-luyen/ke-hoach') }}",
+            createSessionRoute: "{{ route('tap-luyen.buoi-tap.store') }}",
+            deleteSessionUrl: "{{ url('/tap-luyen/buoi-tap') }}"
         };
     </script>
 

@@ -114,6 +114,23 @@
     color: #ffffff;
 }
 
+.schedule-day-pill.rest-day-pill {
+    background-color: #f8fafc;
+    border-style: dashed;
+}
+
+.schedule-day-pill.workout-day-pill {
+    background-color: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.schedule-day-pill.workout-day-pill:hover:not(.active-today) {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
 .schedule-day-pill .today-marker {
     position: absolute;
     top: -6px;
@@ -125,6 +142,10 @@
     padding: 1px 5px;
     border-radius: 8px;
     line-height: 1;
+}
+
+.fs-9 {
+    font-size: 0.68rem;
 }
 
 /* 4. TABS PHÂN LOẠI BUỔI TẬP */
