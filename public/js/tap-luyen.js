@@ -1,79 +1,85 @@
 /**
  * ==========================================================================
- * SCRIPT ĐIỀU KHIỂN CHỨC NĂNG THỂ CHẤT & TẬP LUYỆN - STUDENT-LIFE / LIFE PLANNER
- * Chuyển giao toàn bộ logic từ suckhoe.js, tối ưu hóa cho cấu trúc Laravel Blade
+ * SCRIPT ĐIỀU KHIỂN CHỨC NĂNG THỂ CHẤT & TẬP LUYỆN - STUDENT-LIFE
+ * Dữ liệu thật 100% từ Database - Không có dữ liệu giả lập (Production-ready)
  * ==========================================================================
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-
-    // 1. Dữ liệu mẫu các phân nhóm bài tập
-    const defaultWorkoutTemplates = {
-        'Push': {
-            type: 'Push',
-            title: 'Push — 3 ngực, 2 tay sau, 1 vai',
-            exercises: [
-                { name: 'Barbell Bench Press', sets: 4, reps: '8-10' },
-                { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12' },
-                { name: 'Cable Fly', sets: 3, reps: '12-15' },
-                { name: 'Triceps Pushdown', sets: 3, reps: '10-12' },
-                { name: 'Overhead Triceps Extension', sets: 3, reps: '10-12' },
-                { name: 'Dumbbell Shoulder Press', sets: 3, reps: '10-12' }
-            ]
-        },
-        'Pull': {
-            type: 'Pull',
-            title: 'Pull — Lưng xô, bắp tay trước',
-            exercises: [
-                { name: 'Deadlift', sets: 4, reps: '6-8' },
-                { name: 'Pull up', sets: 3, reps: '8-10' },
-                { name: 'Lat Pulldown', sets: 3, reps: '10-12' },
-                { name: 'Barbell Row', sets: 3, reps: '8-10' },
-                { name: 'Bicep Curl', sets: 3, reps: '10-12' }
-            ]
-        },
-        'Legs': {
-            type: 'Legs',
-            title: 'Legs — Đùi, mông, bắp chân',
-            exercises: [
-                { name: 'Squat', sets: 4, reps: '8-10' },
-                { name: 'Leg Press', sets: 4, reps: '10-12' },
-                { name: 'Leg Extension', sets: 3, reps: '12-15' },
-                { name: 'Leg Curl', sets: 3, reps: '10-12' },
-                { name: 'Calf Raise', sets: 4, reps: '15-20' }
-            ]
-        },
-        'Other': {
-            type: 'Other',
-            title: 'Cardio & Core',
-            exercises: [
-                { name: 'Treadmill Run', sets: 1, reps: '20 min' },
-                { name: 'Plank', sets: 3, reps: '60s' },
-                { name: 'Crunch', sets: 3, reps: '15-20' }
-            ]
-        }
+    const config = window.FITNESS_CONFIG || {
+        currentMonth: new Date().getMonth() + 1,
+        currentYear: new Date().getFullYear(),
+        currentType: 'Push',
+        currentBuoiTapId: null,
+        danhSachBaiTap: [],
+        monthlyHeatmap: {},
+        completeRoute: '/tap-luyen/hoan-thanh'
     };
 
-    let currentWorkout = JSON.parse(JSON.stringify(defaultWorkoutTemplates['Push']));
-
-    // Khôi phục trạng thái từ localStorage nếu có
-    const savedData = localStorage.getItem('workoutData');
-    if (savedData) {
-        try {
-            currentWorkout = JSON.parse(savedData);
-        } catch (e) {
-            console.error('Lỗi khi phân tích dữ liệu workoutData từ localStorage', e);
-        }
-    }
+    // 1. Quản lý trạng thái buổi tập hiện tại
+    let currentWorkout = {
+        type: config.currentType || 'Push',
+        title: config.currentType ? (config.currentType + ' — Buổi tập') : 'Tập tự do',
+        buoiTapId: config.currentBuoiTapId,
+        exercises: Array.isArray(config.danhSachBaiTap) ? [...config.danhSachBaiTap] : []
+    };
 
     let editingWorkout = JSON.parse(JSON.stringify(currentWorkout));
     let currentExerciseIndex = 0;
 
-    // 2. Render giao diện Trình tập luyện
-    function renderDashboard() {
+    // 2. Các phần tử DOM
+    const timerDisplay = document.getElementById('workout-timer');
+    const toggleTimerBtn = document.getElementById('toggle-timer-btn');
+    const toggleTimerIcon = document.getElementById('toggle-timer-icon');
+    const toggleTimerText = document.getElementById('toggle-timer-text');
+    const nextExBtn = document.getElementById('next-ex-btn');
+    const finishExBtn = document.getElementById('finish-ex-btn');
+    const statusBadge = document.getElementById('workout-status-badge');
+    const statusText = document.getElementById('workout-status-text');
+    const activeExName = document.getElementById('active-ex-name');
+    const activeExSetRep = document.getElementById('active-ex-set-rep');
+    const emptyBanner = document.getElementById('exercise-empty-banner');
+    const titleDisplay = document.getElementById('workout-title-display');
+    const workoutTabs = document.querySelectorAll('.workout-tab');
+
+    // Hàm định dạng thông số bài tập theo đúng chuẩn nghiệp vụ (Strength / Core / Cardio / Khác)
+    function formatExerciseMetric(ex) {
+        if (!ex) return '-- x --';
+        const type = (ex.type || 'strength').toLowerCase();
+        const unit = (ex.duration_unit === 'giay') ? 'giây' : 'phút';
+
+        if (type === 'cardio') {
+            const duration = ex.duration || 30;
+            return `${duration} ${unit}`;
+        }
+
+        if (type === 'core') {
+            if (ex.duration) {
+                if (ex.sets && parseInt(ex.sets) > 1) {
+                    return `${ex.sets} sets × ${ex.duration} ${unit}`;
+                }
+                return `${ex.duration} ${unit}`;
+            }
+            const sets = ex.sets || 3;
+            const reps = ex.reps || '10-12';
+            return `${sets} sets × ${reps} reps`;
+        }
+
+        // Strength & Other mặc định
+        if (ex.duration && !ex.reps) {
+            return `${ex.duration} ${unit}`;
+        }
+        const sets = ex.sets || 3;
+        const reps = ex.reps || '8-12';
+        return `${sets} sets × ${reps} reps`;
+    }
+
+    // 3. Render giao diện Trình tập luyện (Workout Player)
+    function renderPlayer() {
         // Cập nhật tab active
-        document.querySelectorAll('.workout-tab').forEach(tab => {
-            if (tab.dataset.type === currentWorkout.type) {
+        workoutTabs.forEach(tab => {
+            const tabType = tab.dataset.type;
+            if (tabType && tabType.toLowerCase() === currentWorkout.type.toLowerCase()) {
                 tab.classList.add('active');
             } else {
                 tab.classList.remove('active');
@@ -81,160 +87,70 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Cập nhật tiêu đề buổi tập
-        const titleDisplay = document.getElementById('workout-title-display');
         if (titleDisplay) {
             titleDisplay.textContent = currentWorkout.title || currentWorkout.type;
         }
 
-        // Cập nhật thông tin bài tập hiện tại
-        const activeName = document.getElementById('active-ex-name');
-        const activeSetRep = document.getElementById('active-ex-set-rep');
-        const activeNumber = document.getElementById('active-ex-number');
+        // Cập nhật bài tập
+        const exercises = currentWorkout.exercises;
+        const activeExTypeBadge = document.getElementById('active-ex-type-badge');
 
-        if (currentWorkout.exercises && currentWorkout.exercises.length > 0) {
-            if (currentExerciseIndex >= currentWorkout.exercises.length) {
+        if (exercises && exercises.length > 0) {
+            if (currentExerciseIndex >= exercises.length) {
                 currentExerciseIndex = 0;
             }
-            const ex = currentWorkout.exercises[currentExerciseIndex];
-            if (activeName) activeName.textContent = ex.name;
-            if (activeSetRep) activeSetRep.textContent = `${ex.sets} x ${ex.reps}`;
-            if (activeNumber) activeNumber.textContent = currentExerciseIndex + 1;
-        } else {
-            if (activeName) activeName.textContent = 'Chưa có bài tập';
-            if (activeSetRep) activeSetRep.textContent = '-- x --';
-            if (activeNumber) activeNumber.textContent = '0';
-        }
-    }
+            const ex = exercises[currentExerciseIndex];
+            const type = (ex.type || 'strength').toLowerCase();
 
-    // 3. Render danh sách bài tập trong Modal chỉnh sửa
-    function renderModalList() {
-        const listContainer = document.getElementById('modal-exercise-list');
-        if (!listContainer) return;
-
-        listContainer.innerHTML = '';
-
-        const countBadge = document.getElementById('exercise-count-badge');
-        if (countBadge) {
-            countBadge.textContent = `${editingWorkout.exercises.length} bài tập`;
-        }
-
-        if (editingWorkout.exercises.length === 0) {
-            listContainer.innerHTML = '<div class="text-center text-muted py-3 small bg-white rounded-3 border border-dashed">Chưa có bài tập nào trong buổi tập này.</div>';
-            return;
-        }
-
-        editingWorkout.exercises.forEach((ex, index) => {
-            const html = `
-                <div class="d-flex align-items-center justify-content-between bg-white p-2 px-3 rounded-3 border exercise-item-row shadow-2xs">
-                    <div class="d-flex align-items-center gap-2 flex-grow-1 text-truncate me-2">
-                        <span class="badge bg-light text-secondary border rounded-circle" style="width: 24px; height: 24px; display:flex; align-items:center; justify-content:center;">${index + 1}</span>
-                        <span class="fw-semibold text-dark text-truncate small">${ex.name}</span>
-                        <span class="badge bg-light text-muted border small ms-auto">${ex.sets} sets • ${ex.reps} reps</span>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-light border rounded-circle text-danger delete-ex-btn p-1 px-2" data-index="${index}" title="Xóa bài">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            `;
-            listContainer.insertAdjacentHTML('beforeend', html);
-        });
-
-        // Gán sự kiện xóa bài tập
-        document.querySelectorAll('.delete-ex-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const idx = parseInt(this.dataset.index);
-                editingWorkout.exercises.splice(idx, 1);
-                renderModalList();
-            });
-        });
-    }
-
-    // 4. Modal Chỉnh sửa
-    const editWorkoutModal = document.getElementById('editWorkoutModal');
-    if (editWorkoutModal) {
-        editWorkoutModal.addEventListener('show.bs.modal', function () {
-            editingWorkout = JSON.parse(JSON.stringify(currentWorkout));
-            document.getElementById('modal-workout-type').value = editingWorkout.type;
-            document.getElementById('modal-workout-title').value = editingWorkout.title;
-
-            renderModalList();
-
-            document.getElementById('new-ex-name').value = '';
-            document.getElementById('new-ex-sets').value = '';
-            document.getElementById('new-ex-reps').value = '';
-        });
-    }
-
-    // Thêm bài tập trong modal
-    const addExerciseBtn = document.getElementById('add-exercise-btn');
-    if (addExerciseBtn) {
-        addExerciseBtn.addEventListener('click', function () {
-            const nameInput = document.getElementById('new-ex-name');
-            const setsInput = document.getElementById('new-ex-sets');
-            const repsInput = document.getElementById('new-ex-reps');
-
-            const name = nameInput.value.trim();
-            const sets = setsInput.value.trim();
-            const reps = repsInput.value.trim();
-
-            if (name && sets && reps) {
-                editingWorkout.exercises.push({ name, sets, reps });
-                renderModalList();
-
-                nameInput.value = '';
-                setsInput.value = '';
-                repsInput.value = '';
-                nameInput.focus();
-            } else {
-                alert('Vui lòng nhập đầy đủ Tên bài tập, Số sets và Số reps.');
+            if (activeExName) {
+                activeExName.textContent = `${currentExerciseIndex + 1}. ${ex.name}`;
+                activeExName.classList.remove('text-muted');
+                activeExName.classList.add('text-dark');
             }
-        });
-    }
 
-    // Lưu thay đổi từ modal
-    const saveWorkoutBtn = document.getElementById('save-workout-btn');
-    if (saveWorkoutBtn) {
-        saveWorkoutBtn.addEventListener('click', function () {
-            editingWorkout.type = document.getElementById('modal-workout-type').value;
-            let newTitle = document.getElementById('modal-workout-title').value.trim();
-            if (!newTitle) {
-                newTitle = editingWorkout.type;
-            }
-            editingWorkout.title = newTitle;
-
-            currentWorkout = JSON.parse(JSON.stringify(editingWorkout));
-            localStorage.setItem('workoutData', JSON.stringify(currentWorkout));
-
-            renderDashboard();
-
-            const bsModal = bootstrap.Modal.getInstance(editWorkoutModal);
-            if (bsModal) {
-                bsModal.hide();
-            }
-        });
-    }
-
-    // 5. Chuyển đổi tab buổi tập (Push / Pull / Legs / Khác)
-    document.querySelectorAll('.workout-tab').forEach(tab => {
-        tab.addEventListener('click', function () {
-            const newType = this.dataset.type;
-            if (newType !== currentWorkout.type) {
-                if (defaultWorkoutTemplates[newType]) {
-                    currentWorkout = JSON.parse(JSON.stringify(defaultWorkoutTemplates[newType]));
+            if (activeExTypeBadge) {
+                activeExTypeBadge.classList.remove('d-none');
+                activeExTypeBadge.className = `badge exercise-type-badge badge-type-${type} px-3 py-1 rounded-pill small`;
+                if (type === 'cardio') {
+                    activeExTypeBadge.innerHTML = '<i class="bi bi-heart-pulse-fill me-1"></i>Cardio';
+                } else if (type === 'core') {
+                    activeExTypeBadge.innerHTML = '<i class="bi bi-bullseye me-1"></i>Core';
+                } else if (type === 'strength') {
+                    activeExTypeBadge.innerHTML = '<i class="bi bi-lightning-fill me-1"></i>Strength';
                 } else {
-                    currentWorkout.type = newType;
+                    activeExTypeBadge.innerHTML = '<i class="bi bi-sliders me-1"></i>Khác';
                 }
-                currentExerciseIndex = 0;
-                localStorage.setItem('workoutData', JSON.stringify(currentWorkout));
-                renderDashboard();
             }
-        });
-    });
 
-    // 6. Đồng hồ đếm thời gian tập luyện (Timer)
+            if (activeExSetRep) {
+                activeExSetRep.textContent = formatExerciseMetric(ex);
+            }
+
+            if (emptyBanner) {
+                emptyBanner.classList.add('d-none');
+            }
+        } else {
+            if (activeExName) {
+                activeExName.textContent = 'Chưa có bài tập trong buổi này';
+                activeExName.classList.remove('text-dark');
+                activeExName.classList.add('text-muted');
+            }
+            if (activeExTypeBadge) {
+                activeExTypeBadge.classList.add('d-none');
+            }
+            if (activeExSetRep) {
+                activeExSetRep.textContent = '-- x --';
+            }
+            if (emptyBanner) {
+                emptyBanner.classList.remove('d-none');
+            }
+        }
+    }
+
+    // 4. Đồng hồ đếm thời gian tập luyện (Timer) - Tuân thủ 4 trạng thái
     let timerInterval = null;
     let timerSeconds = 0;
-    let timerRunning = false;
+    let timerState = 'NOT_STARTED'; // 'NOT_STARTED', 'RUNNING', 'PAUSED', 'COMPLETED'
 
     function formatTime(totalSeconds) {
         const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
@@ -243,95 +159,719 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${h}:${m}:${s}`;
     }
 
-    const timerDisplay = document.getElementById('workout-timer');
-    const stopTimerBtn = document.getElementById('stop-timer-btn');
+    function updateStatusUI(state) {
+        timerState = state;
+        if (!statusBadge || !statusText) return;
+
+        statusBadge.className = 'badge workout-status-badge px-3 py-2 rounded-pill shadow-xs border';
+
+        if (state === 'NOT_STARTED') {
+            statusBadge.classList.add('badge-not-started');
+            statusText.textContent = 'Chưa bắt đầu';
+            if (toggleTimerIcon) toggleTimerIcon.className = 'bi bi-play-fill fs-5 text-primary';
+            if (toggleTimerText) toggleTimerText.textContent = 'Bắt đầu tập';
+        } else if (state === 'RUNNING') {
+            statusBadge.classList.add('badge-running');
+            statusText.textContent = 'Đang tập luyện';
+            if (toggleTimerIcon) toggleTimerIcon.className = 'bi bi-pause-fill fs-5 text-warning';
+            if (toggleTimerText) toggleTimerText.textContent = 'Tạm dừng';
+        } else if (state === 'PAUSED') {
+            statusBadge.classList.add('badge-paused');
+            statusText.textContent = 'Tạm dừng';
+            if (toggleTimerIcon) toggleTimerIcon.className = 'bi bi-play-fill fs-5 text-primary';
+            if (toggleTimerText) toggleTimerText.textContent = 'Tiếp tục tập';
+        } else if (state === 'COMPLETED') {
+            statusBadge.classList.add('badge-completed');
+            statusText.textContent = 'Đã hoàn thành';
+            if (toggleTimerIcon) toggleTimerIcon.className = 'bi bi-arrow-repeat fs-5 text-primary';
+            if (toggleTimerText) toggleTimerText.textContent = 'Tập buổi mới';
+        }
+    }
 
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
-        timerRunning = true;
-        if (stopTimerBtn) {
-            stopTimerBtn.innerHTML = '<i class="bi bi-pause-fill fs-5 text-warning"></i><span>Tạm dừng</span>';
-            stopTimerBtn.classList.remove('text-primary');
-            stopTimerBtn.classList.add('text-warning');
-        }
+        updateStatusUI('RUNNING');
 
         timerInterval = setInterval(() => {
             timerSeconds++;
-            if (timerDisplay) timerDisplay.textContent = formatTime(timerSeconds);
+            if (timerDisplay) {
+                timerDisplay.textContent = formatTime(timerSeconds);
+            }
         }, 1000);
     }
 
-    function stopTimer() {
+    function pauseTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = null;
-        timerRunning = false;
-        if (stopTimerBtn) {
-            stopTimerBtn.innerHTML = '<i class="bi bi-play-fill fs-5 text-primary"></i><span>Tiếp tục tính thời gian</span>';
-            stopTimerBtn.classList.remove('text-warning');
-            stopTimerBtn.classList.add('text-primary');
-        }
+        updateStatusUI('PAUSED');
     }
 
-    if (stopTimerBtn) {
-        stopTimerBtn.addEventListener('click', function () {
-            if (timerRunning) {
-                stopTimer();
-            } else {
+    function stopAndFinishTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        // GIỮ NGUYÊN THỜI GIAN ĐÃ TẬP, KHÔNG RESET VỀ 00:00:00
+        updateStatusUI('COMPLETED');
+    }
+
+    function resetTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        timerSeconds = 0;
+        if (timerDisplay) {
+            timerDisplay.textContent = '00:00:00';
+        }
+        updateStatusUI('NOT_STARTED');
+    }
+
+    // Sự kiện Nút phụ điều khiển (Bắt đầu tập / Tạm dừng / Tiếp tục)
+    if (toggleTimerBtn) {
+        toggleTimerBtn.addEventListener('click', function () {
+            if (timerState === 'NOT_STARTED' || timerState === 'PAUSED') {
+                startTimer();
+            } else if (timerState === 'RUNNING') {
+                pauseTimer();
+            } else if (timerState === 'COMPLETED') {
+                resetTimer();
                 startTimer();
             }
         });
     }
 
     // Nút "Bài tiếp theo"
-    const nextBtn = document.getElementById('next-ex-btn');
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
+    if (nextExBtn) {
+        nextExBtn.addEventListener('click', function () {
             if (currentWorkout.exercises && currentWorkout.exercises.length > 0) {
                 currentExerciseIndex = (currentExerciseIndex + 1) % currentWorkout.exercises.length;
-                renderDashboard();
+                renderPlayer();
             }
         });
     }
 
     // Nút "Hoàn thành"
-    const finishBtn = document.getElementById('finish-ex-btn');
-    if (finishBtn) {
-        finishBtn.addEventListener('click', function () {
-            stopTimer();
-            alert('🎉 Chúc mừng! Bạn đã hoàn thành xuất sắc buổi tập hôm nay. Dữ liệu đã được ghi nhận.');
+    if (finishExBtn) {
+        finishExBtn.addEventListener('click', function () {
+            const elapsed = timerSeconds;
+
+            if (timerState === 'NOT_STARTED' && elapsed === 0) {
+                alert('Vui lòng bấm "Bắt đầu tập" để bắt đầu tính giờ trước khi hoàn thành buổi tập.');
+                return;
+            }
+
+            // Dừng timer và giữ nguyên thời gian
+            stopAndFinishTimer();
+
+            // Gửi dữ liệu ghi nhận buổi tập về backend
+            saveWorkoutSession(elapsed);
         });
     }
 
-    // 7. Sinh lịch tập dạng Heatmap (Calendar)
-    function generateCalendar() {
+    // 5. Lưu buổi tập vào cơ sở dữ liệu qua Backend API
+    function saveWorkoutSession(seconds) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const durationMinutes = Math.max(1, Math.round(seconds / 60));
+
+        const payload = {
+            buoi_tap_id: currentWorkout.buoiTapId,
+            ten_buoi_tap: currentWorkout.title || currentWorkout.type,
+            seconds: seconds,
+            tong_thoi_luong: durationMinutes,
+            ghi_chu: `Hoàn thành buổi tập ${currentWorkout.type}`
+        };
+
+        fetch(config.completeRoute, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken || ''
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Không thể lưu buổi tập. Mã lỗi: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(res => {
+            if (res.success) {
+                // Cập nhật các KPI thống kê tức thì trên giao diện
+                const kpiDuration = document.getElementById('kpi-duration');
+                const kpiWeek = document.getElementById('kpi-week');
+                const kpiTotal = document.getElementById('kpi-total');
+
+                if (kpiDuration && res.data.thoiGianTapHomNay !== undefined) {
+                    kpiDuration.innerHTML = `${res.data.thoiGianTapHomNay} <span class="fs-6 fw-normal text-muted">phút</span>`;
+                }
+                if (kpiWeek && res.data.buoiTapTuanNay !== undefined) {
+                    kpiWeek.innerHTML = `${res.data.buoiTapTuanNay} <span class="fs-6 fw-normal text-muted">buổi</span>`;
+                }
+                if (kpiTotal && res.data.tongBuoiTap !== undefined) {
+                    kpiTotal.innerHTML = `${res.data.tongBuoiTap} <span class="fs-6 fw-normal text-muted">buổi</span>`;
+                }
+
+                // Cập nhật danh sách Hoạt động gần đây
+                addRecentActivityUI(res.data);
+
+                // Cập nhật Heatmap ngày hôm nay
+                updateTodayHeatmap(durationMinutes);
+
+                // Hiển thị thông báo hoàn thành
+                showCompletionToast(durationMinutes);
+            }
+        })
+        .catch(err => {
+            console.error('Lỗi khi lưu buổi tập:', err);
+            alert(`🎉 Bạn đã hoàn thành buổi tập ${durationMinutes} phút! (Lưu ý: Không thể đồng bộ trực tiếp tới máy chủ: ${err.message})`);
+        });
+    }
+
+    // Cập nhật DOM Hoạt động gần đây sau khi hoàn thành
+    function addRecentActivityUI(data) {
+        const container = document.getElementById('recent-activities-container');
+        if (!container) return;
+
+        // Nếu đang hiển thị Empty State, xóa empty state
+        const emptyBox = container.querySelector('.empty-activity-box');
+        if (emptyBox) {
+            container.innerHTML = '<div class="d-flex flex-column gap-3" id="history-items-list"></div>';
+        }
+
+        const historyList = document.getElementById('history-items-list');
+        if (!historyList) return;
+
+        const newHtml = `
+            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border-bottom pb-3 activity-record-item border-primary-subtle bg-primary-subtle-10 animate-fade-in">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon-box bg-primary-subtle text-primary">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark fs-6">${data.ten || 'Buổi tập'}</div>
+                        <small class="text-muted">${data.thoi_gian} • Vừa xong</small>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Vừa xong</span>
+                </div>
+            </div>
+        `;
+        historyList.insertAdjacentHTML('afterbegin', newHtml);
+    }
+
+    // Thông báo Toast hoàn thành buổi tập
+    function showCompletionToast(minutes) {
+        const alertBox = document.createElement('div');
+        alertBox.className = 'alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3';
+        alertBox.style.maxWidth = '380px';
+        alertBox.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-trophy-fill text-warning fs-3"></i>
+                <div>
+                    <strong class="d-block">Xuất sắc hoàn thành!</strong>
+                    <small>Đã ghi nhận ${minutes} phút tập luyện vào lịch sử thực tế.</small>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertBox);
+        setTimeout(() => {
+            alertBox.classList.remove('show');
+            setTimeout(() => alertBox.remove(), 300);
+        }, 5000);
+    }
+
+    // Nút Bắt đầu nhanh từ Empty state
+    document.getElementById('quick-start-workout-btn')?.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        startTimer();
+    });
+
+    // 6. Chuyển đổi Tabs loại buổi tập (Push / Pull / Legs / Khác)
+    workoutTabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            const newType = this.dataset.type;
+            if (newType !== currentWorkout.type) {
+                currentWorkout.type = newType;
+                currentWorkout.title = `${newType} — Buổi tập hôm nay`;
+                currentExerciseIndex = 0;
+
+                // Nạp bài tập từ kế hoạch DB nếu đã có sẵn
+                const typeKey = newType.toLowerCase();
+                if (config.workoutPlansByType && config.workoutPlansByType[typeKey]) {
+                    const plan = config.workoutPlansByType[typeKey];
+                    currentWorkout.buoiTapId = plan.id;
+                    currentWorkout.title = plan.title;
+                    currentWorkout.exercises = Array.isArray(plan.exercises) ? [...plan.exercises] : [];
+                }
+
+                renderPlayer();
+            }
+        });
+    });
+
+    // 7. Modal Chỉnh sửa / Thêm bài tập (Hỗ trợ Strength + Core + Cardio + Other)
+    const editWorkoutModal = document.getElementById('editWorkoutModal');
+    const modalExerciseList = document.getElementById('modal-exercise-list');
+    const exerciseCountBadge = document.getElementById('exercise-count-badge');
+    const modalWorkoutType = document.getElementById('modal-workout-type');
+    const modalWorkoutTitle = document.getElementById('modal-workout-title');
+
+    // Các phần tử input bài tập mới trong modal
+    const newExType = document.getElementById('new-ex-type');
+    const newExName = document.getElementById('new-ex-name');
+    const coreMeasureSelector = document.getElementById('core-measure-selector');
+    const fieldGroupSets = document.getElementById('field-group-sets');
+    const fieldGroupReps = document.getElementById('field-group-reps');
+    const fieldGroupDuration = document.getElementById('field-group-duration');
+    const fieldGroupUnit = document.getElementById('field-group-unit');
+    const newExSets = document.getElementById('new-ex-sets');
+    const newExReps = document.getElementById('new-ex-reps');
+    const newExDuration = document.getElementById('new-ex-duration');
+    const newExUnit = document.getElementById('new-ex-unit');
+    const modeReps = document.getElementById('mode-reps');
+    const modeDuration = document.getElementById('mode-duration');
+    const saveWorkoutBtn = document.getElementById('save-workout-btn');
+    const saveWorkoutSpinner = document.getElementById('save-workout-spinner');
+    const saveWorkoutIcon = document.getElementById('save-workout-icon');
+
+    // Chuyển đổi giao diện input tương ứng theo loại bài tập được chọn
+    function updateModalFieldVisibility() {
+        const type = (newExType ? newExType.value : 'strength').toLowerCase();
+
+        if (type === 'strength') {
+            coreMeasureSelector?.classList.add('d-none');
+            fieldGroupSets?.classList.remove('d-none');
+            fieldGroupReps?.classList.remove('d-none');
+            fieldGroupDuration?.classList.add('d-none');
+            fieldGroupUnit?.classList.add('d-none');
+            if (newExSets) newExSets.placeholder = 'Số sets (VD: 3 hoặc 4)';
+            if (newExReps) newExReps.placeholder = 'Reps (VD: 8-10 hoặc 8-12)';
+        } else if (type === 'cardio') {
+            coreMeasureSelector?.classList.add('d-none');
+            fieldGroupSets?.classList.add('d-none');
+            fieldGroupReps?.classList.add('d-none');
+            fieldGroupDuration?.classList.remove('d-none');
+            fieldGroupUnit?.classList.remove('d-none');
+            if (newExDuration) newExDuration.placeholder = 'Thời lượng (VD: 30)';
+            if (newExUnit) newExUnit.value = 'phut';
+        } else {
+            // Core hoặc Other
+            coreMeasureSelector?.classList.remove('d-none');
+            const isDurationMode = modeDuration && modeDuration.checked;
+            if (isDurationMode) {
+                fieldGroupSets?.classList.remove('d-none');
+                fieldGroupReps?.classList.add('d-none');
+                fieldGroupDuration?.classList.remove('d-none');
+                fieldGroupUnit?.classList.remove('d-none');
+                if (newExSets) newExSets.placeholder = 'Sets (VD: 3, hoặc để trống)';
+                if (newExDuration) newExDuration.placeholder = 'Thời gian (VD: 30 hoặc 60)';
+            } else {
+                fieldGroupSets?.classList.remove('d-none');
+                fieldGroupReps?.classList.remove('d-none');
+                fieldGroupDuration?.classList.add('d-none');
+                fieldGroupUnit?.classList.add('d-none');
+                if (newExSets) newExSets.placeholder = 'Số sets (VD: 3)';
+                if (newExReps) newExReps.placeholder = 'Reps (VD: 10-12 hoặc 15)';
+            }
+        }
+    }
+
+    if (newExType) {
+        newExType.addEventListener('change', updateModalFieldVisibility);
+    }
+    if (modeReps) {
+        modeReps.addEventListener('change', updateModalFieldVisibility);
+    }
+    if (modeDuration) {
+        modeDuration.addEventListener('change', updateModalFieldVisibility);
+    }
+
+    // Render danh sách bài tập bên trong Modal
+    function renderModalList() {
+        if (!modalExerciseList) return;
+        modalExerciseList.innerHTML = '';
+
+        const exercises = editingWorkout.exercises || [];
+        if (exerciseCountBadge) {
+            exerciseCountBadge.textContent = `${exercises.length} bài tập`;
+        }
+
+        if (exercises.length === 0) {
+            modalExerciseList.innerHTML = '<div class="text-center text-muted py-3 small bg-white rounded-3 border border-dashed">Chưa có bài tập nào. Hãy thêm bài tập mới bên trên.</div>';
+            return;
+        }
+
+        exercises.forEach((ex, idx) => {
+            const row = document.createElement('div');
+            row.className = 'd-flex align-items-center justify-content-between bg-white p-2 px-3 rounded-3 border exercise-item-row shadow-2xs';
+
+            const type = (ex.type || 'strength').toLowerCase();
+            const metricText = formatExerciseMetric(ex);
+
+            // Badge loại bài tập
+            let typeBadgeHtml = '';
+            if (type === 'cardio') {
+                typeBadgeHtml = '<span class="badge badge-type-cardio rounded-pill px-2 py-1 fs-8">Cardio</span>';
+            } else if (type === 'core') {
+                typeBadgeHtml = '<span class="badge badge-type-core rounded-pill px-2 py-1 fs-8">Core</span>';
+            } else if (type === 'strength') {
+                typeBadgeHtml = '<span class="badge badge-type-strength rounded-pill px-2 py-1 fs-8">Strength</span>';
+            } else {
+                typeBadgeHtml = '<span class="badge badge-type-other rounded-pill px-2 py-1 fs-8">Khác</span>';
+            }
+
+            row.innerHTML = `
+                <div class="d-flex align-items-center gap-2 flex-grow-1 text-truncate me-2">
+                    <span class="badge bg-light text-secondary border rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.75rem;">${idx + 1}</span>
+                    ${typeBadgeHtml}
+                    <span class="fw-semibold text-dark text-truncate small">${ex.name}</span>
+                    <span class="badge bg-light text-dark border small ms-auto fw-medium">${metricText}</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-light border rounded-circle text-danger delete-modal-ex-btn p-1 px-2" data-index="${idx}" title="Xóa bài">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            modalExerciseList.appendChild(row);
+        });
+
+        // Gán sự kiện xóa & re-index tự động
+        modalExerciseList.querySelectorAll('.delete-modal-ex-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const idx = parseInt(this.dataset.index);
+                editingWorkout.exercises.splice(idx, 1);
+                // Cập nhật lại số thứ tự (thu_tu)
+                editingWorkout.exercises.forEach((item, i) => {
+                    item.order = i + 1;
+                });
+                renderModalList();
+            });
+        });
+    }
+
+    if (editWorkoutModal) {
+        editWorkoutModal.addEventListener('show.bs.modal', function () {
+            editingWorkout = JSON.parse(JSON.stringify(currentWorkout));
+
+            if (modalWorkoutType) modalWorkoutType.value = editingWorkout.type || 'Push';
+            if (modalWorkoutTitle) modalWorkoutTitle.value = editingWorkout.title || '';
+
+            renderModalList();
+
+            // Reset form thêm bài
+            if (newExType) newExType.value = 'strength';
+            if (newExName) newExName.value = '';
+            if (newExSets) newExSets.value = '3';
+            if (newExReps) newExReps.value = '8-12';
+            if (newExDuration) newExDuration.value = '';
+            if (newExUnit) newExUnit.value = 'phut';
+            if (modeReps) modeReps.checked = true;
+
+            updateModalFieldVisibility();
+        });
+    }
+
+    // Nút thêm bài trong modal
+    document.getElementById('add-exercise-btn')?.addEventListener('click', function () {
+        const type = (newExType ? newExType.value : 'strength').toLowerCase();
+        const name = newExName?.value.trim();
+
+        if (!name) {
+            alert('Vui lòng nhập Tên bài tập.');
+            newExName?.focus();
+            return;
+        }
+
+        let newExercise = {
+            name: name,
+            type: type,
+            sets: null,
+            reps: null,
+            duration: null,
+            duration_unit: newExUnit ? newExUnit.value : 'phut',
+            order: (editingWorkout.exercises || []).length + 1
+        };
+
+        if (type === 'strength') {
+            const sets = parseInt(newExSets?.value.trim());
+            const reps = newExReps?.value.trim();
+
+            if (!sets || sets <= 0) {
+                alert('Vui lòng nhập Số sets hợp lệ cho bài tập Strength.');
+                newExSets?.focus();
+                return;
+            }
+            if (!reps) {
+                alert('Vui lòng nhập Số reps (VD: 8-10 hoặc 8-12) cho bài tập Strength.');
+                newExReps?.focus();
+                return;
+            }
+
+            newExercise.sets = sets;
+            newExercise.reps = reps;
+        } else if (type === 'cardio') {
+            const duration = parseInt(newExDuration?.value.trim());
+            if (!duration || duration <= 0) {
+                alert('Vui lòng nhập Thời lượng (phút/giây) cho bài tập Cardio.');
+                newExDuration?.focus();
+                return;
+            }
+
+            newExercise.duration = duration;
+            newExercise.duration_unit = newExUnit?.value || 'phut';
+        } else {
+            // Core hoặc Other
+            const isDurationMode = modeDuration && modeDuration.checked;
+            if (isDurationMode) {
+                const duration = parseInt(newExDuration?.value.trim());
+                if (!duration || duration <= 0) {
+                    alert('Vui lòng nhập Thời gian cho bài tập.');
+                    newExDuration?.focus();
+                    return;
+                }
+                const sets = parseInt(newExSets?.value.trim());
+                if (sets && sets > 0) {
+                    newExercise.sets = sets;
+                }
+                newExercise.duration = duration;
+                newExercise.duration_unit = newExUnit?.value || 'giay';
+            } else {
+                const sets = parseInt(newExSets?.value.trim()) || 3;
+                const reps = newExReps?.value.trim() || '10-12';
+                newExercise.sets = sets;
+                newExercise.reps = reps;
+            }
+        }
+
+        editingWorkout.exercises = editingWorkout.exercises || [];
+        editingWorkout.exercises.push(newExercise);
+        renderModalList();
+
+        // Reset ô tên bài tập và focus để người dùng nhập bài tiếp theo nhanh chóng
+        if (newExName) {
+            newExName.value = '';
+            newExName.focus();
+        }
+    });
+
+    // Nút "Áp dụng vào buổi tập" - Lưu bền vững vào cơ sở dữ liệu (Database Persistence)
+    if (saveWorkoutBtn) {
+        saveWorkoutBtn.addEventListener('click', function () {
+            if (modalWorkoutType) editingWorkout.type = modalWorkoutType.value;
+            if (modalWorkoutTitle) {
+                const titleVal = modalWorkoutTitle.value.trim();
+                editingWorkout.title = titleVal || `${editingWorkout.type} — Buổi tập hôm nay`;
+            }
+
+            // Hiển thị trạng thái đang lưu
+            saveWorkoutBtn.disabled = true;
+            saveWorkoutSpinner?.classList.remove('d-none');
+            saveWorkoutIcon?.classList.add('d-none');
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const payload = {
+                buoi_tap_id: editingWorkout.buoiTapId,
+                ten_buoi_tap: editingWorkout.title,
+                exercises: editingWorkout.exercises || []
+            };
+
+            fetch(config.updateWorkoutRoute || '/tap-luyen/cap-nhat-buoi-tap', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Lỗi lưu buổi tập (' + response.status + ')');
+                    });
+                }
+                return response.json();
+            })
+            .then(res => {
+                if (res.success && res.data) {
+                    // Cập nhật state với dữ liệu chuẩn hóa từ server
+                    currentWorkout.buoiTapId = res.data.buoi_tap_id;
+                    currentWorkout.title = res.data.ten_buoi_tap;
+                    currentWorkout.type = editingWorkout.type;
+                    currentWorkout.exercises = res.data.exercises || [];
+
+                    // Cập nhật bộ nhớ cache theo loại buổi tập
+                    const typeKey = currentWorkout.type.toLowerCase();
+                    if (!config.workoutPlansByType) config.workoutPlansByType = {};
+                    config.workoutPlansByType[typeKey] = {
+                        id: res.data.buoi_tap_id,
+                        title: res.data.ten_buoi_tap,
+                        exercises: res.data.exercises || []
+                    };
+
+                    currentExerciseIndex = 0;
+                    renderPlayer();
+
+                    // Đóng modal
+                    const bsModal = bootstrap.Modal.getInstance(editWorkoutModal);
+                    if (bsModal) bsModal.hide();
+
+                    // Hiển thị toast thành công
+                    showWorkoutSavedToast(res.message);
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi lưu cấu hình buổi tập:', err);
+                alert('Không thể lưu buổi tập: ' + err.message);
+            })
+            .finally(() => {
+                saveWorkoutBtn.disabled = false;
+                saveWorkoutSpinner?.classList.add('d-none');
+                saveWorkoutIcon?.classList.remove('d-none');
+            });
+        });
+    }
+
+    // Toast thông báo lưu thành công
+    function showWorkoutSavedToast(msg) {
+        const alertBox = document.createElement('div');
+        alertBox.className = 'alert alert-primary alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3';
+        alertBox.style.maxWidth = '380px';
+        alertBox.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-primary fs-4"></i>
+                <div>
+                    <strong class="d-block">Đã cập nhật buổi tập!</strong>
+                    <small>${msg}</small>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertBox);
+        setTimeout(() => {
+            alertBox.classList.remove('show');
+            setTimeout(() => alertBox.remove(), 300);
+        }, 4000);
+    }
+
+    // 8. Sinh Lịch tập Heatmap (Calendar) từ DỮ LIỆU THẬT DATABASE
+    let viewMonth = config.currentMonth;
+    let viewYear = config.currentYear;
+    const heatmapData = config.monthlyHeatmap || {};
+
+    const colorScale = [
+        '#f1f5f9', // 0: Nghỉ / Chưa tập
+        '#c7d2fe', // 1: Nhẹ (1 - 20p)
+        '#818cf8', // 2: Vừa (21 - 40p)
+        '#6366f1', // 3: Nhiều (41 - 60p)
+        '#4338ca'  // 4: Rất nhiều (> 60p)
+    ];
+
+    function getIntensity(minutes) {
+        if (!minutes || minutes <= 0) return 0;
+        if (minutes <= 20) return 1;
+        if (minutes <= 40) return 2;
+        if (minutes <= 60) return 3;
+        return 4;
+    }
+
+    function generateCalendar(month, year) {
         const grid = document.getElementById('calendar-grid');
+        const monthTitle = document.getElementById('calendar-month-title');
         if (!grid) return;
+
+        if (monthTitle) {
+            monthTitle.textContent = `Tháng ${month}, ${year}`;
+        }
 
         // Giữ lại 7 thẻ tiêu đề ngày đầu tuần (T2 - CN)
         const headers = Array.from(grid.children).slice(0, 7);
         grid.innerHTML = '';
         headers.forEach(h => grid.appendChild(h));
 
-        // Cường độ tập mẫu 35 ô: 0 = Nghỉ, 1 = Nhẹ, 2 = Vừa, 3 = Nhiều, 4 = Rất nhiều
-        const sampleIntensity = [
-            0, 0, 1, 0, 2, 0, 0,
-            0, 1, 3, 0, 2, 0, 1,
-            0, 2, 0, 4, 3, 2, 0,
-            0, 1, 2, 3, 0, 0, 1,
-            2, 0, 0, 1, 0, 0, 0
-        ];
+        // Tính ngày đầu tháng rơi vào thứ mấy (Thứ 2 = 1, ..., CN = 7)
+        const firstDay = new Date(year, month - 1, 1);
+        let startDayOfWeek = firstDay.getDay(); // 0 = CN, 1 = T2
+        if (startDayOfWeek === 0) startDayOfWeek = 7; // Chuyển CN về cuối tuần (7)
 
-        const colorScale = ['#f1f5f9', '#c7d2fe', '#818cf8', '#6366f1', '#4338ca'];
+        const daysInMonth = new Date(year, month, 0).getDate();
 
-        for (let i = 0; i < 35; i++) {
+        // 1. Render các ô trống trước ngày 1 của tháng
+        for (let i = 1; i < startDayOfWeek; i++) {
+            const blankCell = document.createElement('div');
+            blankCell.className = 'calendar-heatmap-cell cell-empty';
+            grid.appendChild(blankCell);
+        }
+
+        // 2. Render các ngày trong tháng
+        for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
             cell.className = 'calendar-heatmap-cell';
-            const intensity = sampleIntensity[i] || 0;
+
+            // Định dạng YYYY-MM-DD
+            const monthStr = month.toString().padStart(2, '0');
+            const dayStr = day.toString().padStart(2, '0');
+            const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+            const record = heatmapData[dateKey];
+            const duration = record ? (record.duration || 0) : 0;
+            const count = record ? (record.count || 0) : 0;
+            const intensity = getIntensity(duration);
+
             cell.style.backgroundColor = colorScale[intensity];
-            cell.title = `Ngày ${i + 1} - Cường độ: ${intensity}/4`;
+            cell.dataset.date = dateKey;
+
+            if (duration > 0) {
+                cell.title = `Ngày ${day}/${month}: Đã tập ${duration} phút (${count} buổi)`;
+                cell.classList.add('has-workout');
+            } else {
+                cell.title = `Ngày ${day}/${month}: Chưa có hoạt động tập luyện`;
+            }
+
+            // Đánh dấu ngày hôm nay
+            const today = new Date();
+            if (today.getFullYear() === year && (today.getMonth() + 1) === month && today.getDate() === day) {
+                cell.classList.add('today-cell');
+            }
+
             grid.appendChild(cell);
         }
     }
+
+    function updateTodayHeatmap(newMinutes) {
+        const today = new Date();
+        const monthStr = (today.getMonth() + 1).toString().padStart(2, '0');
+        const dayStr = today.getDate().toString().padStart(2, '0');
+        const dateKey = `${today.getFullYear()}-${monthStr}-${dayStr}`;
+
+        if (!heatmapData[dateKey]) {
+            heatmapData[dateKey] = { count: 0, duration: 0 };
+        }
+        heatmapData[dateKey].count += 1;
+        heatmapData[dateKey].duration += newMinutes;
+
+        // Render lại calendar tháng hiện tại
+        generateCalendar(viewMonth, viewYear);
+    }
+
+    // Điều hướng tháng của Calendar
+    document.getElementById('prev-month-btn')?.addEventListener('click', function () {
+        viewMonth--;
+        if (viewMonth < 1) {
+            viewMonth = 12;
+            viewYear--;
+        }
+        generateCalendar(viewMonth, viewYear);
+    });
+
+    document.getElementById('next-month-btn')?.addEventListener('click', function () {
+        viewMonth++;
+        if (viewMonth > 12) {
+            viewMonth = 1;
+            viewYear++;
+        }
+        generateCalendar(viewMonth, viewYear);
+    });
 
     // Bật/tắt Sidebar trên màn hình di động
     document.getElementById('sidebarToggle')?.addEventListener('click', function () {
@@ -339,6 +879,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Khởi chạy ban đầu
-    renderDashboard();
-    generateCalendar();
+    renderPlayer();
+    updateStatusUI('NOT_STARTED');
+    generateCalendar(viewMonth, viewYear);
 });

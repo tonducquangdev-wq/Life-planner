@@ -9,10 +9,11 @@ class BaiTapTheChat extends Model
     protected $table = 'bai_tap_the_chat';
 
     protected $fillable = [
-    'ten_bai_tap',
-    'nhom_co',
-    'mo_ta'
-];
+        'ten_bai_tap',
+        'nhom_co',
+        'loai_bai_tap',
+        'mo_ta',
+    ];
 
     public function chiTietBuoiTaps()
 {

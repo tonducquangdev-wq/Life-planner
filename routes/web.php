@@ -16,6 +16,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware('auth')->group(function () {
     Route::resource('mon-hoc', MonHocController::class);
     Route::get('/tap-luyen', [TapLuyenController::class, 'index'])->name('tap-luyen.index');
+    Route::post('/tap-luyen/cap-nhat-buoi-tap', [TapLuyenController::class, 'capNhatBuoiTap'])->name('tap-luyen.cap-nhat-buoi-tap');
+    Route::post('/tap-luyen/hoan-thanh', [TapLuyenController::class, 'hoanThanh'])->name('tap-luyen.hoan-thanh');
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
