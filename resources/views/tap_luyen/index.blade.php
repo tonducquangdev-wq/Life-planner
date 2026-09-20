@@ -52,9 +52,13 @@
 
                 <div class="user-profile dropdown">
                     <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-                        <div class="user-avatar">
-                            {{ mb_substr(Auth::user()->ho_ten ?? 'User', 0, 1) }}
-                        </div>
+                        @if(Auth::check() && !empty(Auth::user()->avatar_url))
+                            <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="user-avatar rounded-circle object-fit-cover" style="width: 40px; height: 40px;">
+                        @else
+                            <div class="user-avatar">
+                                {{ Auth::check() ? Auth::user()->initials : 'U' }}
+                            </div>
+                        @endif
                         <div class="d-none d-md-block text-start">
                             <div class="fw-bold text-dark fs-6 leading-tight">{{ Auth::user()->ho_ten ?? 'User' }}</div>
                             <small class="text-muted fs-7">{{ Auth::user()->email ?? 'user@lifeplanner.local' }}</small>
