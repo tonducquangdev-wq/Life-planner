@@ -1,23 +1,26 @@
 /* ==========================================================================
-   TÙY CHỈNH CHUẨN 100VH TOÀN MÀN HÌNH (FULL VIEWPORT DASHBOARD)
+   DASHBOARD DESIGN SYSTEM - LIFE PLANNER (MODERN DASHBOARD 100VH)
    ========================================================================== */
 :root {
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #e0e7ff;
     --secondary-bg: #f8fafc;
     --sidebar-width: 260px;
     --sidebar-bg: #0f172a;
     --header-height: 70px;
-    --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --card-radius: 20px;
+    --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    --card-shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
 }
 
 html, body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #f1f5f9;
-    color: #334155;
+    color: #1e293b;
     overflow: hidden; /* Cố định chuẩn 100vh trên Desktop */
 }
 
@@ -32,7 +35,7 @@ html, body {
     left: 0;
     background-color: var(--sidebar-bg);
     color: #94a3b8;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1040;
     display: flex;
     flex-direction: column;
@@ -65,13 +68,13 @@ html, body {
 }
 
 .sidebar-menu .nav-item {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.35rem;
 }
 
 .sidebar-menu .nav-link {
     color: #94a3b8;
     padding: 0.75rem 1rem;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -93,7 +96,7 @@ html, body {
 .sidebar-menu .nav-link.active {
     color: #ffffff;
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 /* ==========================================================================
@@ -116,7 +119,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
     flex-shrink: 0;
     z-index: 1030;
 }
@@ -131,7 +134,14 @@ html, body {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 30px;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+    background-color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .search-box i {
@@ -145,15 +155,15 @@ html, body {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .notification-btn {
     position: relative;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -204,27 +214,28 @@ html, body {
     flex-grow: 1;
     height: calc(100vh - var(--header-height));
     overflow-y: auto;
-    padding: 1.5rem 2rem;
+    padding: 1.75rem 2rem;
 }
 
 /* ==========================================================================
-   3. CARDS VÀ THÀNH PHẦN
+   3. MODERN DASHBOARD CARDS & COMPONENTS
    ========================================================================== */
 .custom-card {
     background-color: #ffffff;
-    border-radius: 16px;
-    border: none;
+    border-radius: var(--card-radius);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: var(--card-shadow);
-    margin-bottom: 1.25rem;
-    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.5rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
 }
 
 .custom-card:hover {
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.07);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .card-header-custom {
-    padding: 1rem 1.25rem;
+    padding: 1.15rem 1.4rem;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     align-items: center;
@@ -233,173 +244,207 @@ html, body {
 }
 
 .card-title-custom {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #0f172a;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-/* LỊCH THÁNG (CALENDAR) */
-.calendar-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 2px;
-}
-
-.calendar-table th {
-    text-align: center;
-    font-size: 0.8rem;
-    color: #64748b;
-    font-weight: 600;
-    padding: 4px 0;
-}
-
-.calendar-day {
-    text-align: center;
-    vertical-align: middle;
-    height: 38px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #334155;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-}
-
-.calendar-day:hover:not(.empty) {
-    background-color: #f1f5f9;
-}
-
-.calendar-day.active {
-    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-    color: #ffffff !important;
-    font-weight: 700;
-    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-}
-
-.calendar-day.has-event::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background-color: #3b82f6;
-}
-
-.calendar-day.active.has-event::after {
+/* STAT CARDS (4 HỘP THỐNG KÊ HÀNG 1) */
+.stat-card {
     background-color: #ffffff;
-}
-
-.calendar-day.other-month {
-    color: #cbd5e1;
-}
-
-/* DANH SÁCH SỰ KIỆN TRONG NGÀY */
-.event-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.75rem 0.9rem;
-    border-radius: 12px;
-    background-color: #f8fafc;
-    margin-bottom: 0.6rem;
-    border-left: 4px solid #3b82f6;
-    transition: all 0.2s;
-}
-
-.event-item:hover {
-    background-color: #f1f5f9;
-    transform: translateX(4px);
-}
-
-.event-item.hoc-tap { border-left-color: #6366f1; }
-.event-item.the-chat { border-left-color: #10b981; }
-.event-item.ca-nhan { border-left-color: #f59e0b; }
-
-/* TIMELINE HÔM NAY */
-.timeline {
-    position: relative;
-    padding-left: 20px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 6px;
-    top: 5px;
-    bottom: 5px;
-    width: 2px;
-    background-color: #e2e8f0;
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -18px;
-    top: 4px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #6366f1;
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
-}
-
-/* BADGES VÀ TASKS */
-.badge-priority {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-weight: 600;
-}
-.badge-priority.cao { background-color: #fee2e2; color: #ef4444; }
-.badge-priority.trung_binh { background-color: #fef3c7; color: #d97706; }
-.badge-priority.thap { background-color: #d1fae5; color: #059669; }
-
-.task-checkbox:checked + label {
-    text-decoration: line-through;
-    color: #94a3b8;
-}
-
-/* CARD SỰ KIỆN NỔI BẬT */
-.featured-card {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    color: #ffffff;
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
+    border-radius: var(--card-radius);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.35rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.25s ease;
+    height: 100%;
     position: relative;
     overflow: hidden;
 }
 
-.featured-card::after {
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.stat-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.stat-card-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+/* TIMELINE HÔM NAY (HÀNG 2 - TRÁI) */
+.today-timeline {
+    position: relative;
+    padding-left: 28px;
+}
+
+.today-timeline::before {
     content: '';
     position: absolute;
-    right: -20px;
-    bottom: -20px;
-    width: 120px;
-    height: 120px;
-    background: rgba(255, 255, 255, 0.1);
+    left: 11px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: linear-gradient(to bottom, #6366f1 0%, #cbd5e1 100%);
+    border-radius: 2px;
+}
+
+.timeline-row {
+    position: relative;
+    margin-bottom: 1.2rem;
+}
+
+.timeline-row:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -28px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
+    background-color: #ffffff;
+    border: 3px solid #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    z-index: 2;
+}
+
+.timeline-dot.dot-completed {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    background-color: #10b981;
+}
+
+.timeline-dot.dot-upcoming {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.timeline-dot.dot-overdue {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.timeline-card {
+    background-color: #f8fafc;
+    border-radius: 16px;
+    padding: 1rem 1.15rem;
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.timeline-card:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #e2e8f0;
+}
+
+/* CARD "SẮP ĐẾN HẠN" (HÀNG 2 - PHẢI) */
+.deadline-item {
+    background-color: #f8fafc;
+    border-radius: 14px;
+    padding: 0.95rem 1.1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.deadline-item:last-child {
+    margin-bottom: 0;
+}
+
+.deadline-item:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #e2e8f0;
+    transform: translateX(3px);
+}
+
+/* PROGRESS BAR "MỤC TIÊU ĐANG THỰC HIỆN" (HÀNG 3 - TRÁI) */
+.goal-item {
+    margin-bottom: 1.25rem;
+}
+
+.goal-item:last-child {
+    margin-bottom: 0;
+}
+
+.goal-progress-bar {
+    height: 9px;
+    border-radius: 10px;
+    background-color: #e2e8f0;
+    overflow: hidden;
+}
+
+.goal-progress-bar .progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* "HOẠT ĐỘNG GẦN ĐÂY" (HÀNG 3 - PHẢI) */
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.activity-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
-   4. RESPONSIVE MÀN HÌNH NHỎ (MOBILE & TABLET)
+   4. RESPONSIVE (MOBILE & TABLET)
    ========================================================================== */
 @media (max-width: 991.98px) {
     html, body {
-        overflow: auto; /* Trên di động cuộn tự nhiên */
+        overflow: auto; /* Cho phép cuộn trang trên mobile */
     }
     .sidebar {
         margin-left: calc(-1 * var(--sidebar-width));
@@ -415,6 +460,7 @@ html, body {
     .content-body {
         height: auto;
         overflow-y: visible;
-        padding: 1rem;
+        padding: 1.25rem 1rem;
     }
 }
+

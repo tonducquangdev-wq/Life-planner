@@ -19,7 +19,16 @@
             </a>
         </li>
 
-        <!-- 2. Học tập (Môn học & Bài tập) -->
+        <!-- 2. Lịch (Module chính - Calendar) -->
+        <li class="nav-item">
+            <a href="{{ route('calendar.index') }}" 
+               class="nav-link {{ request()->routeIs('calendar.*') || request()->routeIs('lich.*') ? 'active' : '' }}">
+                <i class="bi bi-calendar3"></i>
+                <span>Lịch</span>
+            </a>
+        </li>
+
+        <!-- 3. Học tập (Môn học & Bài tập) -->
         <li class="nav-item">
             <a href="{{ route('mon-hoc.index') }}" 
                class="nav-link {{ request()->routeIs('mon-hoc.*') || request()->routeIs('bai-tap.*') ? 'active' : '' }}">
@@ -28,16 +37,7 @@
             </a>
         </li>
 
-        <!-- 3. Lịch (Sự kiện & Lịch trình) -->
-        <li class="nav-item">
-            <a href="#" 
-               class="nav-link {{ request()->routeIs('lich.*') || request()->routeIs('su-kien.*') ? 'active' : '' }}">
-                <i class="bi bi-calendar3"></i>
-                <span>Lịch</span>
-            </a>
-        </li>
-
-        <!-- 4. Thể chất (Bài tập & Kế hoạch tập luyện) -->
+        <!-- 4. Thể chất (Bài tập & Kế hoạch) -->
         <li class="nav-item">
             <a href="{{ route('tap-luyen.index') }}" 
                class="nav-link {{ request()->routeIs('tap-luyen.*') || request()->routeIs('the-chat.*') || request()->routeIs('buoi-tap.*') ? 'active' : '' }}">
@@ -46,7 +46,16 @@
             </a>
         </li>
 
-        <!-- 5. Hồ sơ cá nhân -->
+        <!-- 5. Mục tiêu -->
+        <li class="nav-item">
+            <a href="#" 
+               class="nav-link {{ request()->routeIs('muc-tieu.*') ? 'active' : '' }}">
+                <i class="bi bi-trophy-fill"></i>
+                <span>Mục tiêu</span>
+            </a>
+        </li>
+
+        <!-- 6. Hồ sơ cá nhân -->
         <li class="nav-item">
             <a href="{{ route('profile.edit') }}" 
                class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -55,7 +64,7 @@
             </a>
         </li>
 
-        <!-- 6. Cài đặt hệ thống -->
+        <!-- 7. Cài đặt hệ thống -->
         <li class="nav-item">
             <a href="#" 
                class="nav-link {{ request()->routeIs('settings.*') || request()->routeIs('cai-dat.*') ? 'active' : '' }}">
@@ -65,3 +74,4 @@
         </li>
     </ul>
 </aside>
+

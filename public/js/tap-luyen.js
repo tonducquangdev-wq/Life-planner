@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
  * SCRIPT ĐIỀU KHIỂN CHỨC NĂNG THỂ CHẤT & TẬP LUYỆN - STUDENT-LIFE
- * Dữ liệu thật 100% từ Database - Không có dữ liệu giả lập (Production-ready)
+ * Dữ liệu thật 100% từ Database - Custom Workout Schedule (Production-ready)
  * ==========================================================================
  */
 
@@ -11,18 +11,45 @@ document.addEventListener('DOMContentLoaded', function () {
         currentYear: new Date().getFullYear(),
         currentType: 'Push',
         currentBuoiTapId: null,
+        activePlanId: null,
         danhSachBaiTap: [],
+        buoiTapList: [],
+        workoutPlansByType: {},
+        lichTuan: {},
         monthlyHeatmap: {},
-        completeRoute: '/tap-luyen/hoan-thanh'
+        completeRoute: '/tap-luyen/hoan-thanh',
+        updateWorkoutRoute: '/tap-luyen/cap-nhat-buoi-tap',
+        createPlanRoute: '/tap-luyen/ke-hoach',
+        activatePlanUrl: '/tap-luyen/ke-hoach',
+        deletePlanUrl: '/tap-luyen/ke-hoach',
+        createSessionRoute: '/tap-luyen/buoi-tap',
+        deleteSessionUrl: '/tap-luyen/buoi-tap'
     };
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     // 1. Quản lý trạng thái buổi tập hiện tại
     let currentWorkout = {
         type: config.currentType || 'Push',
-        title: config.currentType ? (config.currentType + ' — Buổi tập') : 'Tập tự do',
+        title: config.currentType || 'Buổi rèn luyện',
         buoiTapId: config.currentBuoiTapId,
+        ngayTrongTuan: null,
         exercises: Array.isArray(config.danhSachBaiTap) ? [...config.danhSachBaiTap] : []
     };
+
+    // Tìm thông tin ban đầu nếu có trong buoiTapList
+    if (config.buoiTapList && config.buoiTapList.length > 0) {
+        const found = config.buoiTapList.find(b => b.id === currentWorkout.buoiTapId) || config.buoiTapList[0];
+        if (found) {
+            currentWorkout.buoiTapId = found.id;
+            currentWorkout.type = found.title;
+            currentWorkout.title = found.title;
+            currentWorkout.ngayTrongTuan = found.ngay_trong_tuan;
+            if (!currentWorkout.exercises || currentWorkout.exercises.length === 0) {
+                currentWorkout.exercises = Array.isArray(found.exercises) ? [...found.exercises] : [];
+            }
+        }
+    }
 
     let editingWorkout = JSON.parse(JSON.stringify(currentWorkout));
     let currentExerciseIndex = 0;
@@ -40,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const activeExSetRep = document.getElementById('active-ex-set-rep');
     const emptyBanner = document.getElementById('exercise-empty-banner');
     const titleDisplay = document.getElementById('workout-title-display');
-    const workoutTabs = document.querySelectorAll('.workout-tab');
+    const workoutTabsContainer = document.getElementById('workout-tabs-container');
 
     // Hàm định dạng thông số bài tập theo đúng chuẩn nghiệp vụ (Strength / Core / Cardio / Khác)
     function formatExerciseMetric(ex) {
@@ -77,9 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // 3. Render giao diện Trình tập luyện (Workout Player)
     function renderPlayer() {
         // Cập nhật tab active
-        workoutTabs.forEach(tab => {
+        const tabs = workoutTabsContainer?.querySelectorAll('.workout-tab') || [];
+        tabs.forEach(tab => {
+            const tabId = tab.dataset.id ? parseInt(tab.dataset.id) : null;
             const tabType = tab.dataset.type;
-            if (tabType && tabType.toLowerCase() === currentWorkout.type.toLowerCase()) {
+
+            if ((tabId && currentWorkout.buoiTapId && tabId === currentWorkout.buoiTapId) ||
+                (tabType && tabType.toLowerCase() === currentWorkout.type.toLowerCase())) {
                 tab.classList.add('active');
             } else {
                 tab.classList.remove('active');
@@ -147,6 +178,64 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Chuyển sang buổi tập bất kỳ
+    function switchWorkoutSession(buoiTapId, title) {
+        currentExerciseIndex = 0;
+        let session = null;
+
+        if (config.buoiTapList && config.buoiTapList.length > 0) {
+            if (buoiTapId) {
+                session = config.buoiTapList.find(b => b.id === parseInt(buoiTapId));
+            }
+            if (!session && title) {
+                session = config.buoiTapList.find(b => b.title.toLowerCase() === title.toLowerCase());
+            }
+        }
+
+        if (session) {
+            currentWorkout.buoiTapId = session.id;
+            currentWorkout.type = session.title;
+            currentWorkout.title = session.title;
+            currentWorkout.ngayTrongTuan = session.ngay_trong_tuan;
+            currentWorkout.exercises = Array.isArray(session.exercises) ? [...session.exercises] : [];
+        } else {
+            currentWorkout.buoiTapId = buoiTapId || null;
+            currentWorkout.type = title || 'Tập tự do';
+            currentWorkout.title = title || 'Tập tự do';
+            currentWorkout.exercises = [];
+        }
+
+        const modalBuoiTapId = document.getElementById('modal-buoi-tap-id');
+        if (modalBuoiTapId) modalBuoiTapId.value = currentWorkout.buoiTapId || '';
+
+        renderPlayer();
+    }
+
+    // Bắt sự kiện click vào các Tab buổi tập
+    function bindWorkoutTabEvents() {
+        const tabs = workoutTabsContainer?.querySelectorAll('.workout-tab') || [];
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                const id = this.dataset.id ? parseInt(this.dataset.id) : null;
+                const type = this.dataset.type;
+                switchWorkoutSession(id, type);
+            });
+        });
+    }
+    bindWorkoutTabEvents();
+
+    // Bắt sự kiện click vào các Pill ngày trong tuần (chuyển nhanh sang buổi tập ngày đó)
+    document.querySelectorAll('#weekly-schedule-pills .schedule-day-pill').forEach(pill => {
+        pill.addEventListener('click', function () {
+            const buoiTapId = this.dataset.buoiTapId;
+            const name = this.dataset.name;
+            if (buoiTapId) {
+                switchWorkoutSession(parseInt(buoiTapId), name);
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+            }
+        });
+    });
+
     // 4. Đồng hồ đếm thời gian tập luyện (Timer) - Tuân thủ 4 trạng thái
     let timerInterval = null;
     let timerSeconds = 0;
@@ -209,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function stopAndFinishTimer() {
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = null;
-        // GIỮ NGUYÊN THỜI GIAN ĐÃ TẬP, KHÔNG RESET VỀ 00:00:00
         updateStatusUI('COMPLETED');
     }
 
@@ -223,7 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updateStatusUI('NOT_STARTED');
     }
 
-    // Sự kiện Nút phụ điều khiển (Bắt đầu tập / Tạm dừng / Tiếp tục)
     if (toggleTimerBtn) {
         toggleTimerBtn.addEventListener('click', function () {
             if (timerState === 'NOT_STARTED' || timerState === 'PAUSED') {
@@ -237,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Nút "Bài tiếp theo"
     if (nextExBtn) {
         nextExBtn.addEventListener('click', function () {
             if (currentWorkout.exercises && currentWorkout.exercises.length > 0) {
@@ -247,7 +333,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Nút "Hoàn thành"
     if (finishExBtn) {
         finishExBtn.addEventListener('click', function () {
             const elapsed = timerSeconds;
@@ -257,17 +342,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Dừng timer và giữ nguyên thời gian
             stopAndFinishTimer();
-
-            // Gửi dữ liệu ghi nhận buổi tập về backend
             saveWorkoutSession(elapsed);
         });
     }
 
-    // 5. Lưu buổi tập vào cơ sở dữ liệu qua Backend API
     function saveWorkoutSession(seconds) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         const durationMinutes = Math.max(1, Math.round(seconds / 60));
 
         const payload = {
@@ -275,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ten_buoi_tap: currentWorkout.title || currentWorkout.type,
             seconds: seconds,
             tong_thoi_luong: durationMinutes,
-            ghi_chu: `Hoàn thành buổi tập ${currentWorkout.type}`
+            ghi_chu: `Hoàn thành buổi tập ${currentWorkout.title || currentWorkout.type}`
         };
 
         fetch(config.completeRoute, {
@@ -295,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(res => {
             if (res.success) {
-                // Cập nhật các KPI thống kê tức thì trên giao diện
                 const kpiDuration = document.getElementById('kpi-duration');
                 const kpiWeek = document.getElementById('kpi-week');
                 const kpiTotal = document.getElementById('kpi-total');
@@ -310,13 +389,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     kpiTotal.innerHTML = `${res.data.tongBuoiTap} <span class="fs-6 fw-normal text-muted">buổi</span>`;
                 }
 
-                // Cập nhật danh sách Hoạt động gần đây
                 addRecentActivityUI(res.data);
-
-                // Cập nhật Heatmap ngày hôm nay
                 updateTodayHeatmap(durationMinutes);
-
-                // Hiển thị thông báo hoàn thành
                 showCompletionToast(durationMinutes);
             }
         })
@@ -326,12 +400,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Cập nhật DOM Hoạt động gần đây sau khi hoàn thành
     function addRecentActivityUI(data) {
         const container = document.getElementById('recent-activities-container');
         if (!container) return;
 
-        // Nếu đang hiển thị Empty State, xóa empty state
         const emptyBox = container.querySelector('.empty-activity-box');
         if (emptyBox) {
             container.innerHTML = '<div class="d-flex flex-column gap-3" id="history-items-list"></div>';
@@ -341,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!historyList) return;
 
         const newHtml = `
-            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border-bottom pb-3 activity-record-item border-primary-subtle bg-primary-subtle-10 animate-fade-in">
+            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border-bottom pb-3 activity-record-item border-primary-subtle bg-primary-subtle-10">
                 <div class="d-flex align-items-center gap-3">
                     <div class="metric-icon-box bg-primary-subtle text-primary">
                         <i class="bi bi-activity"></i>
@@ -359,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function () {
         historyList.insertAdjacentHTML('afterbegin', newHtml);
     }
 
-    // Thông báo Toast hoàn thành buổi tập
     function showCompletionToast(minutes) {
         const alertBox = document.createElement('div');
         alertBox.className = 'alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3';
@@ -381,43 +452,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
-    // Nút Bắt đầu nhanh từ Empty state
     document.getElementById('quick-start-workout-btn')?.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         startTimer();
     });
 
-    // 6. Chuyển đổi Tabs loại buổi tập (Push / Pull / Legs / Khác)
-    workoutTabs.forEach(tab => {
-        tab.addEventListener('click', function () {
-            const newType = this.dataset.type;
-            if (newType !== currentWorkout.type) {
-                currentWorkout.type = newType;
-                currentWorkout.title = `${newType} — Buổi tập hôm nay`;
-                currentExerciseIndex = 0;
-
-                // Nạp bài tập từ kế hoạch DB nếu đã có sẵn
-                const typeKey = newType.toLowerCase();
-                if (config.workoutPlansByType && config.workoutPlansByType[typeKey]) {
-                    const plan = config.workoutPlansByType[typeKey];
-                    currentWorkout.buoiTapId = plan.id;
-                    currentWorkout.title = plan.title;
-                    currentWorkout.exercises = Array.isArray(plan.exercises) ? [...plan.exercises] : [];
-                }
-
-                renderPlayer();
-            }
-        });
-    });
-
-    // 7. Modal Chỉnh sửa / Thêm bài tập (Hỗ trợ Strength + Core + Cardio + Other)
+    // 6. Modal Chỉnh sửa / Thêm bài tập
     const editWorkoutModal = document.getElementById('editWorkoutModal');
     const modalExerciseList = document.getElementById('modal-exercise-list');
     const exerciseCountBadge = document.getElementById('exercise-count-badge');
-    const modalWorkoutType = document.getElementById('modal-workout-type');
+    const modalBuoiTapId = document.getElementById('modal-buoi-tap-id');
     const modalWorkoutTitle = document.getElementById('modal-workout-title');
+    const modalWorkoutDay = document.getElementById('modal-workout-day');
 
-    // Các phần tử input bài tập mới trong modal
     const newExType = document.getElementById('new-ex-type');
     const newExName = document.getElementById('new-ex-name');
     const coreMeasureSelector = document.getElementById('core-measure-selector');
@@ -435,7 +482,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const saveWorkoutSpinner = document.getElementById('save-workout-spinner');
     const saveWorkoutIcon = document.getElementById('save-workout-icon');
 
-    // Chuyển đổi giao diện input tương ứng theo loại bài tập được chọn
     function updateModalFieldVisibility() {
         const type = (newExType ? newExType.value : 'strength').toLowerCase();
 
@@ -456,7 +502,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (newExDuration) newExDuration.placeholder = 'Thời lượng (VD: 30)';
             if (newExUnit) newExUnit.value = 'phut';
         } else {
-            // Core hoặc Other
             coreMeasureSelector?.classList.remove('d-none');
             const isDurationMode = modeDuration && modeDuration.checked;
             if (isDurationMode) {
@@ -477,17 +522,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    if (newExType) {
-        newExType.addEventListener('change', updateModalFieldVisibility);
-    }
-    if (modeReps) {
-        modeReps.addEventListener('change', updateModalFieldVisibility);
-    }
-    if (modeDuration) {
-        modeDuration.addEventListener('change', updateModalFieldVisibility);
-    }
+    if (newExType) newExType.addEventListener('change', updateModalFieldVisibility);
+    if (modeReps) modeReps.addEventListener('change', updateModalFieldVisibility);
+    if (modeDuration) modeDuration.addEventListener('change', updateModalFieldVisibility);
 
-    // Render danh sách bài tập bên trong Modal
     function renderModalList() {
         if (!modalExerciseList) return;
         modalExerciseList.innerHTML = '';
@@ -509,7 +547,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const type = (ex.type || 'strength').toLowerCase();
             const metricText = formatExerciseMetric(ex);
 
-            // Badge loại bài tập
             let typeBadgeHtml = '';
             if (type === 'cardio') {
                 typeBadgeHtml = '<span class="badge badge-type-cardio rounded-pill px-2 py-1 fs-8">Cardio</span>';
@@ -535,12 +572,10 @@ document.addEventListener('DOMContentLoaded', function () {
             modalExerciseList.appendChild(row);
         });
 
-        // Gán sự kiện xóa & re-index tự động
         modalExerciseList.querySelectorAll('.delete-modal-ex-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const idx = parseInt(this.dataset.index);
                 editingWorkout.exercises.splice(idx, 1);
-                // Cập nhật lại số thứ tự (thu_tu)
                 editingWorkout.exercises.forEach((item, i) => {
                     item.order = i + 1;
                 });
@@ -553,12 +588,12 @@ document.addEventListener('DOMContentLoaded', function () {
         editWorkoutModal.addEventListener('show.bs.modal', function () {
             editingWorkout = JSON.parse(JSON.stringify(currentWorkout));
 
-            if (modalWorkoutType) modalWorkoutType.value = editingWorkout.type || 'Push';
+            if (modalBuoiTapId) modalBuoiTapId.value = editingWorkout.buoiTapId || '';
             if (modalWorkoutTitle) modalWorkoutTitle.value = editingWorkout.title || '';
+            if (modalWorkoutDay) modalWorkoutDay.value = editingWorkout.ngayTrongTuan || '';
 
             renderModalList();
 
-            // Reset form thêm bài
             if (newExType) newExType.value = 'strength';
             if (newExName) newExName.value = '';
             if (newExSets) newExSets.value = '3';
@@ -571,7 +606,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Nút thêm bài trong modal
     document.getElementById('add-exercise-btn')?.addEventListener('click', function () {
         const type = (newExType ? newExType.value : 'strength').toLowerCase();
         const name = newExName?.value.trim();
@@ -620,7 +654,6 @@ document.addEventListener('DOMContentLoaded', function () {
             newExercise.duration = duration;
             newExercise.duration_unit = newExUnit?.value || 'phut';
         } else {
-            // Core hoặc Other
             const isDurationMode = modeDuration && modeDuration.checked;
             if (isDurationMode) {
                 const duration = parseInt(newExDuration?.value.trim());
@@ -647,31 +680,32 @@ document.addEventListener('DOMContentLoaded', function () {
         editingWorkout.exercises.push(newExercise);
         renderModalList();
 
-        // Reset ô tên bài tập và focus để người dùng nhập bài tiếp theo nhanh chóng
         if (newExName) {
             newExName.value = '';
             newExName.focus();
         }
     });
 
-    // Nút "Áp dụng vào buổi tập" - Lưu bền vững vào cơ sở dữ liệu (Database Persistence)
+    // Nút "Lưu & Áp dụng bài tập"
     if (saveWorkoutBtn) {
         saveWorkoutBtn.addEventListener('click', function () {
-            if (modalWorkoutType) editingWorkout.type = modalWorkoutType.value;
-            if (modalWorkoutTitle) {
-                const titleVal = modalWorkoutTitle.value.trim();
-                editingWorkout.title = titleVal || `${editingWorkout.type} — Buổi tập hôm nay`;
+            const titleVal = modalWorkoutTitle ? modalWorkoutTitle.value.trim() : '';
+            if (titleVal) {
+                editingWorkout.title = titleVal;
+                editingWorkout.type = titleVal;
             }
 
-            // Hiển thị trạng thái đang lưu
+            const dayVal = modalWorkoutDay ? modalWorkoutDay.value : '';
+            const dayInt = dayVal ? parseInt(dayVal) : null;
+
             saveWorkoutBtn.disabled = true;
             saveWorkoutSpinner?.classList.remove('d-none');
             saveWorkoutIcon?.classList.add('d-none');
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const payload = {
                 buoi_tap_id: editingWorkout.buoiTapId,
-                ten_buoi_tap: editingWorkout.title,
+                ten_buoi_tap: editingWorkout.title || 'Buổi rèn luyện',
+                ngay_trong_tuan: dayInt,
                 exercises: editingWorkout.exercises || []
             };
 
@@ -694,29 +728,28 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(res => {
                 if (res.success && res.data) {
-                    // Cập nhật state với dữ liệu chuẩn hóa từ server
                     currentWorkout.buoiTapId = res.data.buoi_tap_id;
                     currentWorkout.title = res.data.ten_buoi_tap;
-                    currentWorkout.type = editingWorkout.type;
+                    currentWorkout.type = res.data.ten_buoi_tap;
+                    currentWorkout.ngayTrongTuan = res.data.ngay_trong_tuan;
                     currentWorkout.exercises = res.data.exercises || [];
 
-                    // Cập nhật bộ nhớ cache theo loại buổi tập
-                    const typeKey = currentWorkout.type.toLowerCase();
-                    if (!config.workoutPlansByType) config.workoutPlansByType = {};
-                    config.workoutPlansByType[typeKey] = {
-                        id: res.data.buoi_tap_id,
-                        title: res.data.ten_buoi_tap,
-                        exercises: res.data.exercises || []
-                    };
+                    if (config.buoiTapList) {
+                        const existing = config.buoiTapList.find(b => b.id === currentWorkout.buoiTapId);
+                        if (existing) {
+                            existing.title = currentWorkout.title;
+                            existing.exercises = currentWorkout.exercises;
+                            existing.ngay_trong_tuan = currentWorkout.ngayTrongTuan;
+                            existing.ten_thu = res.data.ten_thu;
+                        }
+                    }
 
                     currentExerciseIndex = 0;
                     renderPlayer();
 
-                    // Đóng modal
                     const bsModal = bootstrap.Modal.getInstance(editWorkoutModal);
                     if (bsModal) bsModal.hide();
 
-                    // Hiển thị toast thành công
                     showWorkoutSavedToast(res.message);
                 }
             })
@@ -732,7 +765,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Toast thông báo lưu thành công
     function showWorkoutSavedToast(msg) {
         const alertBox = document.createElement('div');
         alertBox.className = 'alert alert-primary alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3';
@@ -741,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill text-primary fs-4"></i>
                 <div>
-                    <strong class="d-block">Đã cập nhật buổi tập!</strong>
+                    <strong class="d-block">Đã cập nhật bài tập!</strong>
                     <small>${msg}</small>
                 </div>
             </div>
@@ -754,7 +786,161 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     }
 
-    // 8. Sinh Lịch tập Heatmap (Calendar) từ DỮ LIỆU THẬT DATABASE
+    // 7. QUẢN LÝ LỊCH TẬP & KẾ HOẠCH (MANAGE SCHEDULE MODAL ACTIONS)
+    document.getElementById('btn-add-session')?.addEventListener('click', function () {
+        const nameInput = document.getElementById('new-session-name');
+        const daySelect = document.getElementById('new-session-day');
+        const name = nameInput?.value.trim();
+        const dayVal = daySelect?.value;
+
+        if (!name) {
+            alert('Vui lòng nhập tên buổi tập (VD: Upper Body, Legs...).');
+            nameInput?.focus();
+            return;
+        }
+
+        const payload = {
+            ke_hoach_tap_luyen_id: config.activePlanId,
+            ten_buoi_tap: name,
+            ngay_trong_tuan: dayVal ? parseInt(dayVal) : null,
+        };
+
+        fetch(config.createSessionRoute || '/tap-luyen/buoi-tap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken || ''
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Không thể thêm buổi tập: ' + (data.message || 'Lỗi'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Lỗi kết nối máy chủ: ' + err.message);
+        });
+    });
+
+    document.querySelectorAll('.btn-delete-session').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            if (!confirm('Bạn có chắc chắn muốn xóa buổi tập này khỏi kế hoạch?')) return;
+
+            fetch(`${config.deleteSessionUrl || '/tap-luyen/buoi-tap'}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => alert('Lỗi: ' + err.message));
+        });
+    });
+
+    document.getElementById('btn-create-plan')?.addEventListener('click', function () {
+        const nameInput = document.getElementById('new-plan-name');
+        const descInput = document.getElementById('new-plan-desc');
+        const name = nameInput?.value.trim();
+
+        if (!name) {
+            alert('Vui lòng nhập tên kế hoạch mới.');
+            nameInput?.focus();
+            return;
+        }
+
+        const payload = {
+            ten_ke_hoach: name,
+            mo_ta: descInput?.value.trim() || null,
+            is_active: true
+        };
+
+        fetch(config.createPlanRoute || '/tap-luyen/ke-hoach', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken || ''
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Không thể tạo kế hoạch: ' + (data.message || 'Lỗi'));
+            }
+        })
+        .catch(err => alert('Lỗi kết nối: ' + err.message));
+    });
+
+    document.querySelectorAll('.btn-activate-plan').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            fetch(`${config.activatePlanUrl || '/tap-luyen/ke-hoach'}/${id}/kich-hoat`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => alert('Lỗi: ' + err.message));
+        });
+    });
+
+    document.querySelectorAll('.btn-delete-plan').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            if (!confirm('Bạn có chắc chắn muốn xóa kế hoạch này? Các buổi tập thuộc kế hoạch cũng sẽ bị xóa.')) return;
+
+            fetch(`${config.deletePlanUrl || '/tap-luyen/ke-hoach'}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => alert('Lỗi: ' + err.message));
+        });
+    });
+
+    // 8. Sinh Lịch tập Heatmap từ DB thật
     let viewMonth = config.currentMonth;
     let viewYear = config.currentYear;
     const heatmapData = config.monthlyHeatmap || {};
@@ -784,31 +970,26 @@ document.addEventListener('DOMContentLoaded', function () {
             monthTitle.textContent = `Tháng ${month}, ${year}`;
         }
 
-        // Giữ lại 7 thẻ tiêu đề ngày đầu tuần (T2 - CN)
         const headers = Array.from(grid.children).slice(0, 7);
         grid.innerHTML = '';
         headers.forEach(h => grid.appendChild(h));
 
-        // Tính ngày đầu tháng rơi vào thứ mấy (Thứ 2 = 1, ..., CN = 7)
         const firstDay = new Date(year, month - 1, 1);
-        let startDayOfWeek = firstDay.getDay(); // 0 = CN, 1 = T2
-        if (startDayOfWeek === 0) startDayOfWeek = 7; // Chuyển CN về cuối tuần (7)
+        let startDayOfWeek = firstDay.getDay();
+        if (startDayOfWeek === 0) startDayOfWeek = 7;
 
         const daysInMonth = new Date(year, month, 0).getDate();
 
-        // 1. Render các ô trống trước ngày 1 của tháng
         for (let i = 1; i < startDayOfWeek; i++) {
             const blankCell = document.createElement('div');
             blankCell.className = 'calendar-heatmap-cell cell-empty';
             grid.appendChild(blankCell);
         }
 
-        // 2. Render các ngày trong tháng
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
             cell.className = 'calendar-heatmap-cell';
 
-            // Định dạng YYYY-MM-DD
             const monthStr = month.toString().padStart(2, '0');
             const dayStr = day.toString().padStart(2, '0');
             const dateKey = `${year}-${monthStr}-${dayStr}`;
@@ -828,7 +1009,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 cell.title = `Ngày ${day}/${month}: Chưa có hoạt động tập luyện`;
             }
 
-            // Đánh dấu ngày hôm nay
             const today = new Date();
             if (today.getFullYear() === year && (today.getMonth() + 1) === month && today.getDate() === day) {
                 cell.classList.add('today-cell');
@@ -850,11 +1030,9 @@ document.addEventListener('DOMContentLoaded', function () {
         heatmapData[dateKey].count += 1;
         heatmapData[dateKey].duration += newMinutes;
 
-        // Render lại calendar tháng hiện tại
         generateCalendar(viewMonth, viewYear);
     }
 
-    // Điều hướng tháng của Calendar
     document.getElementById('prev-month-btn')?.addEventListener('click', function () {
         viewMonth--;
         if (viewMonth < 1) {
@@ -873,12 +1051,10 @@ document.addEventListener('DOMContentLoaded', function () {
         generateCalendar(viewMonth, viewYear);
     });
 
-    // Bật/tắt Sidebar trên màn hình di động
     document.getElementById('sidebarToggle')?.addEventListener('click', function () {
         document.getElementById('sidebar')?.classList.toggle('show');
     });
 
-    // Khởi chạy ban đầu
     renderPlayer();
     updateStatusUI('NOT_STARTED');
     generateCalendar(viewMonth, viewYear);

@@ -17,7 +17,7 @@ class BaiTapApiController extends Controller
         return response()->json([
             'success' => true,
             'data' => $danhSach
-        ], 200);
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -41,7 +41,7 @@ class BaiTapApiController extends Controller
             'success' => true,
             'message' => 'Thêm bài tập thành công!',
             'data'    => $baiTap
-        ], 201);
+        ], 201, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -55,13 +55,13 @@ class BaiTapApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Không tìm thấy bài tập'
-            ], 404);
+            ], 404, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
 
         return response()->json([
             'success' => true,
             'data'    => $baiTap
-        ], 200);
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -75,7 +75,7 @@ class BaiTapApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Không tìm thấy bài tập'
-            ], 404);
+            ], 404, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
 
         $validated = $request->validate([
@@ -89,7 +89,7 @@ class BaiTapApiController extends Controller
             'success' => true,
             'message' => 'Cập nhật thành công!',
             'data'    => $baiTap
-        ], 200);
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -103,7 +103,7 @@ class BaiTapApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Không tìm thấy bài tập'
-            ], 404);
+            ], 404, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
 
         $baiTap->delete();
@@ -111,6 +111,6 @@ class BaiTapApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Xóa bài tập thành công!'
-        ], 200);
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 }
