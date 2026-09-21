@@ -42,9 +42,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Xử lý bật/tắt Sidebar trên thiết bị di động
+        // Xử lý bật/tắt Sidebar Offcanvas trên thiết bị di động & tablet (< 992px)
         document.getElementById('sidebarToggle')?.addEventListener('click', function () {
-            document.getElementById('sidebar')?.classList.toggle('show');
+            const offcanvasEl = document.getElementById('sidebarOffcanvas');
+            if (offcanvasEl && typeof bootstrap !== 'undefined') {
+                const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+                bsOffcanvas.toggle();
+            }
         });
     </script>
     @stack('scripts')

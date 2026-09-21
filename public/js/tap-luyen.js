@@ -1052,7 +1052,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('sidebarToggle')?.addEventListener('click', function () {
-        document.getElementById('sidebar')?.classList.toggle('show');
+        const offcanvasEl = document.getElementById('sidebarOffcanvas');
+        if (offcanvasEl && typeof bootstrap !== 'undefined') {
+            const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+            bsOffcanvas.toggle();
+        }
     });
 
     renderPlayer();

@@ -440,20 +440,18 @@ html, body {
 }
 
 /* ==========================================================================
-   4. RESPONSIVE (MOBILE & TABLET)
+   4. RESPONSIVE (MOBILE & TABLET < 992px)
    ========================================================================== */
 @media (max-width: 991.98px) {
     html, body {
         overflow: auto; /* Cho phép cuộn trang trên mobile */
     }
-    .sidebar {
-        margin-left: calc(-1 * var(--sidebar-width));
-    }
-    .sidebar.show {
-        margin-left: 0;
+    aside.sidebar {
+        display: none !important; /* Cuộn ẩn sidebar cố định thành nút menu */
     }
     .main-wrapper {
-        margin-left: 0;
+        margin-left: 0 !important;
+        width: 100% !important;
         height: auto;
         min-height: 100vh;
     }
@@ -463,4 +461,5 @@ html, body {
         padding: 1.25rem 1rem;
     }
 }
+
 

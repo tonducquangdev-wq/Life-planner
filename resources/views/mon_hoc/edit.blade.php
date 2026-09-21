@@ -25,8 +25,8 @@
         <!-- HEADER -->
         <header class="top-header">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none p-1 px-2 border" id="sidebarToggle">
-                    <i class="bi bi-list fs-4"></i>
+                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                    <i class="bi bi-list fs-4 text-primary"></i>
                 </button>
                 <h5 class="fw-bold text-dark mb-0">Chỉnh sửa môn học</h5>
             </div>

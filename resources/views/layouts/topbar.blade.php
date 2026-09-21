@@ -3,9 +3,9 @@
      ========================================================================== -->
 <header class="top-header">
     <div class="d-flex align-items-center gap-3">
-        <!-- Nút bật/tắt Sidebar trên mobile -->
-        <button class="btn btn-light d-lg-none p-1 px-2 border" id="sidebarToggle" type="button" aria-label="Toggle Sidebar">
-            <i class="bi bi-list fs-4"></i>
+        <!-- Nút bật/tắt Sidebar trên mobile & tablet (< 992px) -->
+        <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" aria-label="Toggle Sidebar">
+            <i class="bi bi-list fs-4 text-primary"></i>
         </button>
 
         @if(!empty($title))
