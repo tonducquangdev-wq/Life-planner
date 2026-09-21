@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CALENDAR FIRST MODULE CSS - LIFE PLANNER (MODERN DASHBOARD & CALENDAR)
+   CALENDAR FIRST MODULE CSS - LIFE PLANNER (CHUẨN ĐỒ ÁN)
    ========================================================================== */
 
 :root {
@@ -8,35 +8,43 @@
     --card-radius: 20px;
     --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
     --card-shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.09);
-    
-    /* Event Colors */
-    --event-blue-bg: #dbeafe;
-    --event-blue-text: #1e40af;
-    --event-blue-border: #bfdbfe;
 
-    --event-orange-bg: #ffedd5;
+    /* 4 TÔNG MÀU CHUẨN ĐÃ CHỐT */
+    /* 1. Lịch học: Xanh dương (#3b82f6) */
+    --event-blue-bg: #eff6ff;
+    --event-blue-text: #1d4ed8;
+    --event-blue-border: #bfdbfe;
+    --event-blue-dot: #3b82f6;
+
+    /* 2. Lịch tập: Xanh lá (#22c55e) */
+    --event-green-bg: #f0fdf4;
+    --event-green-text: #15803d;
+    --event-green-border: #bbf7d0;
+    --event-green-dot: #22c55e;
+
+    /* 3. Deadline: Cam (#f97316) */
+    --event-orange-bg: #fff7ed;
     --event-orange-text: #c2410c;
     --event-orange-border: #fed7aa;
+    --event-orange-dot: #f97316;
 
-    --event-green-bg: #d1fae5;
-    --event-green-text: #065f46;
-    --event-green-border: #a7f3d0;
-
-    --event-purple-bg: #f3e8ff;
-    --event-purple-text: #6b21a8;
+    /* 4. Sự kiện cá nhân: Tím (#a855f7) */
+    --event-purple-bg: #faf5ff;
+    --event-purple-text: #7e22ce;
     --event-purple-border: #e9d5ff;
+    --event-purple-dot: #a855f7;
 }
 
 /* ==========================================================================
-   1. LEGEND BADGES & FILTER BUTTONS (NÚT LỌC SỰ KIỆN)
+   1. LEGEND BADGES & NÚT LỌC MÀU SỰ KIỆN (MULTI-SELECT FILTER)
    ========================================================================== */
 .legend-pill, .legend-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     border: 1.5px solid transparent;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -54,10 +62,29 @@
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
-.legend-pill.hoc-tap, .legend-btn.hoc-tap { background-color: var(--event-blue-bg); color: var(--event-blue-text); }
-.legend-pill.deadline, .legend-btn.deadline { background-color: var(--event-orange-bg); color: var(--event-orange-text); }
-.legend-pill.tap-luyen, .legend-btn.tap-luyen { background-color: var(--event-green-bg); color: var(--event-green-text); }
-.legend-pill.ca-nhan, .legend-btn.ca-nhan { background-color: var(--event-purple-bg); color: var(--event-purple-text); }
+.legend-pill.hoc-tap, .legend-btn.hoc-tap {
+    background-color: var(--event-blue-bg);
+    color: var(--event-blue-text);
+    border-color: var(--event-blue-border);
+}
+
+.legend-pill.tap-luyen, .legend-btn.tap-luyen {
+    background-color: var(--event-green-bg);
+    color: var(--event-green-text);
+    border-color: var(--event-green-border);
+}
+
+.legend-pill.deadline, .legend-btn.deadline {
+    background-color: var(--event-orange-bg);
+    color: var(--event-orange-text);
+    border-color: var(--event-orange-border);
+}
+
+.legend-pill.ca-nhan, .legend-btn.ca-nhan {
+    background-color: var(--event-purple-bg);
+    color: var(--event-purple-text);
+    border-color: var(--event-purple-border);
+}
 
 .legend-btn.active[data-filter="all"] {
     background-color: #4f46e5;
@@ -73,26 +100,25 @@
     transform: scale(1.05);
 }
 
-/* Khi một bộ lọc được chọn, làm mờ nhẹ các nút khác */
 .filter-active .legend-btn:not(.active) {
     opacity: 0.45;
-    filter: grayscale(25%);
+    filter: grayscale(30%);
     transform: scale(0.96);
 }
 
 .legend-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     display: inline-block;
 }
-.hoc-tap .legend-dot { background-color: #2563eb; }
-.deadline .legend-dot { background-color: #ea580c; }
-.tap-luyen .legend-dot { background-color: #059669; }
-.ca-nhan .legend-dot { background-color: #9333ea; }
+.hoc-tap .legend-dot { background-color: var(--event-blue-dot); }
+.tap-luyen .legend-dot { background-color: var(--event-green-dot); }
+.deadline .legend-dot { background-color: var(--event-orange-dot); }
+.ca-nhan .legend-dot { background-color: var(--event-purple-dot); }
 
 /* ==========================================================================
-   2. MONTHLY CALENDAR GRID (LƯỚI LỊCH THÁNG LỚN)
+   2. LƯỚI LỊCH THÁNG LỚN (MONTHLY CALENDAR GRID)
    ========================================================================== */
 .calendar-grid-container {
     display: grid;
@@ -110,7 +136,7 @@
     font-weight: 700;
     font-size: 0.85rem;
     text-align: center;
-    padding: 10px 0;
+    padding: 12px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -121,13 +147,14 @@
 
 .calendar-day-cell {
     background-color: #ffffff;
-    min-height: 120px;
+    min-height: 125px;
     padding: 8px 6px;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
     position: relative;
+    cursor: pointer;
 }
 
 .calendar-day-cell:hover {
@@ -152,7 +179,7 @@
 }
 
 .day-number {
-    font-size: 0.875rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: #334155;
     width: 26px;
@@ -163,16 +190,16 @@
     justify-content: center;
 }
 
-/* HIGHLIGHT NGÀY HIỆN TẠI (TODAY) */
+/* NỔI BẬT NGÀY HIỆN TẠI (TODAY HIGHLIGHT) */
 .calendar-day-cell.is-today {
-    background-color: rgba(99, 102, 241, 0.04);
-    box-shadow: inset 0 0 0 2px #6366f1;
+    background-color: rgba(99, 102, 241, 0.05);
+    box-shadow: inset 0 0 0 2px #4f46e5;
 }
 
 .calendar-day-cell.is-today .day-number {
     background-color: #4f46e5;
     color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
 }
 
 .today-tag {
@@ -185,7 +212,7 @@
 }
 
 /* ==========================================================================
-   3. EVENT PILLS (NHÃN SỰ KIỆN TRONG Ô NGÀY)
+   3. EVENT PILLS (THẺ SỰ KIỆN TRONG Ô NGÀY)
    ========================================================================== */
 .event-pill-list {
     display: flex;
@@ -197,14 +224,14 @@
 .event-pill {
     font-size: 0.72rem;
     font-weight: 600;
-    padding: 3px 6px;
+    padding: 3px 7px;
     border-radius: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     cursor: pointer;
     transition: transform 0.15s ease, filter 0.15s ease;
     border: 1px solid transparent;
@@ -221,16 +248,16 @@
     border-color: var(--event-blue-border);
 }
 
-.event-pill.deadline {
-    background-color: var(--event-orange-bg);
-    color: var(--event-orange-text);
-    border-color: var(--event-orange-border);
-}
-
 .event-pill.tap-luyen {
     background-color: var(--event-green-bg);
     color: var(--event-green-text);
     border-color: var(--event-green-border);
+}
+
+.event-pill.deadline {
+    background-color: var(--event-orange-bg);
+    color: var(--event-orange-text);
+    border-color: var(--event-orange-border);
 }
 
 .event-pill.ca-nhan {
@@ -242,7 +269,7 @@
 .event-more-pill {
     font-size: 0.7rem;
     font-weight: 700;
-    color: #64748b;
+    color: #475569;
     background-color: #f1f5f9;
     padding: 2px 6px;
     border-radius: 6px;
@@ -257,7 +284,7 @@
 }
 
 /* ==========================================================================
-   4. RIGHT COLUMN CARDS (CỘT BÊN PHẢI 25%)
+   4. CARDS CỘT PHẢI (SUMMARY & SCHEDULE)
    ========================================================================== */
 .side-card {
     background-color: #ffffff;
@@ -290,50 +317,84 @@
     gap: 8px;
 }
 
-/* LỊCH TRÌNH HÔM NAY ITEM */
 .schedule-item {
     padding: 0.75rem 0.85rem;
     border-radius: 12px;
     background-color: #f8fafc;
     margin-bottom: 0.6rem;
-    border-left: 3px solid #6366f1;
+    border-left: 3.5px solid #6366f1;
     transition: all 0.2s ease;
 }
 
-.schedule-item:last-child {
-    margin-bottom: 0;
-}
+.schedule-item.hoc-tap { border-left-color: #3b82f6; }
+.schedule-item.tap-luyen { border-left-color: #22c55e; }
+.schedule-item.deadline { border-left-color: #f97316; }
+.schedule-item.ca-nhan { border-left-color: #a855f7; }
 
 .schedule-item:hover {
     background-color: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* THỐNG KÊ NHANH ITEM */
-.quick-stat-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 0.9rem;
-    border-radius: 12px;
-    background-color: #f8fafc;
-    margin-bottom: 0.6rem;
+/* ==========================================================================
+   5. BOOTSTRAP MODAL PHÂN LOẠI 4 TAB
+   ========================================================================== */
+.modal-custom .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
-.quick-stat-row:last-child {
-    margin-bottom: 0;
+.modal-custom .modal-header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-custom .nav-pills .nav-link {
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.modal-custom .nav-pills .nav-link.active.tab-hoc-tap {
+    background-color: var(--event-blue-dot);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.modal-custom .nav-pills .nav-link.active.tab-tap-luyen {
+    background-color: var(--event-green-dot);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+}
+
+.modal-custom .nav-pills .nav-link.active.tab-deadline {
+    background-color: var(--event-orange-dot);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+}
+
+.modal-custom .nav-pills .nav-link.active.tab-ca-nhan {
+    background-color: var(--event-purple-dot);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35);
 }
 
 /* ==========================================================================
-   5. RESPONSIVE DESIGN (TABLET & MOBILE)
+   6. RESPONSIVE DESIGN (DESKTOP & MOBILE)
    ========================================================================== */
 @media (max-width: 1199.98px) {
     .calendar-day-cell {
-        min-height: 100px;
+        min-height: 105px;
     }
     .event-pill {
         font-size: 0.68rem;
-        padding: 2px 4px;
+        padding: 2px 5px;
     }
 }
 

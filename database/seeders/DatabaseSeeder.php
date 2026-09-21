@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MonHocSeeder::class,
+            LichHocSeeder::class,
             BaiTapSeeder::class,
             KeHoachTapLuyenSeeder::class,
             BuoiTapSeeder::class,

@@ -1,5 +1,5 @@
 <!-- ==========================================================================
-     SIDEBAR MENU BÊN TRÁI - LIFE PLANNER
+     SIDEBAR MENU BÊN TRÁI - LIFE PLANNER (CHỈ 4 MENU CHÍNH)
      ========================================================================== -->
 <aside class="sidebar" id="sidebar">
     <!-- Logo thương hiệu -->
@@ -8,54 +8,36 @@
         <span>Life Planner</span>
     </div>
 
-    <!-- Danh sách menu điều hướng chính -->
+    <!-- Danh sách menu điều hướng chuẩn 4 mục -->
     <ul class="sidebar-menu">
-        <!-- 1. Tổng quan (Dashboard) -->
-        <li class="nav-item">
-            <a href="{{ route('dashboard') }}" 
-               class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2-fill"></i>
-                <span>Tổng quan</span>
-            </a>
-        </li>
-
-        <!-- 2. Lịch (Module chính - Calendar) -->
+        <!-- 1. Lịch (Màn hình chính Calendar First) -->
         <li class="nav-item">
             <a href="{{ route('calendar.index') }}" 
-               class="nav-link {{ request()->routeIs('calendar.*') || request()->routeIs('lich.*') ? 'active' : '' }}">
+               class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar3"></i>
                 <span>Lịch</span>
             </a>
         </li>
 
-        <!-- 3. Học tập (Môn học & Bài tập) -->
+        <!-- 2. Báo cáo học tập -->
         <li class="nav-item">
-            <a href="{{ route('mon-hoc.index') }}" 
-               class="nav-link {{ request()->routeIs('mon-hoc.*') || request()->routeIs('bai-tap.*') ? 'active' : '' }}">
-                <i class="bi bi-book-half"></i>
-                <span>Học tập</span>
+            <a href="{{ Route::has('bao-cao-hoc-tap.index') ? route('bao-cao-hoc-tap.index') : '#' }}" 
+               class="nav-link {{ request()->routeIs('bao-cao-hoc-tap.*') ? 'active' : '' }}">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span>Báo cáo học tập</span>
             </a>
         </li>
 
-        <!-- 4. Thể chất (Bài tập & Kế hoạch) -->
+        <!-- 3. Báo cáo tập luyện -->
         <li class="nav-item">
-            <a href="{{ route('tap-luyen.index') }}" 
-               class="nav-link {{ request()->routeIs('tap-luyen.*') || request()->routeIs('the-chat.*') || request()->routeIs('buoi-tap.*') ? 'active' : '' }}">
+            <a href="{{ Route::has('bao-cao-tap-luyen.index') ? route('bao-cao-tap-luyen.index') : '#' }}" 
+               class="nav-link {{ request()->routeIs('bao-cao-tap-luyen.*') ? 'active' : '' }}">
                 <i class="bi bi-activity"></i>
-                <span>Thể chất</span>
+                <span>Báo cáo tập luyện</span>
             </a>
         </li>
 
-        <!-- 5. Mục tiêu -->
-        <li class="nav-item">
-            <a href="#" 
-               class="nav-link {{ request()->routeIs('muc-tieu.*') ? 'active' : '' }}">
-                <i class="bi bi-trophy-fill"></i>
-                <span>Mục tiêu</span>
-            </a>
-        </li>
-
-        <!-- 6. Hồ sơ cá nhân -->
+        <!-- 4. Hồ sơ cá nhân -->
         <li class="nav-item">
             <a href="{{ route('profile.edit') }}" 
                class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -63,15 +45,5 @@
                 <span>Hồ sơ</span>
             </a>
         </li>
-
-        <!-- 7. Cài đặt hệ thống -->
-        <li class="nav-item">
-            <a href="#" 
-               class="nav-link {{ request()->routeIs('settings.*') || request()->routeIs('cai-dat.*') ? 'active' : '' }}">
-                <i class="bi bi-gear-wide-connected"></i>
-                <span>Cài đặt</span>
-            </a>
-        </li>
     </ul>
 </aside>
-

@@ -47,4 +47,9 @@ class MonHoc extends Model
     {
         return $this->hasMany(BaiTap::class);
     }
+
+    public function lichHocs()
+    {
+        return $this->hasMany(LichHoc::class, 'mon_hoc_id');
+    }
 }

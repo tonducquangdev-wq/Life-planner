@@ -90,6 +90,11 @@ class User extends Authenticatable
         return $this->hasMany(MonHoc::class);
     }
 
+    public function lichHocs()
+    {
+        return $this->hasMany(LichHoc::class);
+    }
+
     public function suKiens()
     {
         return $this->hasMany(SuKien::class);
