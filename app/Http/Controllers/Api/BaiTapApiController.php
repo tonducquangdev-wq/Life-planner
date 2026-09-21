@@ -13,7 +13,7 @@ class BaiTapApiController extends Controller
      */
     public function index()
     {
-        $danhSach = BaiTap::all();
+        $danhSach = BaiTap::with('monHoc')->get();
         return response()->json([
             'success' => true,
             'data' => $danhSach
@@ -27,8 +27,12 @@ class BaiTapApiController extends Controller
     {
         // Validate dữ liệu đầu vào
         $validated = $request->validate([
+            'mon_hoc_id' => 'required|exists:mon_hoc,id',
             'tieu_de' => 'required|string|max:255',
             'mo_ta'       => 'nullable|string',
+            'han_nop' => 'required|date',
+            'muc_do_uu_tien' => 'nullable|in:thap,trung_binh,cao',
+            'trang_thai' => 'nullable|in:chua_hoan_thanh,dang_thuc_hien,da_hoan_thanh',
         ]);
 
         $baiTap = BaiTap::create($validated);
