@@ -3,6 +3,7 @@
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuKienController;
 use App\Http\Controllers\TapLuyenController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,13 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    
+    // CRUD Sự kiện Lịch (Bảng su_kien)
+    Route::get('/calendar/events', [SuKienController::class, 'index'])->name('calendar.events.index');
+    Route::post('/calendar/events', [SuKienController::class, 'store'])->name('calendar.events.store');
+    Route::put('/calendar/events/{id}', [SuKienController::class, 'update'])->name('calendar.events.update');
+    Route::delete('/calendar/events/{id}', [SuKienController::class, 'destroy'])->name('calendar.events.destroy');
+
     Route::get('/bao-cao-hoc-tap', [MonHocController::class, 'baoCaoHocTap'])->name('bao-cao-hoc-tap.index');
     Route::resource('mon-hoc', MonHocController::class);
 

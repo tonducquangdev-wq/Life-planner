@@ -1,87 +1,18 @@
 /* ==========================================================================
-   LIFE PLANNER - CALENDAR FIRST MODULE (VANILLA JS ENGINE)
+   LIFE PLANNER - CALENDAR MODULE (REAL DATABASE & FETCH API CRUD ENGINE)
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     // ==========================================================================
-    // 1. STATE DỮ LIỆN LỊCH CHÍNH (MASTER CALENDAR EVENTS DATA STORE)
+    // 1. STATE & CHỈ SỐ THỜI GIAN
     // ==========================================================================
-    let eventsList = [
-        // Ngày 1
-        { id: 101, day: 1, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 2
-        { id: 102, day: 2, isCurrentMonth: true, type: 'ca-nhan', title: 'Nghỉ lễ Quốc Khánh 2/9', time: '08:00', startTime: '08:00', endTime: '', location: 'Gia đình', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 3
-        { id: 103, day: 3, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:30 Cơ sở dữ liệu nâng cao', time: '14:00 - 16:30', startTime: '14:00', endTime: '16:30', location: 'Phòng A1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        { id: 104, day: 3, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 5
-        { id: 105, day: 5, isCurrentMonth: true, type: 'tap-luyen', title: '09:00 - 10:00 Chạy bộ 5km công viên', time: '09:00 - 10:00', startTime: '09:00', endTime: '10:00', location: 'Công viên Gia Định', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 7
-        { id: 106, day: 7, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 8
-        { id: 107, day: 8, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Lưng Tay Trước Abs', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 9
-        { id: 108, day: 9, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp đồ án PHP & MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'Hệ thống LMS', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 1 },
-
-        // Ngày 10
-        { id: 109, day: 10, isCurrentMonth: true, type: 'hoc-tap', title: '13:30 - 16:00 Kiểm thử phần mềm', time: '13:30 - 16:00', startTime: '13:30', endTime: '16:00', location: 'Phòng C3.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 11
-        { id: 110, day: 11, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Tập Leg Day Chân Bắp Chân', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        
-        // Ngày 12
-        { id: 111, day: 12, isCurrentMonth: true, type: 'ca-nhan', title: '19:00 - 22:00 Sinh nhật bạn thân', time: '19:00 - 22:00', startTime: '19:00', endTime: '22:00', location: 'Nhà hàng BBQ', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 14 (HÔM NAY - CÓ 6 SỰ KIỆN ĐỂ TEST ĐỦ VIỆC "+3 KHÁC")
-        { id: 1, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04 • Thầy Nguyễn Văn A', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        { id: 2, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '14:00 - 15:30 Họp nhóm Đồ án Life Planner', time: '14:00 - 15:30', startTime: '14:00', endTime: '15:30', location: 'Google Meet', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
-        { id: 3, day: 14, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau (Chest & Shoulders)', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center • Bench Press 4x10', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        { id: 4, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '21:00 - 22:00 Đọc sách Clean Code & Refactoring', time: '21:00 - 22:00', startTime: '21:00', endTime: '22:00', location: 'Phòng đọc sách', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-        { id: 5, day: 14, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Lab 4 PHP Laravel', time: '23:59', startTime: '23:59', endTime: '', location: 'Nộp trên Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 1 },
-        { id: 6, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '23:59 Ôn tập Kiểm thử phần mềm', time: '23:59', startTime: '23:59', endTime: '', location: 'Tự học online', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 15
-        { id: 112, day: 15, isCurrentMonth: true, type: 'hoc-tap', title: '10:00 - 11:30 Học Tiếng Anh Chuyên Ngành', time: '10:00 - 11:30', startTime: '10:00', endTime: '11:30', location: 'Phòng C1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 16
-        { id: 113, day: 16, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp bài tập CSDL MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'LMS Portal', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
-        { id: 114, day: 16, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 18:45 Tập Cardio & HIIT 45p', time: '18:00 - 18:45', startTime: '18:00', endTime: '18:45', location: 'Công viên', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 17
-        { id: 115, day: 17, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 CSDL Nâng cao & Indexing', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng A2.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 18
-        { id: 116, day: 18, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Giữa Kỳ Đồ án', time: '23:59', startTime: '23:59', endTime: '', location: 'Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 19
-        { id: 117, day: 19, isCurrentMonth: true, type: 'tap-luyen', title: '17:00 - 19:00 Đá bóng giao hữu Khoa CNTT', time: '17:00 - 19:00', startTime: '17:00', endTime: '19:00', location: 'Sân bóng đá Thống Nhất', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 21
-        { id: 118, day: 21, isCurrentMonth: true, type: 'deadline', title: '08:00 Thi giữa kỳ Kiểm thử phần mềm', time: '08:00', startTime: '08:00', endTime: '', location: 'Phòng Máy 3', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
-
-        // Ngày 22
-        { id: 119, day: 22, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 FullBody Gym Workout', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 24
-        { id: 120, day: 24, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:00 Workshop AI & Machine Learning', time: '14:00 - 16:00', startTime: '14:00', endTime: '16:00', location: 'Hội trường A', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 25
-        { id: 121, day: 25, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:00 Tập Yoga giãn cơ', time: '18:00 - 19:00', startTime: '18:00', endTime: '19:00', location: 'Yoga Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
-
-        // Ngày 30
-        { id: 122, day: 30, isCurrentMonth: true, type: 'ca-nhan', title: '20:00 - 21:00 Tổng kết Mục tiêu Tháng 9', time: '20:00 - 21:00', startTime: '20:00', endTime: '21:00', location: 'Nhà', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 }
-    ];
-
-    // Filter state
-    let activeFilters = new Set();
+    let eventsList = []; // Chứa dữ liệu thật fetch từ API backend
+    let currentYear = 2026;
+    let currentMonth = 9; // Tháng 9
     let activeSelectedDay = 14;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     // Modals
     const dayDetailModalEl = document.getElementById('dayDetailModal');
@@ -95,6 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const deleteChoiceModalEl = document.getElementById('deleteEventChoiceModal');
     const deleteChoiceModal = deleteChoiceModalEl ? new bootstrap.Modal(deleteChoiceModalEl) : null;
+
+    // Filter State
+    let activeFilters = new Set();
 
     // Type Maps
     const typeIconMap = {
@@ -111,95 +45,173 @@ document.addEventListener('DOMContentLoaded', function() {
         'ca-nhan': '🎉 Cá nhân'
     };
 
-    const repeatLabelMap = {
-        'once': 'Sự kiện 1 lần',
-        'weekly': 'Lặp hàng tuần',
-        'daily': 'Lặp hàng ngày',
-        'monthly': 'Lặp hàng tháng'
-    };
+    // Helper Toast Thông báo
+    function showToast(message, isSuccess = true) {
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '1090';
+            document.body.appendChild(toastContainer);
+        }
 
-    const repeatIconMap = {
-        'once': 'bi-calendar-event',
-        'weekly': 'bi-repeat',
-        'daily': 'bi-arrow-repeat',
-        'monthly': 'bi-calendar-month'
-    };
-
-    // Monthly days structure (35 cells)
-    const monthDaysStructure = [
-        { day: 31, isCurrentMonth: false, isToday: false },
-        { day: 1, isCurrentMonth: true, isToday: false },
-        { day: 2, isCurrentMonth: true, isToday: false },
-        { day: 3, isCurrentMonth: true, isToday: false },
-        { day: 4, isCurrentMonth: true, isToday: false },
-        { day: 5, isCurrentMonth: true, isToday: false },
-        { day: 6, isCurrentMonth: true, isToday: false },
-
-        { day: 7, isCurrentMonth: true, isToday: false },
-        { day: 8, isCurrentMonth: true, isToday: false },
-        { day: 9, isCurrentMonth: true, isToday: false },
-        { day: 10, isCurrentMonth: true, isToday: false },
-        { day: 11, isCurrentMonth: true, isToday: false },
-        { day: 12, isCurrentMonth: true, isToday: false },
-        { day: 13, isCurrentMonth: true, isToday: false },
-
-        { day: 14, isCurrentMonth: true, isToday: true }, // HÔM NAY (Thứ 2)
-        { day: 15, isCurrentMonth: true, isToday: false },
-        { day: 16, isCurrentMonth: true, isToday: false },
-        { day: 17, isCurrentMonth: true, isToday: false },
-        { day: 18, isCurrentMonth: true, isToday: false },
-        { day: 19, isCurrentMonth: true, isToday: false },
-        { day: 20, isCurrentMonth: true, isToday: false },
-
-        { day: 21, isCurrentMonth: true, isToday: false },
-        { day: 22, isCurrentMonth: true, isToday: false },
-        { day: 23, isCurrentMonth: true, isToday: false },
-        { day: 24, isCurrentMonth: true, isToday: false },
-        { day: 25, isCurrentMonth: true, isToday: false },
-        { day: 26, isCurrentMonth: true, isToday: false },
-        { day: 27, isCurrentMonth: true, isToday: false },
-
-        { day: 28, isCurrentMonth: true, isToday: false },
-        { day: 29, isCurrentMonth: true, isToday: false },
-        { day: 30, isCurrentMonth: true, isToday: false },
-        { day: 1, isCurrentMonth: false, isToday: false },
-        { day: 2, isCurrentMonth: false, isToday: false },
-        { day: 3, isCurrentMonth: false, isToday: false },
-        { day: 4, isCurrentMonth: false, isToday: false }
-    ];
+        const toastId = 'toast-' + Date.now();
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white ${isSuccess ? 'bg-success' : 'bg-danger'} border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body d-flex align-items-center gap-2">
+                        <i class="bi ${isSuccess ? 'bi-check-circle-fill' : 'bi-exclamation-octagon-fill'} fs-5"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+        const toastEl = document.getElementById(toastId);
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 3500 });
+        bsToast.show();
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+    }
 
     function disposeTooltips() {
         const tooltips = document.querySelectorAll('.tooltip');
         tooltips.forEach(t => t.remove());
     }
 
-    // Recurrence Engine
-    function getEventsForDay(day, isCurrentMonth) {
-        if (!isCurrentMonth) return [];
+    // ==========================================================================
+    // 2. FETCH DATABASE CRUD OPERATIONS
+    // ==========================================================================
 
-        return eventsList.filter(evt => {
-            if (!evt.isCurrentMonth) return false;
+    /**
+     * Nạp toàn bộ dữ liệu sự kiện từ Database qua API GET /calendar/events
+     */
+    async function loadEventsFromDatabase() {
+        try {
+            const response = await fetch('/calendar/events', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
 
-            if (Array.isArray(evt.excludedDays) && evt.excludedDays.includes(day)) {
-                return false;
+            if (!response.ok) {
+                throw new Error('Không thể kết nối dữ liệu từ máy chủ.');
             }
 
-            const repeatType = evt.repeatType || 'once';
+            const result = await response.json();
+            if (result.success && Array.isArray(result.data)) {
+                eventsList = result.data.map(evt => {
+                    const startDate = evt.start ? new Date(evt.start) : new Date();
+                    const endDate = evt.end ? new Date(evt.end) : null;
 
-            if (repeatType === 'once') {
-                return evt.day === day;
-            } else if (repeatType === 'daily') {
-                return true;
-            } else if (repeatType === 'weekly') {
-                return Math.abs(day - evt.day) % 7 === 0;
-            } else if (repeatType === 'monthly') {
-                return evt.day === day;
+                    const day = startDate.getDate();
+                    const month = startDate.getMonth() + 1;
+                    const year = startDate.getFullYear();
+
+                    const startHours = String(startDate.getHours()).padStart(2, '0');
+                    const startMins = String(startDate.getMinutes()).padStart(2, '0');
+                    const startTimeStr = `${startHours}:${startMins}`;
+
+                    let timeRangeStr = startTimeStr;
+                    let endTimeStr = '';
+                    if (endDate) {
+                        const endHours = String(endDate.getHours()).padStart(2, '0');
+                        const endMins = String(endDate.getMinutes()).padStart(2, '0');
+                        endTimeStr = `${endHours}:${endMins}`;
+                        timeRangeStr = `${startTimeStr} - ${endTimeStr}`;
+                    }
+
+                    return {
+                        id: evt.id,
+                        day: day,
+                        month: month,
+                        year: year,
+                        isCurrentMonth: true,
+                        type: evt.type || 'ca-nhan',
+                        title: evt.title,
+                        time: timeRangeStr,
+                        startTime: startTimeStr,
+                        endTime: endTimeStr,
+                        location: evt.location || '',
+                        batThongBao: Boolean(evt.bat_thong_bao),
+                        soNgayNhac: parseInt(evt.so_ngay_nhac || 1)
+                    };
+                });
             }
-            return evt.day === day;
-        });
+        } catch (error) {
+            console.error('Lỗi khi tải lịch:', error);
+        } finally {
+            renderCalendarGrid();
+        }
     }
 
-    // Render monthly grid
+    // ==========================================================================
+    // 3. DYNAMIC MONTH GRID GENERATOR (TÍNH TOÁN NGÀY TRONG THÁNG)
+    // ==========================================================================
+    function generateMonthDaysStructure(year, month) {
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        const prevMonthLastDay = new Date(year, month - 1, 0).getDate();
+
+        const startDayOfWeek = firstDay.getDay(); // 0 (CN) -> 6 (T7)
+        const totalDays = lastDay.getDate();
+
+        const today = new Date();
+        const isCurrentActualYear = today.getFullYear() === year;
+        const isCurrentActualMonth = (today.getMonth() + 1) === month;
+        const currentActualDay = today.getDate();
+
+        const monthDays = [];
+
+        // Các ngày cuối tháng trước
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            monthDays.push({
+                day: prevMonthLastDay - i,
+                month: month === 1 ? 12 : month - 1,
+                year: month === 1 ? year - 1 : year,
+                isCurrentMonth: false,
+                isToday: false
+            });
+        }
+
+        // Các ngày trong tháng hiện tại
+        for (let d = 1; d <= totalDays; d++) {
+            monthDays.push({
+                day: d,
+                month: month,
+                year: year,
+                isCurrentMonth: true,
+                isToday: isCurrentActualYear && isCurrentActualMonth && (d === currentActualDay)
+            });
+        }
+
+        // Các ngày đầu tháng sau cho tròn ô lưới
+        const totalCells = monthDays.length > 35 ? 42 : 35;
+        const remaining = totalCells - monthDays.length;
+        for (let n = 1; n <= remaining; n++) {
+            monthDays.push({
+                day: n,
+                month: month === 12 ? 1 : month + 1,
+                year: month === 12 ? year + 1 : year,
+                isCurrentMonth: false,
+                isToday: false
+            });
+        }
+
+        return monthDays;
+    }
+
+    function getEventsForDay(day, isCurrentMonth, month = currentMonth, year = currentYear) {
+        if (!isCurrentMonth) return [];
+        return eventsList.filter(evt => evt.day === day && evt.month === month && evt.year === year);
+    }
+
+    // ==========================================================================
+    // 4. RENDER CALENDAR GRID
+    // ==========================================================================
     function renderCalendarGrid() {
         disposeTooltips();
         const calendarGrid = document.getElementById('calendarGrid');
@@ -215,10 +227,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="calendar-header-day weekend">T7</div>
         `;
 
+        const monthDays = generateMonthDaysStructure(currentYear, currentMonth);
         let cellsHtml = '';
 
-        monthDaysStructure.forEach(cell => {
-            const cellEvents = getEventsForDay(cell.day, cell.isCurrentMonth);
+        monthDays.forEach(cell => {
+            const cellEvents = getEventsForDay(cell.day, cell.isCurrentMonth, cell.month, cell.year);
 
             const filteredEvents = cellEvents.filter(e => {
                 return activeFilters.size === 0 || activeFilters.has(e.type);
@@ -245,8 +258,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const evt = filteredEvents[i];
                 const iconClass = typeIconMap[evt.type] || 'bi-circle-fill';
                 const bellIconHtml = evt.batThongBao ? '🔔 ' : '';
-                const tooltipTitle = evt.batThongBao 
-                    ? `Đang nhắc trước ${evt.soNgayNhac || 1} ngày • ${evt.title} (${evt.time})` 
+                const tooltipTitle = evt.batThongBao
+                    ? `Đang nhắc trước ${evt.soNgayNhac || 1} ngày • ${evt.title} (${evt.time})`
                     : `${evt.title} (${evt.time}) • ${evt.location}`;
 
                 cellsHtml += `
@@ -283,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function attachCellClickHandlers() {
         document.querySelectorAll('.calendar-day-cell').forEach(cell => {
-            cell.addEventListener('click', function(e) {
+            cell.addEventListener('click', function () {
                 const day = parseInt(this.getAttribute('data-day'));
                 const isCurrentMonth = this.getAttribute('data-current-month') === '1';
 
@@ -299,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
         activeSelectedDay = day;
         const modalTitle = document.getElementById('selectedDateTitle');
         if (modalTitle) {
-            modalTitle.textContent = `Chi tiết Lịch Ngày ${day}/09/2026`;
+            modalTitle.textContent = `Chi tiết Lịch Ngày ${day}/${String(currentMonth).padStart(2, '0')}/${currentYear}`;
         }
 
         renderDayDetailEventsList(day);
@@ -310,14 +323,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const listContainer = document.getElementById('dayEventsDetailList');
         if (!listContainer) return;
 
-        const dayEvents = getEventsForDay(day, true);
+        const dayEvents = getEventsForDay(day, true, currentMonth, currentYear);
         dayEvents.sort((a, b) => a.time.localeCompare(b.time));
 
         if (dayEvents.length === 0) {
             listContainer.innerHTML = `
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-x text-muted display-4"></i>
-                    <h6 class="fw-bold text-dark mt-3 mb-1">Chưa có sự kiện nào cho Ngày ${day}/09/2026</h6>
+                    <h6 class="fw-bold text-dark mt-3 mb-1">Chưa có sự kiện nào cho Ngày ${day}/${String(currentMonth).padStart(2, '0')}/${currentYear}</h6>
                     <p class="text-muted fs-7 mb-4">Bạn chưa lên lịch học, lịch tập hay deadline cho ngày này.</p>
                     <button type="button" class="btn btn-primary rounded-pill px-4 btn-sm" id="btnEmptyStateAdd">
                         <i class="bi bi-plus-lg me-1"></i>Thêm sự kiện ngay
@@ -325,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            document.getElementById('btnEmptyStateAdd')?.addEventListener('click', function() {
+            document.getElementById('btnEmptyStateAdd')?.addEventListener('click', function () {
                 dayDetailModal?.hide();
                 openCreateModalWithDay(day);
             });
@@ -335,9 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         dayEvents.forEach(evt => {
             const iconClass = typeIconMap[evt.type] || 'bi-calendar';
-            const repeatBadgeClass = evt.repeatType === 'once' ? 'once' : 'weekly';
-            const repeatBadgeIcon = repeatIconMap[evt.repeatType] || 'bi-repeat';
-            const repeatBadgeText = evt.repeatLabel || repeatLabelMap[evt.repeatType] || 'Lặp hàng tuần';
             const notifTag = evt.batThongBao ? `
                 <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1" title="Đang nhắc trước ${evt.soNgayNhac || 1} ngày">
                     🔔 Nhắc trước ${evt.soNgayNhac || 1} ngày
@@ -353,9 +363,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="text-truncate">
                             <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
                                 <span class="fw-bold text-dark fs-6 text-truncate">${evt.title}</span>
-                                <span class="repeat-tag ${repeatBadgeClass}">
-                                    <i class="bi ${repeatBadgeIcon}"></i>${repeatBadgeText}
-                                </span>
                                 ${notifTag}
                             </div>
                             <div class="d-flex align-items-center gap-3 text-muted fs-7">
@@ -379,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         listContainer.innerHTML = html;
 
         listContainer.querySelectorAll('[data-edit-id]').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const id = parseInt(this.getAttribute('data-edit-id'));
                 openEditModal(id);
@@ -387,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         listContainer.querySelectorAll('[data-delete-id]').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const id = parseInt(this.getAttribute('data-delete-id'));
                 deleteEvent(id, day);
@@ -400,7 +407,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const badge = document.getElementById('todayCountBadge');
         if (!todayList) return;
 
-        const todayEvents = getEventsForDay(14, true);
+        const today = new Date();
+        const todayEvents = getEventsForDay(today.getDate(), true, today.getMonth() + 1, today.getFullYear());
         todayEvents.sort((a, b) => a.time.localeCompare(b.time));
 
         if (badge) badge.textContent = todayEvents.length;
@@ -416,10 +424,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="schedule-item ${evt.type}" data-type="${evt.type}">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                         <span class="fw-bold text-dark fs-7">${evt.time}</span>
-                        <span class="badge rounded-pill px-2 py-0 fs-8 legend-pill ${evt.type}">${typeLabelMap[evt.type]}</span>
+                        <span class="badge rounded-pill px-2 py-0 fs-8 legend-pill ${evt.type}">${typeLabelMap[evt.type] || 'Sự kiện'}</span>
                     </div>
                     <div class="fw-semibold text-dark fs-6 mb-1 text-truncate">${evt.title}</div>
-                    <small class="text-muted fs-7"><i class="bi bi-geo-alt me-1"></i>${evt.location}</small>
+                    <small class="text-muted fs-7"><i class="bi bi-geo-alt me-1"></i>${evt.location || 'Chưa có vị trí'}</small>
                 </div>
             `;
         });
@@ -427,9 +435,9 @@ document.addEventListener('DOMContentLoaded', function() {
         todayList.innerHTML = html;
     }
 
-    // Lắng nghe sự kiện bật/tắt Switch Thông báo cho tất cả các form
+    // Toggle switch thông báo UI
     document.querySelectorAll('.notif-toggle-switch').forEach(switchEl => {
-        switchEl.addEventListener('change', function() {
+        switchEl.addEventListener('change', function () {
             const targetSelector = this.getAttribute('data-target');
             if (targetSelector) {
                 const targetEl = document.querySelector(targetSelector);
@@ -444,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.getElementById('btnAddNewFromDayModal')?.addEventListener('click', function() {
+    document.getElementById('btnAddNewFromDayModal')?.addEventListener('click', function () {
         dayDetailModal?.hide();
         openCreateModalWithDay(activeSelectedDay);
     });
@@ -455,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('createDeadlineDay').value = day;
         document.getElementById('createCaNhanDay').value = day;
 
-        // Reset trạng thái thông báo mặc định: Tắt
         ['createHocTap', 'createTapLuyen', 'createDeadline', 'createCaNhan'].forEach(prefix => {
             const sw = document.getElementById(`${prefix}BatThongBao`);
             const sel = document.getElementById(`${prefix}SoNgayNhac`);
@@ -468,126 +475,110 @@ document.addEventListener('DOMContentLoaded', function() {
         createEventModal?.show();
     }
 
-    document.getElementById('btnSaveNewEvent')?.addEventListener('click', function() {
+    // ==========================================================================
+    // 5. BƯỚC 5: TẠO SỰ KIỆN (POST /calendar/events)
+    // ==========================================================================
+    document.getElementById('btnSaveNewEvent')?.addEventListener('click', async function () {
         const activeTab = document.querySelector('#eventTab .nav-link.active');
         const tabId = activeTab ? activeTab.getAttribute('id') : 'hoc-tap-tab';
 
-        let newEvt = null;
-        const newId = Date.now();
+        let payload = {};
 
         if (tabId === 'hoc-tap-tab') {
-            const title = document.getElementById('createHocTapTitle').value.trim() || 'Môn học mới';
+            const title = document.getElementById('createHocTapTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên môn học.', false); return; }
             const day = parseInt(document.getElementById('createHocTapDay').value);
             const startTime = document.getElementById('createHocTapTime').value || '08:00';
             const endTime = document.getElementById('createHocTapEndTime').value || '10:30';
-            const timeRange = `${startTime} - ${endTime}`;
-            const location = document.getElementById('createHocTapLocation').value.trim() || 'Phòng học';
-            const repeatType = document.getElementById('createHocTapRepeat').value || 'weekly';
-            const batThongBao = document.getElementById('createHocTapBatThongBao')?.checked || false;
-            const soNgayNhac = parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1);
+            const location = document.getElementById('createHocTapLocation').value.trim();
 
-            newEvt = {
-                id: newId,
-                day: day,
-                isCurrentMonth: true,
-                type: 'hoc-tap',
-                title: `${timeRange} ${title}`,
-                time: timeRange,
-                startTime: startTime,
-                endTime: endTime,
-                location: location,
-                repeatType: repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Lặp hàng tuần',
-                excludedDays: [],
-                batThongBao: batThongBao,
-                soNgayNhac: soNgayNhac
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'hoc_tap',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1)
             };
         } else if (tabId === 'tap-luyen-tab') {
-            const title = document.getElementById('createTapLuyenTitle').value.trim() || 'Buổi tập mới';
+            const title = document.getElementById('createTapLuyenTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên buổi tập.', false); return; }
             const day = parseInt(document.getElementById('createTapLuyenDay').value);
             const startTime = document.getElementById('createTapLuyenTime').value || '18:00';
             const endTime = document.getElementById('createTapLuyenEndTime').value || '19:30';
-            const timeRange = `${startTime} - ${endTime}`;
-            const location = document.getElementById('createTapLuyenLocation').value.trim() || 'Gym Club';
-            const repeatType = document.getElementById('createTapLuyenRepeat').value || 'weekly';
-            const batThongBao = document.getElementById('createTapLuyenBatThongBao')?.checked || false;
-            const soNgayNhac = parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1);
+            const location = document.getElementById('createTapLuyenLocation').value.trim();
 
-            newEvt = {
-                id: newId,
-                day: day,
-                isCurrentMonth: true,
-                type: 'tap-luyen',
-                title: `${timeRange} ${title}`,
-                time: timeRange,
-                startTime: startTime,
-                endTime: endTime,
-                location: location,
-                repeatType: repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Lặp hàng tuần',
-                excludedDays: [],
-                batThongBao: batThongBao,
-                soNgayNhac: soNgayNhac
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'tap_luyen',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1)
             };
         } else if (tabId === 'deadline-tab') {
-            const title = document.getElementById('createDeadlineTitle').value.trim() || 'Deadline mới';
+            const title = document.getElementById('createDeadlineTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tiêu đề deadline.', false); return; }
             const day = parseInt(document.getElementById('createDeadlineDay').value);
             const time = document.getElementById('createDeadlineTime').value || '23:59';
-            const location = document.getElementById('createDeadlineLocation').value.trim() || 'Nộp online';
-            const repeatType = document.getElementById('createDeadlineRepeat').value || 'once';
-            const batThongBao = document.getElementById('createDeadlineBatThongBao')?.checked || false;
-            const soNgayNhac = parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1);
+            const location = document.getElementById('createDeadlineLocation').value.trim();
 
-            newEvt = {
-                id: newId,
-                day: day,
-                isCurrentMonth: true,
-                type: 'deadline',
-                title: `${time} ${title}`,
-                time: time,
-                startTime: time,
-                endTime: '',
-                location: location,
-                repeatType: repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện 1 lần',
-                excludedDays: [],
-                batThongBao: batThongBao,
-                soNgayNhac: soNgayNhac
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'deadline',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1)
             };
         } else {
-            const title = document.getElementById('createCaNhanTitle').value.trim() || 'Sự kiện cá nhân';
+            const title = document.getElementById('createCaNhanTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên sự kiện.', false); return; }
             const day = parseInt(document.getElementById('createCaNhanDay').value);
             const time = document.getElementById('createCaNhanTime').value || '14:00';
-            const location = document.getElementById('createCaNhanLocation').value.trim() || 'Địa điểm';
-            const repeatType = document.getElementById('createCaNhanRepeat').value || 'once';
-            const batThongBao = document.getElementById('createCaNhanBatThongBao')?.checked || false;
-            const soNgayNhac = parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1);
+            const location = document.getElementById('createCaNhanLocation').value.trim();
 
-            newEvt = {
-                id: newId,
-                day: day,
-                isCurrentMonth: true,
-                type: 'ca-nhan',
-                title: `${time} ${title}`,
-                time: time,
-                startTime: time,
-                endTime: '',
-                location: location,
-                repeatType: repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện 1 lần',
-                excludedDays: [],
-                batThongBao: batThongBao,
-                soNgayNhac: soNgayNhac
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'ca_nhan',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1)
             };
         }
 
-        eventsList.push(newEvt);
-        createEventModal?.hide();
+        try {
+            const response = await fetch('/calendar/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
 
-        renderCalendarGrid();
-        openDayDetailModal(newEvt.day);
+            const result = await response.json();
+            if (response.ok && result.success) {
+                createEventModal?.hide();
+                showToast(result.message || 'Thêm sự kiện thành công!');
+                await loadEventsFromDatabase();
+                openDayDetailModal(payload.thoi_gian_bat_dau ? parseInt(payload.thoi_gian_bat_dau.split(' ')[0].split('-')[2]) : activeSelectedDay);
+            } else {
+                showToast(result.message || 'Lỗi khi tạo sự kiện.', false);
+            }
+        } catch (error) {
+            console.error('Lỗi API POST /calendar/events:', error);
+            showToast('Lỗi gửi yêu cầu tạo sự kiện.', false);
+        }
     });
 
+    // ==========================================================================
+    // 6. BƯỚC 6: SỬA SỰ KIỆN (PUT /calendar/events/{id})
+    // ==========================================================================
     function openEditModal(eventId) {
         const evt = eventsList.find(e => e.id === eventId);
         if (!evt) return;
@@ -598,12 +589,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('editEventType').value = evt.type;
         document.getElementById('editEventTitle').value = evt.title;
         document.getElementById('editEventDay').value = evt.day;
-        document.getElementById('editEventTime').value = evt.startTime || (evt.time ? evt.time.split(' - ')[0] : '08:00');
-        document.getElementById('editEventEndTime').value = evt.endTime || (evt.time ? (evt.time.split(' - ')[1] || '') : '');
-        document.getElementById('editEventRepeat').value = evt.repeatType || 'weekly';
-        document.getElementById('editEventLocation').value = evt.location;
+        document.getElementById('editEventTime').value = evt.startTime || '08:00';
+        document.getElementById('editEventEndTime').value = evt.endTime || '';
+        document.getElementById('editEventLocation').value = evt.location || '';
 
-        // Điền dữ liệu thông báo hiện tại vào Modal Sửa
         const editSw = document.getElementById('editEventBatThongBao');
         const editSel = document.getElementById('editEventSoNgayNhac');
         const editGrp = document.getElementById('editEventRemindGroup');
@@ -611,56 +600,71 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editSw) editSw.checked = evt.batThongBao || false;
         if (editSel) editSel.value = evt.soNgayNhac || 1;
         if (editGrp) {
-            if (evt.batThongBao) {
-                editGrp.classList.add('show');
-            } else {
-                editGrp.classList.remove('show');
-            }
+            if (evt.batThongBao) editGrp.classList.add('show');
+            else editGrp.classList.remove('show');
         }
 
         editEventModal?.show();
     }
 
-    document.getElementById('btnUpdateEvent')?.addEventListener('click', function() {
-        const id = parseInt(document.getElementById('editEventId').value);
-        const evtIndex = eventsList.findIndex(e => e.id === id);
+    document.getElementById('btnUpdateEvent')?.addEventListener('click', async function () {
+        const id = document.getElementById('editEventId').value;
+        if (!id) return;
 
-        if (evtIndex !== -1) {
-            const type = document.getElementById('editEventType').value;
-            const title = document.getElementById('editEventTitle').value;
-            const day = parseInt(document.getElementById('editEventDay').value);
-            const startTime = document.getElementById('editEventTime').value;
-            const endTime = document.getElementById('editEventEndTime').value;
-            const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
-            const location = document.getElementById('editEventLocation').value;
-            const repeatType = document.getElementById('editEventRepeat').value || 'weekly';
-            const batThongBao = document.getElementById('editEventBatThongBao')?.checked || false;
-            const soNgayNhac = parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1);
+        const type = document.getElementById('editEventType').value;
+        const title = document.getElementById('editEventTitle').value.trim();
+        const day = parseInt(document.getElementById('editEventDay').value);
+        const startTime = document.getElementById('editEventTime').value || '08:00';
+        const endTime = document.getElementById('editEventEndTime').value;
+        const location = document.getElementById('editEventLocation').value.trim();
 
-            eventsList[evtIndex] = {
-                ...eventsList[evtIndex],
-                type,
-                title,
-                day,
-                time: timeRange,
-                startTime,
-                endTime,
-                location,
-                repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện',
-                batThongBao,
-                soNgayNhac
-            };
+        if (!title) {
+            showToast('Vui lòng nhập tiêu đề sự kiện.', false);
+            return;
         }
 
-        editEventModal?.hide();
-        renderCalendarGrid();
-        if (evtIndex !== -1) {
-            openDayDetailModal(eventsList[evtIndex].day);
+        const payload = {
+            tieu_de: title,
+            loai_su_kien: type,
+            thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+            mo_ta: location,
+            bat_thong_bao: document.getElementById('editEventBatThongBao')?.checked || false,
+            so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1)
+        };
+
+        if (endTime) {
+            payload.thoi_gian_ket_thuc = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`;
+        }
+
+        try {
+            const response = await fetch(`/calendar/events/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            if (response.ok && result.success) {
+                editEventModal?.hide();
+                showToast(result.message || 'Cập nhật sự kiện thành công!');
+                await loadEventsFromDatabase();
+                openDayDetailModal(day);
+            } else {
+                showToast(result.message || 'Lỗi khi cập nhật sự kiện.', false);
+            }
+        } catch (error) {
+            console.error('Lỗi API PUT /calendar/events:', error);
+            showToast('Lỗi gửi yêu cầu cập nhật.', false);
         }
     });
 
-    // Delete handling
+    // ==========================================================================
+    // 7. BƯỚC 7: XÓA SỰ KIỆN (DELETE /calendar/events/{id})
+    // ==========================================================================
     let pendingDeleteEventId = null;
     let pendingDeleteDay = null;
 
@@ -668,67 +672,61 @@ document.addEventListener('DOMContentLoaded', function() {
         const evt = eventsList.find(e => e.id === eventId);
         if (!evt) return;
 
-        const repeatType = evt.repeatType || 'once';
-
-        if (repeatType === 'once') {
-            if (confirm(`Bạn có chắc chắn muốn xóa sự kiện "${evt.title}" không?`)) {
-                eventsList = eventsList.filter(e => e.id !== eventId);
-                renderCalendarGrid();
-                renderDayDetailEventsList(day);
-            }
-        } else {
-            pendingDeleteEventId = eventId;
-            pendingDeleteDay = day;
-
-            const titleEl = document.getElementById('deleteEventChoiceTitle');
-            const dayEl = document.getElementById('deleteEventChoiceDay');
-
-            if (titleEl) titleEl.textContent = evt.title;
-            if (dayEl) dayEl.textContent = day;
-
-            deleteChoiceModal?.show();
+        if (confirm(`Bạn có chắc chắn muốn xóa sự kiện "${evt.title}" không?`)) {
+            executeDeleteApi(eventId, day);
         }
     }
 
-    document.getElementById('btnDeleteOnlyThisOccurrence')?.addEventListener('click', function() {
-        if (!pendingDeleteEventId || !pendingDeleteDay) return;
+    async function executeDeleteApi(eventId, day) {
+        try {
+            const response = await fetch(`/calendar/events/${eventId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
 
-        const evt = eventsList.find(e => e.id === pendingDeleteEventId);
-        if (evt) {
-            evt.excludedDays = evt.excludedDays || [];
-            if (!evt.excludedDays.includes(pendingDeleteDay)) {
-                evt.excludedDays.push(pendingDeleteDay);
+            const result = await response.json();
+            if (response.ok && result.success) {
+                deleteChoiceModal?.hide();
+                showToast(result.message || 'Đã xóa sự kiện thành công!');
+                await loadEventsFromDatabase();
+                openDayDetailModal(day);
+            } else {
+                showToast(result.message || 'Không thể xóa sự kiện này.', false);
             }
+        } catch (error) {
+            console.error('Lỗi API DELETE /calendar/events:', error);
+            showToast('Lỗi gửi yêu cầu xóa.', false);
         }
+    }
 
-        deleteChoiceModal?.hide();
-        renderCalendarGrid();
-        renderDayDetailEventsList(pendingDeleteDay);
+    document.getElementById('btnDeleteOnlyThisOccurrence')?.addEventListener('click', function () {
+        if (pendingDeleteEventId && pendingDeleteDay) {
+            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay);
+        }
     });
 
-    document.getElementById('btnDeleteAllOccurrences')?.addEventListener('click', function() {
-        if (!pendingDeleteEventId) return;
-
-        eventsList = eventsList.filter(e => e.id !== pendingDeleteEventId);
-
-        deleteChoiceModal?.hide();
-        renderCalendarGrid();
-        renderDayDetailEventsList(pendingDeleteDay);
+    document.getElementById('btnDeleteAllOccurrences')?.addEventListener('click', function () {
+        if (pendingDeleteEventId && pendingDeleteDay) {
+            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay);
+        }
     });
 
-    // Filter events
+    // Multi-select Legend Filter Buttons
     const allBtn = document.querySelector('#calendarFilterGroup .legend-btn[data-filter="all"]');
     const categoryButtons = document.querySelectorAll('#calendarFilterGroup .legend-btn:not([data-filter="all"])');
     const filterContainer = document.getElementById('calendarFilterGroup');
 
-    allBtn?.addEventListener('click', function() {
+    allBtn?.addEventListener('click', function () {
         activeFilters.clear();
         applyFilterStyles();
         renderCalendarGrid();
     });
 
     categoryButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const filter = this.getAttribute('data-filter');
             if (activeFilters.has(filter)) {
                 activeFilters.delete(filter);
@@ -759,8 +757,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Search filter
-    document.getElementById('searchCalendar')?.addEventListener('input', function(e) {
+    // Quick Search Input
+    document.getElementById('searchCalendar')?.addEventListener('input', function (e) {
         const query = e.target.value.toLowerCase().trim();
         if (!query) {
             renderCalendarGrid();
@@ -777,21 +775,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Mark all notifications read
-    document.getElementById('btnMarkAllRead')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelectorAll('.notification-item.unread').forEach(item => {
-            item.classList.remove('unread');
-            item.classList.add('read', 'opacity-75');
-            item.querySelector('.notif-dot')?.remove();
-        });
-        const notifBadgeDot = document.getElementById('notifBadgeDot');
-        if (notifBadgeDot) notifBadgeDot.style.display = 'none';
-
-        const countBadge = document.getElementById('notifCountBadge');
-        if (countBadge) countBadge.textContent = '0 mới';
+    // Nút Prev/Next Month
+    document.getElementById('btnPrevMonth')?.addEventListener('click', function () {
+        if (currentMonth === 1) {
+            currentMonth = 12;
+            currentYear--;
+        } else {
+            currentMonth--;
+        }
+        document.getElementById('currentMonthTitle').textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        renderCalendarGrid();
     });
 
-    // Initial render
+    document.getElementById('btnNextMonth')?.addEventListener('click', function () {
+        if (currentMonth === 12) {
+            currentMonth = 1;
+            currentYear++;
+        } else {
+            currentMonth++;
+        }
+        document.getElementById('currentMonthTitle').textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        renderCalendarGrid();
+    });
+
+    // 1. Vẽ lưới lịch ban đầu lập tức khi vừa mở trang
     renderCalendarGrid();
+
+    // 2. Nạp dữ liệu sự kiện thực từ Database
+    loadEventsFromDatabase();
 });
