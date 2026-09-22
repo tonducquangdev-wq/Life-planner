@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh Sách Môn Học - Life Planner</title>
+
+    <!-- Kịch bản Khởi tạo Giao diện Sáng/Tối chống giật trang (Anti-Flicker) -->
+    <script>
+        (function() {
+            var userTheme = "{{ Auth::check() ? (Auth::user()->giao_dien ?? 'system') : 'system' }}";
+            var savedTheme = localStorage.getItem('theme');
+            var themeToApply = 'light';
+            if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+                themeToApply = savedTheme;
+            } else if (userTheme && (userTheme === 'dark' || userTheme === 'light')) {
+                themeToApply = userTheme;
+            } else {
+                themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-bs-theme', themeToApply);
+            if (themeToApply === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        })();
+    </script>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

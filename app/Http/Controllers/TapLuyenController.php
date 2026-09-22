@@ -45,7 +45,7 @@ class TapLuyenController extends Controller
         $lichTuan = [];
         for ($day = 1; $day <= 7; $day++) {
             $sessions = $buoiTapsByDay[$day] ?? [];
-            if (!empty($sessions)) {
+            if (! empty($sessions)) {
                 $bt = $sessions[0];
                 $soBai = ($bt->chiTietBuoiTaps) ? $bt->chiTietBuoiTaps->count() : 0;
                 $lichTuan[$day] = [
@@ -102,7 +102,7 @@ class TapLuyenController extends Controller
         $dates = LichSuTapLuyen::where('user_id', $userId)
             ->orderByDesc('thoi_gian_bat_dau')
             ->pluck('thoi_gian_bat_dau')
-            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->map(fn ($d) => Carbon::parse($d)->toDateString())
             ->unique()
             ->values();
 
@@ -134,13 +134,13 @@ class TapLuyenController extends Controller
 
         // Xác định kế hoạch hoạt động (Active Plan)
         $activePlan = $keHoachList->firstWhere('is_active', true);
-        if (!$activePlan && $keHoachList->isNotEmpty()) {
+        if (! $activePlan && $keHoachList->isNotEmpty()) {
             $activePlan = $keHoachList->first();
             $activePlan->update(['is_active' => true]);
         }
 
         // Nếu người dùng chưa có kế hoạch nào, tạo mặc định 1 kế hoạch cá nhân kèm lịch mẫu
-        if (!$activePlan) {
+        if (! $activePlan) {
             $activePlan = KeHoachTapLuyen::create([
                 'user_id' => $userId,
                 'ten_ke_hoach' => 'Kế hoạch cá nhân (PPL)',
@@ -212,9 +212,9 @@ class TapLuyenController extends Controller
 
             $startedAt = Carbon::parse($lichSu->thoi_gian_bat_dau);
             if ($startedAt->isToday()) {
-                $thoiDiem = 'Hôm nay ' . $startedAt->format('H:i');
+                $thoiDiem = 'Hôm nay '.$startedAt->format('H:i');
             } elseif ($startedAt->isYesterday()) {
-                $thoiDiem = 'Hôm qua ' . $startedAt->format('H:i');
+                $thoiDiem = 'Hôm qua '.$startedAt->format('H:i');
             } else {
                 $thoiDiem = $startedAt->diffForHumans();
             }
@@ -240,8 +240,8 @@ class TapLuyenController extends Controller
                 'id' => $lichSu->id,
                 'loai' => $tenBuoiTap,
                 'ten' => $tenBuoiTap,
-                'thoi_gian' => ($lichSu->tong_thoi_luong ?: 0) . ' phút',
-                'so_bai' => $soBai > 0 ? ($soBai . ' bài tập') : 'Buổi tập',
+                'thoi_gian' => ($lichSu->tong_thoi_luong ?: 0).' phút',
+                'so_bai' => $soBai > 0 ? ($soBai.' bài tập') : 'Buổi tập',
                 'thoi_diem' => $thoiDiem,
                 'icon' => $icon,
                 'color' => $color,
@@ -257,8 +257,8 @@ class TapLuyenController extends Controller
         $monthlyHeatmap = LichSuTapLuyen::where('user_id', $userId)
             ->whereBetween('thoi_gian_bat_dau', [$startOfMonth, $endOfMonth])
             ->get()
-            ->groupBy(fn($item) => Carbon::parse($item->thoi_gian_bat_dau)->format('Y-m-d'))
-            ->map(fn($items) => [
+            ->groupBy(fn ($item) => Carbon::parse($item->thoi_gian_bat_dau)->format('Y-m-d'))
+            ->map(fn ($items) => [
                 'count' => $items->count(),
                 'duration' => (int) $items->sum('tong_thoi_luong'),
             ]);
@@ -309,7 +309,7 @@ class TapLuyenController extends Controller
                 $currentBuoiTap = $activePlan->buoiTaps->firstWhere('id', $dinhHuongHomNay['buoi_tap_id']);
             }
 
-            if (!$currentBuoiTap) {
+            if (! $currentBuoiTap) {
                 $currentBuoiTap = $activePlan->buoiTaps->first();
             }
 
@@ -367,12 +367,12 @@ class TapLuyenController extends Controller
 
         if ($buoiTapId) {
             $exists = BuoiTap::where('id', $buoiTapId)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 $buoiTapId = null;
             }
         }
 
-        if (!$buoiTapId) {
+        if (! $buoiTapId) {
             $userBuoiTap = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })->first();
@@ -423,8 +423,8 @@ class TapLuyenController extends Controller
             'data' => [
                 'id' => $lichSu->id,
                 'ten' => $request->input('ten_buoi_tap') ?: 'Buổi tập',
-                'thoi_gian' => $minutes . ' phút',
-                'thoi_diem' => 'Hôm nay ' . $now->format('H:i'),
+                'thoi_gian' => $minutes.' phút',
+                'thoi_diem' => 'Hôm nay '.$now->format('H:i'),
                 'buoiTapTuanNay' => $buoiTapTuanNay,
                 'thoiGianTapHomNay' => $thoiGianTapHomNay,
                 'tongBuoiTap' => $tongBuoiTap,
@@ -474,9 +474,9 @@ class TapLuyenController extends Controller
                     ], 422);
                 }
             } elseif ($type === 'core' || $type === 'other') {
-                $hasReps = !empty($ex['sets']) && !empty($ex['reps']);
-                $hasDuration = !empty($ex['duration']);
-                if (!$hasReps && !$hasDuration) {
+                $hasReps = ! empty($ex['sets']) && ! empty($ex['reps']);
+                $hasDuration = ! empty($ex['duration']);
+                if (! $hasReps && ! $hasDuration) {
                     return response()->json([
                         'success' => false,
                         'message' => "Bài tập #{$pos} \"{$name}\" phải chọn ít nhất Sets/Reps hoặc Thời lượng.",
@@ -490,7 +490,7 @@ class TapLuyenController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$keHoach) {
+        if (! $keHoach) {
             $keHoach = KeHoachTapLuyen::firstOrCreate(
                 ['user_id' => $userId, 'ten_ke_hoach' => 'Kế hoạch cá nhân'],
                 ['mo_ta' => 'Kế hoạch tập luyện được quản lý tự động', 'is_active' => true]
@@ -509,7 +509,7 @@ class TapLuyenController extends Controller
                 ->first();
         }
 
-        if (!$buoiTap) {
+        if (! $buoiTap) {
             $count = BuoiTap::where('ke_hoach_tap_luyen_id', $keHoach->id)->count();
             $buoiTap = BuoiTap::create([
                 'ke_hoach_tap_luyen_id' => $keHoach->id,
@@ -546,7 +546,7 @@ class TapLuyenController extends Controller
                     [
                         'nhom_co' => $nhomCo,
                         'loai_bai_tap' => $type,
-                        'mo_ta' => "Bài tập {$type}"
+                        'mo_ta' => "Bài tập {$type}",
                     ]
                 );
 
@@ -559,10 +559,10 @@ class TapLuyenController extends Controller
                     'bai_tap_the_chat_id' => $baiTap->id,
                     'thu_tu' => $order,
                     'loai_bai_tap' => $type,
-                    'so_sets' => !empty($item['sets']) ? (int)$item['sets'] : null,
-                    'so_reps' => !empty($item['reps']) ? trim($item['reps']) : null,
-                    'thoi_luong' => !empty($item['duration']) ? (int)$item['duration'] : null,
-                    'don_vi_thoi_gian' => !empty($item['duration_unit']) ? trim($item['duration_unit']) : 'phut',
+                    'so_sets' => ! empty($item['sets']) ? (int) $item['sets'] : null,
+                    'so_reps' => ! empty($item['reps']) ? trim($item['reps']) : null,
+                    'thoi_luong' => ! empty($item['duration']) ? (int) $item['duration'] : null,
+                    'don_vi_thoi_gian' => ! empty($item['duration_unit']) ? trim($item['duration_unit']) : 'phut',
                 ]);
             }
         });
@@ -590,7 +590,7 @@ class TapLuyenController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Đã cập nhật {$buoiTap->ten_buoi_tap} với " . count($resultList) . " bài tập thành công!",
+            'message' => "Đã cập nhật {$buoiTap->ten_buoi_tap} với ".count($resultList).' bài tập thành công!',
             'data' => [
                 'buoi_tap_id' => $buoiTap->id,
                 'ten_buoi_tap' => $buoiTap->ten_buoi_tap,
@@ -777,5 +777,176 @@ class TapLuyenController extends Controller
             'success' => true,
             'message' => "Đã xóa buổi tập \"{$ten}\"!",
         ]);
+    }
+
+    /**
+     * Màn hình Báo cáo tập luyện & Phân tích Thể chất
+     */
+    public function baoCaoTapLuyen(Request $request)
+    {
+        $userId = Auth::id();
+
+        // Check active plan
+        $activePlan = KeHoachTapLuyen::where('user_id', $userId)
+            ->where('is_active', true)
+            ->with(['buoiTaps.chiTietBuoiTaps'])
+            ->first();
+
+        if (! $activePlan) {
+            $activePlan = KeHoachTapLuyen::where('user_id', $userId)->first();
+        }
+
+        // Seed sample workout logs if user has no history yet
+        $hasHistory = LichSuTapLuyen::where('user_id', $userId)->exists();
+        if (! $hasHistory) {
+            $userBuoiTap = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })->first();
+
+            if (! $userBuoiTap) {
+                if (! $activePlan) {
+                    $activePlan = KeHoachTapLuyen::create([
+                        'user_id' => $userId,
+                        'ten_ke_hoach' => 'Kế hoạch cá nhân (PPL)',
+                        'mo_ta' => 'Lịch tập phân bổ theo nhóm cơ: Push - Pull - Legs',
+                        'is_active' => true,
+                    ]);
+                }
+                $userBuoiTap = BuoiTap::create([
+                    'ke_hoach_tap_luyen_id' => $activePlan->id,
+                    'ten_buoi_tap' => 'Tập tự do',
+                    'mo_ta' => 'Buổi tập cá nhân',
+                    'thu_tu' => 1,
+                    'ngay_trong_tuan' => 1,
+                ]);
+            }
+
+            $sampleLogs = [
+                ['days_ago' => 0, 'duration' => 60, 'note' => 'Buổi tập Push: Ngực, Vai, Tay sau (Hoàn thành 100%)'],
+                ['days_ago' => 1, 'duration' => 50, 'note' => 'Buổi tập Pull: Lưng xô, Tay trước (Tập nặng)'],
+                ['days_ago' => 3, 'duration' => 70, 'note' => 'Buổi tập Legs: Chân, Mông, Bắp chân'],
+                ['days_ago' => 4, 'duration' => 45, 'note' => 'Buổi tập Cardio & Core: Chạy bộ 5km'],
+                ['days_ago' => 6, 'duration' => 55, 'note' => 'Buổi tập Push: Chú trọng Incline Press'],
+                ['days_ago' => 7, 'duration' => 60, 'note' => 'Buổi tập Pull: Deadlift & Barbell Row'],
+                ['days_ago' => 9, 'duration' => 65, 'note' => 'Buổi tập Legs: Squat 100kg'],
+                ['days_ago' => 11, 'duration' => 40, 'note' => 'Buổi tập FullBody: Rèn luyện sức bền'],
+            ];
+
+            foreach ($sampleLogs as $log) {
+                $start = Carbon::now()->subDays($log['days_ago'])->setHour(18)->setMinute(0);
+                $end = (clone $start)->addMinutes($log['duration']);
+                LichSuTapLuyen::create([
+                    'user_id' => $userId,
+                    'buoi_tap_id' => $userBuoiTap->id,
+                    'thoi_gian_bat_dau' => $start,
+                    'thoi_gian_ket_thuc' => $end,
+                    'tong_thoi_luong' => $log['duration'],
+                    'ghi_chu' => $log['note'],
+                ]);
+            }
+        }
+
+        // 1. Thống kê tổng hợp
+        $tongBuoiTap = LichSuTapLuyen::where('user_id', $userId)->count();
+        $tongThoiGianMinute = (int) LichSuTapLuyen::where('user_id', $userId)->sum('tong_thoi_luong');
+        $tongThoiGianHour = round($tongThoiGianMinute / 60, 1);
+        $thoiGianTrungBinhBuoi = $tongBuoiTap > 0 ? round($tongThoiGianMinute / $tongBuoiTap) : 0;
+
+        // 2. Tính Streak tập luyện
+        $dates = LichSuTapLuyen::where('user_id', $userId)
+            ->orderByDesc('thoi_gian_bat_dau')
+            ->pluck('thoi_gian_bat_dau')
+            ->map(fn ($d) => Carbon::parse($d)->toDateString())
+            ->unique()
+            ->values();
+
+        $chuoiNgayTap = 0;
+        if ($dates->isNotEmpty()) {
+            $today = Carbon::today()->toDateString();
+            $yesterday = Carbon::yesterday()->toDateString();
+            $firstDate = $dates->first();
+
+            if ($firstDate === $today || $firstDate === $yesterday) {
+                $currentCheck = Carbon::parse($firstDate);
+                foreach ($dates as $dateStr) {
+                    if ($dateStr === $currentCheck->toDateString()) {
+                        $chuoiNgayTap++;
+                        $currentCheck->subDay();
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 3. Tần suất tập luyện theo 7 ngày trong tuần (T2 - CN)
+        $dayOfWeekStats = [
+            1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0,
+        ];
+        $allLogs = LichSuTapLuyen::where('user_id', $userId)->get();
+        foreach ($allLogs as $log) {
+            $dayIso = Carbon::parse($log->thoi_gian_bat_dau)->dayOfWeekIso; // 1 = T2 ... 7 = CN
+            $dayOfWeekStats[$dayIso] = ($dayOfWeekStats[$dayIso] ?? 0) + 1;
+        }
+
+        // 4. Phân bổ theo loại buổi tập (Push, Pull, Legs, Cardio, Other)
+        $typeDistribution = [
+            'Push' => 0,
+            'Pull' => 0,
+            'Legs' => 0,
+            'Cardio' => 0,
+            'Khác' => 0,
+        ];
+        foreach ($allLogs as $log) {
+            $noteLower = mb_strtolower($log->ghi_chu ?: '');
+            if (str_contains($noteLower, 'push')) {
+                $typeDistribution['Push']++;
+            } elseif (str_contains($noteLower, 'pull')) {
+                $typeDistribution['Pull']++;
+            } elseif (str_contains($noteLower, 'leg')) {
+                $typeDistribution['Legs']++;
+            } elseif (str_contains($noteLower, 'cardio') || str_contains($noteLower, 'chạy')) {
+                $typeDistribution['Cardio']++;
+            } else {
+                $typeDistribution['Khác']++;
+            }
+        }
+
+        // 5. Nhật ký tập luyện mới nhất (Top 15)
+        $lichSuRecords = LichSuTapLuyen::where('user_id', $userId)
+            ->with('buoiTap')
+            ->orderByDesc('thoi_gian_bat_dau')
+            ->take(15)
+            ->get();
+
+        // 6. Heatmap dữ liệu tháng hiện tại
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $startOfMonth = Carbon::createFromDate($currentYear, $currentMonth, 1)->startOfMonth();
+        $endOfMonth = Carbon::createFromDate($currentYear, $currentMonth, 1)->endOfMonth();
+
+        $monthlyHeatmap = LichSuTapLuyen::where('user_id', $userId)
+            ->whereBetween('thoi_gian_bat_dau', [$startOfMonth, $endOfMonth])
+            ->get()
+            ->groupBy(fn ($item) => Carbon::parse($item->thoi_gian_bat_dau)->format('Y-m-d'))
+            ->map(fn ($items) => [
+                'count' => $items->count(),
+                'duration' => (int) $items->sum('tong_thoi_luong'),
+            ]);
+
+        return view('tap_luyen.bao_cao', compact(
+            'activePlan',
+            'tongBuoiTap',
+            'tongThoiGianMinute',
+            'tongThoiGianHour',
+            'thoiGianTrungBinhBuoi',
+            'chuoiNgayTap',
+            'dayOfWeekStats',
+            'typeDistribution',
+            'lichSuRecords',
+            'monthlyHeatmap',
+            'currentMonth',
+            'currentYear'
+        ));
     }
 }

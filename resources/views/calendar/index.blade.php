@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Life Planner - Lịch Cá Nhân (Calendar First)</title>
+
+    <!-- Kịch bản Khởi tạo Giao diện Sáng/Tối chống giật trang (Anti-Flicker) -->
+    <script>
+        (function() {
+            var userTheme = "{{ Auth::check() ? (Auth::user()->giao_dien ?? 'system') : 'system' }}";
+            var savedTheme = localStorage.getItem('theme');
+            var themeToApply = 'light';
+            if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+                themeToApply = savedTheme;
+            } else if (userTheme && (userTheme === 'dark' || userTheme === 'light')) {
+                themeToApply = userTheme;
+            } else {
+                themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-bs-theme', themeToApply);
+            if (themeToApply === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        })();
+    </script>
 
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,21 +73,32 @@
             <!-- Khu vực người dùng & nút Thông báo -->
             <div class="header-actions d-flex align-items-center gap-3">
 
+                <!-- Nút chuyển chế độ Dark/Light Mode nhanh -->
+                <button type="button" class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 shadow-xs text-dark" id="quickThemeBtn" title="Đổi chế độ Sáng/Tối">
+                    <i class="bi {{ (Auth::user()->giao_dien ?? 'light') === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary' }} fs-5" id="quickThemeIcon"></i>
+                </button>
+
                 <!-- Nút Thông báo & Dropdown Menu -->
                 <div class="notification-dropdown dropdown">
                     <a href="#" class="notification-btn position-relative text-dark text-decoration-none d-flex align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" id="notificationMenuBtn">
-                        <i class="bi bi-bell-fill fs-5"></i>
-                        <span class="badge-dot" id="notifBadgeDot"></span>
+                        <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill text-dark' : 'bi-bell-slash-fill text-muted' }} fs-5" id="mainNotifBellIcon"></i>
+                        <span class="badge-dot {{ (Auth::user()->thong_bao_enabled ?? true) ? '' : 'd-none' }}" id="notifBadgeDot"></span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2" style="width: 360px; max-width: 90vw;">
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2" style="width: 380px; max-width: 90vw;">
                         <!-- Header Dropdown -->
                         <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light rounded-top-4">
                             <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                                <i class="bi bi-bell text-primary"></i>Thông báo
+                                <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill text-primary' : 'bi-bell-slash-fill text-muted' }}" id="notifHeaderIcon"></i>Thông báo
                                 <span class="badge bg-danger rounded-pill fs-8" id="notifCountBadge">3 mới</span>
                             </h6>
-                            <button type="button" class="btn btn-link text-decoration-none p-0 fs-8 text-primary fw-semibold" id="btnMarkAllRead">Đánh dấu đã đọc</button>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check form-switch m-0 d-flex align-items-center gap-1" title="Bật/tắt nhanh thông báo">
+                                    <input class="form-check-input mt-0 cursor-pointer" type="checkbox" role="switch" id="btnQuickToggleNotif" {{ (Auth::user()->thong_bao_enabled ?? true) ? 'checked' : '' }}>
+                                </div>
+                                <button type="button" class="btn btn-link text-decoration-none p-0 fs-8 text-primary fw-semibold" id="btnMarkAllRead">Đã đọc</button>
+                            </div>
                         </div>
+
 
                         <!-- Danh sách thông báo thực tế của Life Planner -->
                         <div class="notification-list p-2" style="max-height: 340px; overflow-y: auto;">
@@ -384,6 +418,30 @@
                                     <label class="form-label fw-semibold fs-7 text-secondary">Phòng học & Giảng viên</label>
                                     <input type="text" class="form-control rounded-3" id="createHocTapLocation" placeholder="Ví dụ: Phòng B2.04 • Thầy Nguyễn Văn A">
                                 </div>
+                                <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                                <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="createHocTapBatThongBao">
+                                            <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                            <span>Bật thông báo</span>
+                                        </label>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="createHocTapBatThongBao" data-target="#createHocTapRemindGroup">
+                                        </div>
+                                    </div>
+                                    <div class="notif-remind-box mt-2" id="createHocTapRemindGroup">
+                                        <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                            <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                        </label>
+                                        <select class="form-select rounded-3" id="createHocTapSoNgayNhac">
+                                            <option value="1" selected>Trước 1 ngày</option>
+                                            <option value="2">Trước 2 ngày</option>
+                                        </select>
+                                        <small class="text-muted fs-8 d-block mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                        </small>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -425,6 +483,30 @@
                                     <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm tập / Ghi chú</label>
                                     <input type="text" class="form-control rounded-3" id="createTapLuyenLocation" placeholder="Ví dụ: Fitness Center • 4 hiệp Bench Press">
                                 </div>
+                                <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                                <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="createTapLuyenBatThongBao">
+                                            <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                            <span>Bật thông báo</span>
+                                        </label>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="createTapLuyenBatThongBao" data-target="#createTapLuyenRemindGroup">
+                                        </div>
+                                    </div>
+                                    <div class="notif-remind-box mt-2" id="createTapLuyenRemindGroup">
+                                        <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                            <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                        </label>
+                                        <select class="form-select rounded-3" id="createTapLuyenSoNgayNhac">
+                                            <option value="1" selected>Trước 1 ngày</option>
+                                            <option value="2">Trước 2 ngày</option>
+                                        </select>
+                                        <small class="text-muted fs-8 d-block mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                        </small>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -462,6 +544,30 @@
                                     <label class="form-label fw-semibold fs-7 text-secondary">Ghi chú deadline</label>
                                     <input type="text" class="form-control rounded-3" id="createDeadlineLocation" placeholder="Ví dụ: Nộp file .zip trên LMS">
                                 </div>
+                                <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                                <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="createDeadlineBatThongBao">
+                                            <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                            <span>Bật thông báo</span>
+                                        </label>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="createDeadlineBatThongBao" data-target="#createDeadlineRemindGroup">
+                                        </div>
+                                    </div>
+                                    <div class="notif-remind-box mt-2" id="createDeadlineRemindGroup">
+                                        <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                            <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                        </label>
+                                        <select class="form-select rounded-3" id="createDeadlineSoNgayNhac">
+                                            <option value="1" selected>Trước 1 ngày</option>
+                                            <option value="2">Trước 2 ngày</option>
+                                        </select>
+                                        <small class="text-muted fs-8 d-block mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                        </small>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -498,6 +604,30 @@
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú</label>
                                     <input type="text" class="form-control rounded-3" id="createCaNhanLocation" placeholder="Ví dụ: Google Meet / Quán Cafe A">
+                                </div>
+                                <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                                <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="createCaNhanBatThongBao">
+                                            <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                            <span>Bật thông báo</span>
+                                        </label>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="createCaNhanBatThongBao" data-target="#createCaNhanRemindGroup">
+                                        </div>
+                                    </div>
+                                    <div class="notif-remind-box mt-2" id="createCaNhanRemindGroup">
+                                        <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                            <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                        </label>
+                                        <select class="form-select rounded-3" id="createCaNhanSoNgayNhac">
+                                            <option value="1" selected>Trước 1 ngày</option>
+                                            <option value="2">Trước 2 ngày</option>
+                                        </select>
+                                        <small class="text-muted fs-8 d-block mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                        </small>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -573,6 +703,30 @@
                             <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú</label>
                             <input type="text" class="form-control rounded-3" id="editEventLocation">
                         </div>
+                        <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                        <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="editEventBatThongBao">
+                                    <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                    <span>Bật thông báo</span>
+                                </label>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="editEventBatThongBao" data-target="#editEventRemindGroup">
+                                </div>
+                            </div>
+                            <div class="notif-remind-box mt-2" id="editEventRemindGroup">
+                                <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                    <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                </label>
+                                <select class="form-select rounded-3" id="editEventSoNgayNhac">
+                                    <option value="1" selected>Trước 1 ngày</option>
+                                    <option value="2">Trước 2 ngày</option>
+                                </select>
+                                <small class="text-muted fs-8 d-block mt-1">
+                                    <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                </small>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer bg-light px-4 py-3 rounded-bottom-4">
@@ -615,6 +769,92 @@
 
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Quick Toggle Notification Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quickNotifSwitch = document.getElementById('btnQuickToggleNotif');
+            const mainBellIcon = document.getElementById('mainNotifBellIcon');
+            const headerIcon = document.getElementById('notifHeaderIcon');
+            const notifBadgeDot = document.getElementById('notifBadgeDot');
+
+            quickNotifSwitch?.addEventListener('change', function() {
+                const isEnabled = this.checked;
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                fetch("{{ route('profile.notifications.quick-toggle') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken || '',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            enabled: isEnabled
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.enabled) {
+                                if (mainBellIcon) mainBellIcon.className = 'bi bi-bell-fill text-dark fs-5';
+                                if (headerIcon) headerIcon.className = 'bi bi-bell-fill text-primary';
+                                if (notifBadgeDot) notifBadgeDot.classList.remove('d-none');
+                            } else {
+                                if (mainBellIcon) mainBellIcon.className = 'bi bi-bell-slash-fill text-muted fs-5';
+                                if (headerIcon) headerIcon.className = 'bi bi-bell-slash-fill text-muted';
+                                if (notifBadgeDot) notifBadgeDot.classList.add('d-none');
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi cập nhật thông báo:', err);
+                    });
+            });
+
+            // Quick Theme Toggle Script (Dark Mode / Light Mode)
+            const quickThemeBtn = document.getElementById('quickThemeBtn');
+            const quickThemeIcon = document.getElementById('quickThemeIcon');
+
+            const currentTheme = localStorage.getItem('theme') || "{{ Auth::user()->giao_dien ?? 'light' }}";
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.body.classList.add('dark-theme');
+                if (quickThemeIcon) quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-5';
+            } else if (currentTheme === 'light') {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                document.body.classList.remove('dark-theme');
+                if (quickThemeIcon) quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-5';
+            }
+
+            quickThemeBtn?.addEventListener('click', function () {
+                const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                const newTheme = isDark ? 'light' : 'dark';
+
+                document.documentElement.setAttribute('data-bs-theme', newTheme);
+                if (newTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    if (quickThemeIcon) quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-5';
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    if (quickThemeIcon) quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-5';
+                }
+                localStorage.setItem('theme', newTheme);
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                fetch("{{ route('profile.theme.quick-toggle') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ giao_dien: newTheme })
+                });
+            });
+        });
+    </script>
+
     <!-- Custom Calendar JS Engine -->
     <script src="{{ asset('js/calendar.js') }}"></script>
 </body>

@@ -578,3 +578,109 @@
     background-color: #e0f2fe;
 }
 
+/* ==========================================================================
+   DARK MODE OVERRIDES FOR CALENDAR (BS 5.3 DATA-BS-THEME="DARK")
+   ========================================================================== */
+[data-bs-theme="dark"] {
+    --event-blue-bg: rgba(59, 130, 246, 0.2);
+    --event-blue-text: #93c5fd;
+    --event-blue-border: rgba(147, 197, 253, 0.3);
+    --event-blue-dot: #60a5fa;
+
+    --event-green-bg: rgba(34, 197, 94, 0.2);
+    --event-green-text: #86efac;
+    --event-green-border: rgba(134, 239, 172, 0.3);
+    --event-green-dot: #4ade80;
+
+    --event-orange-bg: rgba(249, 115, 22, 0.2);
+    --event-orange-text: #fdba74;
+    --event-orange-border: rgba(253, 186, 116, 0.3);
+    --event-orange-dot: #fb923c;
+
+    --event-purple-bg: rgba(168, 85, 247, 0.2);
+    --event-purple-text: #f0abfc;
+    --event-purple-border: rgba(240, 171, 252, 0.3);
+    --event-purple-dot: #c084fc;
+}
+
+[data-bs-theme="dark"] .calendar-grid-container {
+    background-color: #334155 !important;
+    border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .calendar-header-day {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell.other-month {
+    background-color: #0f172a !important;
+    opacity: 0.6;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell.today {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+}
+
+[data-bs-theme="dark"] .day-number {
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell.today .day-number {
+    background-color: #6366f1 !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .legend-btn {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .legend-btn:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .notification-item {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .notification-item:hover {
+    background-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .notification-item.unread {
+    background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .notification-item.unread:hover {
+    background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+/* ==========================================================================
+   7. HIỆU ỨNG FADE & STYLE CHO KHỐI THÔNG BÁO SỰ KIỆN (EVENT NOTIFICATION)
+   ========================================================================== */
+.notif-remind-box {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.notif-remind-box.show {
+    opacity: 1;
+    max-height: 180px;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+

@@ -346,3 +346,53 @@
         font-size: 1.35rem;
     }
 }
+
+/* ==========================================================================
+   10. DARK MODE OVERRIDES FOR TAP LUYEN (BS 5.3 DATA-BS-THEME="DARK")
+   ========================================================================== */
+[data-bs-theme="dark"] .calendar-heatmap-cell.empty-cell {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #64748b !important;
+}
+
+[data-bs-theme="dark"] .empty-activity-box {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .empty-icon-wrapper {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .exercise-item-row:hover,
+[data-bs-theme="dark"] .activity-record-item:hover {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+}
+
+[data-bs-theme="dark"] .badge-type-other {
+    background-color: #334155 !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+}
+
+[data-bs-theme="dark"] .badge-type-strength {
+    background-color: rgba(99, 102, 241, 0.25) !important;
+    color: #a5b4fc !important;
+    border-color: rgba(165, 180, 252, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .badge-type-core {
+    background-color: rgba(20, 184, 166, 0.25) !important;
+    color: #99f6e4 !important;
+    border-color: rgba(153, 246, 228, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .badge-type-cardio {
+    background-color: rgba(244, 63, 94, 0.25) !important;
+    color: #fecdd3 !important;
+    border-color: rgba(254, 205, 211, 0.4) !important;
+}
+

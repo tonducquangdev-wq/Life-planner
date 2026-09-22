@@ -8,9 +8,22 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['ho_ten', 'email', 'password', 'anh_dai_dien'])]
+#[Fillable([
+    'ho_ten',
+    'email',
+    'password',
+    'anh_dai_dien',
+    'thong_bao_enabled',
+    'thong_bao_lich_hoc',
+    'thong_bao_deadline',
+    'thong_bao_tap_luyen',
+    'am_thanh_thong_bao',
+    'ngon_ngu',
+    'giao_dien',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -21,6 +34,11 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'thong_bao_enabled' => 'boolean',
+            'thong_bao_lich_hoc' => 'boolean',
+            'thong_bao_deadline' => 'boolean',
+            'thong_bao_tap_luyen' => 'boolean',
+            'am_thanh_thong_bao' => 'boolean',
         ];
     }
 
@@ -46,7 +64,7 @@ class User extends Authenticatable
             $relativePath = ltrim(preg_replace('#^storage/#', '', $relativePath), '/');
 
             // Fail-safe: Check if file actually exists on public disk
-            if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
+            if (! Storage::disk('public')->exists($relativePath)) {
                 return null; // File missing -> fallback to initials!
             }
 
@@ -72,6 +90,7 @@ class User extends Authenticatable
             if (is_array($words) && count($words) >= 2) {
                 $first = mb_substr($words[0], 0, 1);
                 $last = mb_substr(end($words), 0, 1);
+
                 return mb_strtoupper($first . $last);
             }
 

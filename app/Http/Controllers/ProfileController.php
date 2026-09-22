@@ -71,6 +71,83 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update notification settings.
+     */
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $user->thong_bao_enabled = $request->has('thong_bao_enabled');
+        $user->thong_bao_lich_hoc = $request->has('thong_bao_lich_hoc');
+        $user->thong_bao_deadline = $request->has('thong_bao_deadline');
+        $user->thong_bao_tap_luyen = $request->has('thong_bao_tap_luyen');
+        $user->am_thanh_thong_bao = $request->has('am_thanh_thong_bao');
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'notifications-updated');
+    }
+
+    /**
+     * Quick toggle main notification setting via AJAX.
+     */
+    public function quickToggleNotification(Request $request)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $enabled = $request->has('enabled') ? $request->boolean('enabled') : ! $user->thong_bao_enabled;
+        $user->thong_bao_enabled = $enabled;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'enabled' => $user->thong_bao_enabled,
+            'message' => $user->thong_bao_enabled ? 'Đã bật thông báo!' : 'Đã tắt thông báo!',
+        ]);
+    }
+
+    /**
+     * Update interface language & theme preferences.
+     */
+    public function updateAppearance(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ngon_ngu' => ['required', 'in:vi,en'],
+            'giao_dien' => ['required', 'in:light,dark,system'],
+        ]);
+
+        $user = $request->user();
+        $user->ngon_ngu = $request->input('ngon_ngu', 'vi');
+        $user->giao_dien = $request->input('giao_dien', 'light');
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'appearance-updated');
+    }
+
+    /**
+     * Quick toggle dark mode via AJAX.
+     */
+    public function quickToggleTheme(Request $request)
+    {
+        $user = $request->user();
+        $theme = $request->input('giao_dien', 'light');
+
+        if ($user) {
+            $user->giao_dien = $theme;
+            $user->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'giao_dien' => $theme,
+            'message' => 'Đã cập nhật chế độ giao diện!',
+        ]);
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

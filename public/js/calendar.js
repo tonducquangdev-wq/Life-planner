@@ -9,74 +9,74 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================================================
     let eventsList = [
         // Ngày 1
-        { id: 101, day: 1, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 101, day: 1, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 2
-        { id: 102, day: 2, isCurrentMonth: true, type: 'ca-nhan', title: 'Nghỉ lễ Quốc Khánh 2/9', time: '08:00', startTime: '08:00', endTime: '', location: 'Gia đình', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 102, day: 2, isCurrentMonth: true, type: 'ca-nhan', title: 'Nghỉ lễ Quốc Khánh 2/9', time: '08:00', startTime: '08:00', endTime: '', location: 'Gia đình', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 3
-        { id: 103, day: 3, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:30 Cơ sở dữ liệu nâng cao', time: '14:00 - 16:30', startTime: '14:00', endTime: '16:30', location: 'Phòng A1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
-        { id: 104, day: 3, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 103, day: 3, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:30 Cơ sở dữ liệu nâng cao', time: '14:00 - 16:30', startTime: '14:00', endTime: '16:30', location: 'Phòng A1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
+        { id: 104, day: 3, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 5
-        { id: 105, day: 5, isCurrentMonth: true, type: 'tap-luyen', title: '09:00 - 10:00 Chạy bộ 5km công viên', time: '09:00 - 10:00', startTime: '09:00', endTime: '10:00', location: 'Công viên Gia Định', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 105, day: 5, isCurrentMonth: true, type: 'tap-luyen', title: '09:00 - 10:00 Chạy bộ 5km công viên', time: '09:00 - 10:00', startTime: '09:00', endTime: '10:00', location: 'Công viên Gia Định', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 7
-        { id: 106, day: 7, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 106, day: 7, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 8
-        { id: 107, day: 8, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Lưng Tay Trước Abs', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 107, day: 8, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Lưng Tay Trước Abs', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 9
-        { id: 108, day: 9, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp đồ án PHP & MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'Hệ thống LMS', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 108, day: 9, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp đồ án PHP & MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'Hệ thống LMS', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 1 },
 
         // Ngày 10
-        { id: 109, day: 10, isCurrentMonth: true, type: 'hoc-tap', title: '13:30 - 16:00 Kiểm thử phần mềm', time: '13:30 - 16:00', startTime: '13:30', endTime: '16:00', location: 'Phòng C3.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 109, day: 10, isCurrentMonth: true, type: 'hoc-tap', title: '13:30 - 16:00 Kiểm thử phần mềm', time: '13:30 - 16:00', startTime: '13:30', endTime: '16:00', location: 'Phòng C3.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 11
-        { id: 110, day: 11, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Tập Leg Day Chân Bắp Chân', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 110, day: 11, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Tập Leg Day Chân Bắp Chân', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
         
         // Ngày 12
-        { id: 111, day: 12, isCurrentMonth: true, type: 'ca-nhan', title: '19:00 - 22:00 Sinh nhật bạn thân', time: '19:00 - 22:00', startTime: '19:00', endTime: '22:00', location: 'Nhà hàng BBQ', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 111, day: 12, isCurrentMonth: true, type: 'ca-nhan', title: '19:00 - 22:00 Sinh nhật bạn thân', time: '19:00 - 22:00', startTime: '19:00', endTime: '22:00', location: 'Nhà hàng BBQ', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 14 (HÔM NAY - CÓ 6 SỰ KIỆN ĐỂ TEST ĐỦ VIỆC "+3 KHÁC")
-        { id: 1, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04 • Thầy Nguyễn Văn A', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
-        { id: 2, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '14:00 - 15:30 Họp nhóm Đồ án Life Planner', time: '14:00 - 15:30', startTime: '14:00', endTime: '15:30', location: 'Google Meet', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
-        { id: 3, day: 14, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau (Chest & Shoulders)', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center • Bench Press 4x10', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
-        { id: 4, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '21:00 - 22:00 Đọc sách Clean Code & Refactoring', time: '21:00 - 22:00', startTime: '21:00', endTime: '22:00', location: 'Phòng đọc sách', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
-        { id: 5, day: 14, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Lab 4 PHP Laravel', time: '23:59', startTime: '23:59', endTime: '', location: 'Nộp trên Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
-        { id: 6, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '23:59 Ôn tập Kiểm thử phần mềm', time: '23:59', startTime: '23:59', endTime: '', location: 'Tự học online', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 1, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 Lập trình Web & Laravel 13', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng B2.04 • Thầy Nguyễn Văn A', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
+        { id: 2, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '14:00 - 15:30 Họp nhóm Đồ án Life Planner', time: '14:00 - 15:30', startTime: '14:00', endTime: '15:30', location: 'Google Meet', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
+        { id: 3, day: 14, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 Ngực Vai Tay Sau (Chest & Shoulders)', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Fitness Center • Bench Press 4x10', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
+        { id: 4, day: 14, isCurrentMonth: true, type: 'ca-nhan', title: '21:00 - 22:00 Đọc sách Clean Code & Refactoring', time: '21:00 - 22:00', startTime: '21:00', endTime: '22:00', location: 'Phòng đọc sách', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
+        { id: 5, day: 14, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Lab 4 PHP Laravel', time: '23:59', startTime: '23:59', endTime: '', location: 'Nộp trên Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 1 },
+        { id: 6, day: 14, isCurrentMonth: true, type: 'hoc-tap', title: '23:59 Ôn tập Kiểm thử phần mềm', time: '23:59', startTime: '23:59', endTime: '', location: 'Tự học online', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 15
-        { id: 112, day: 15, isCurrentMonth: true, type: 'hoc-tap', title: '10:00 - 11:30 Học Tiếng Anh Chuyên Ngành', time: '10:00 - 11:30', startTime: '10:00', endTime: '11:30', location: 'Phòng C1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 112, day: 15, isCurrentMonth: true, type: 'hoc-tap', title: '10:00 - 11:30 Học Tiếng Anh Chuyên Ngành', time: '10:00 - 11:30', startTime: '10:00', endTime: '11:30', location: 'Phòng C1.02', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 16
-        { id: 113, day: 16, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp bài tập CSDL MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'LMS Portal', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
-        { id: 114, day: 16, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 18:45 Tập Cardio & HIIT 45p', time: '18:00 - 18:45', startTime: '18:00', endTime: '18:45', location: 'Công viên', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 113, day: 16, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp bài tập CSDL MySQL', time: '23:59', startTime: '23:59', endTime: '', location: 'LMS Portal', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
+        { id: 114, day: 16, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 18:45 Tập Cardio & HIIT 45p', time: '18:00 - 18:45', startTime: '18:00', endTime: '18:45', location: 'Công viên', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 17
-        { id: 115, day: 17, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 CSDL Nâng cao & Indexing', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng A2.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 115, day: 17, isCurrentMonth: true, type: 'hoc-tap', title: '08:00 - 10:30 CSDL Nâng cao & Indexing', time: '08:00 - 10:30', startTime: '08:00', endTime: '10:30', location: 'Phòng A2.01', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 18
-        { id: 116, day: 18, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Giữa Kỳ Đồ án', time: '23:59', startTime: '23:59', endTime: '', location: 'Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 116, day: 18, isCurrentMonth: true, type: 'deadline', title: '23:59 Nộp Báo cáo Giữa Kỳ Đồ án', time: '23:59', startTime: '23:59', endTime: '', location: 'Portal Trường', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 19
-        { id: 117, day: 19, isCurrentMonth: true, type: 'tap-luyen', title: '17:00 - 19:00 Đá bóng giao hữu Khoa CNTT', time: '17:00 - 19:00', startTime: '17:00', endTime: '19:00', location: 'Sân bóng đá Thống Nhất', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 117, day: 19, isCurrentMonth: true, type: 'tap-luyen', title: '17:00 - 19:00 Đá bóng giao hữu Khoa CNTT', time: '17:00 - 19:00', startTime: '17:00', endTime: '19:00', location: 'Sân bóng đá Thống Nhất', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 21
-        { id: 118, day: 21, isCurrentMonth: true, type: 'deadline', title: '08:00 Thi giữa kỳ Kiểm thử phần mềm', time: '08:00', startTime: '08:00', endTime: '', location: 'Phòng Máy 3', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 118, day: 21, isCurrentMonth: true, type: 'deadline', title: '08:00 Thi giữa kỳ Kiểm thử phần mềm', time: '08:00', startTime: '08:00', endTime: '', location: 'Phòng Máy 3', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: true, soNgayNhac: 2 },
 
         // Ngày 22
-        { id: 119, day: 22, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 FullBody Gym Workout', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 119, day: 22, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:30 FullBody Gym Workout', time: '18:00 - 19:30', startTime: '18:00', endTime: '19:30', location: 'Gym Club', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 24
-        { id: 120, day: 24, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:00 Workshop AI & Machine Learning', time: '14:00 - 16:00', startTime: '14:00', endTime: '16:00', location: 'Hội trường A', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] },
+        { id: 120, day: 24, isCurrentMonth: true, type: 'hoc-tap', title: '14:00 - 16:00 Workshop AI & Machine Learning', time: '14:00 - 16:00', startTime: '14:00', endTime: '16:00', location: 'Hội trường A', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 25
-        { id: 121, day: 25, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:00 Tập Yoga giãn cơ', time: '18:00 - 19:00', startTime: '18:00', endTime: '19:00', location: 'Yoga Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [] },
+        { id: 121, day: 25, isCurrentMonth: true, type: 'tap-luyen', title: '18:00 - 19:00 Tập Yoga giãn cơ', time: '18:00 - 19:00', startTime: '18:00', endTime: '19:00', location: 'Yoga Center', repeatType: 'weekly', repeatLabel: 'Lặp hàng tuần', excludedDays: [], batThongBao: false, soNgayNhac: 1 },
 
         // Ngày 30
-        { id: 122, day: 30, isCurrentMonth: true, type: 'ca-nhan', title: '20:00 - 21:00 Tổng kết Mục tiêu Tháng 9', time: '20:00 - 21:00', startTime: '20:00', endTime: '21:00', location: 'Nhà', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [] }
+        { id: 122, day: 30, isCurrentMonth: true, type: 'ca-nhan', title: '20:00 - 21:00 Tổng kết Mục tiêu Tháng 9', time: '20:00 - 21:00', startTime: '20:00', endTime: '21:00', location: 'Nhà', repeatType: 'once', repeatLabel: 'Sự kiện 1 lần', excludedDays: [], batThongBao: false, soNgayNhac: 1 }
     ];
 
     // Filter state
@@ -244,10 +244,15 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 0; i < displayCount; i++) {
                 const evt = filteredEvents[i];
                 const iconClass = typeIconMap[evt.type] || 'bi-circle-fill';
+                const bellIconHtml = evt.batThongBao ? '🔔 ' : '';
+                const tooltipTitle = evt.batThongBao 
+                    ? `Đang nhắc trước ${evt.soNgayNhac || 1} ngày • ${evt.title} (${evt.time})` 
+                    : `${evt.title} (${evt.time}) • ${evt.location}`;
+
                 cellsHtml += `
-                    <div class="event-pill ${evt.type}" data-event-id="${evt.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${evt.title} (${evt.time}) • ${evt.location}">
+                    <div class="event-pill ${evt.type}" data-event-id="${evt.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipTitle}">
                         <i class="bi ${iconClass} fs-8"></i>
-                        <span>${evt.title}</span>
+                        <span>${bellIconHtml}${evt.title}</span>
                     </div>
                 `;
             }
@@ -333,6 +338,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const repeatBadgeClass = evt.repeatType === 'once' ? 'once' : 'weekly';
             const repeatBadgeIcon = repeatIconMap[evt.repeatType] || 'bi-repeat';
             const repeatBadgeText = evt.repeatLabel || repeatLabelMap[evt.repeatType] || 'Lặp hàng tuần';
+            const notifTag = evt.batThongBao ? `
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1" title="Đang nhắc trước ${evt.soNgayNhac || 1} ngày">
+                    🔔 Nhắc trước ${evt.soNgayNhac || 1} ngày
+                </span>
+            ` : '';
 
             html += `
                 <div class="day-event-detail-item ${evt.type}">
@@ -346,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="repeat-tag ${repeatBadgeClass}">
                                     <i class="bi ${repeatBadgeIcon}"></i>${repeatBadgeText}
                                 </span>
+                                ${notifTag}
                             </div>
                             <div class="d-flex align-items-center gap-3 text-muted fs-7">
                                 <span><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
@@ -416,6 +427,23 @@ document.addEventListener('DOMContentLoaded', function() {
         todayList.innerHTML = html;
     }
 
+    // Lắng nghe sự kiện bật/tắt Switch Thông báo cho tất cả các form
+    document.querySelectorAll('.notif-toggle-switch').forEach(switchEl => {
+        switchEl.addEventListener('change', function() {
+            const targetSelector = this.getAttribute('data-target');
+            if (targetSelector) {
+                const targetEl = document.querySelector(targetSelector);
+                if (targetEl) {
+                    if (this.checked) {
+                        targetEl.classList.add('show');
+                    } else {
+                        targetEl.classList.remove('show');
+                    }
+                }
+            }
+        });
+    });
+
     document.getElementById('btnAddNewFromDayModal')?.addEventListener('click', function() {
         dayDetailModal?.hide();
         openCreateModalWithDay(activeSelectedDay);
@@ -426,6 +454,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('createTapLuyenDay').value = day;
         document.getElementById('createDeadlineDay').value = day;
         document.getElementById('createCaNhanDay').value = day;
+
+        // Reset trạng thái thông báo mặc định: Tắt
+        ['createHocTap', 'createTapLuyen', 'createDeadline', 'createCaNhan'].forEach(prefix => {
+            const sw = document.getElementById(`${prefix}BatThongBao`);
+            const sel = document.getElementById(`${prefix}SoNgayNhac`);
+            const grp = document.getElementById(`${prefix}RemindGroup`);
+            if (sw) sw.checked = false;
+            if (sel) sel.value = "1";
+            if (grp) grp.classList.remove('show');
+        });
 
         createEventModal?.show();
     }
@@ -445,6 +483,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const timeRange = `${startTime} - ${endTime}`;
             const location = document.getElementById('createHocTapLocation').value.trim() || 'Phòng học';
             const repeatType = document.getElementById('createHocTapRepeat').value || 'weekly';
+            const batThongBao = document.getElementById('createHocTapBatThongBao')?.checked || false;
+            const soNgayNhac = parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1);
 
             newEvt = {
                 id: newId,
@@ -458,7 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 location: location,
                 repeatType: repeatType,
                 repeatLabel: repeatLabelMap[repeatType] || 'Lặp hàng tuần',
-                excludedDays: []
+                excludedDays: [],
+                batThongBao: batThongBao,
+                soNgayNhac: soNgayNhac
             };
         } else if (tabId === 'tap-luyen-tab') {
             const title = document.getElementById('createTapLuyenTitle').value.trim() || 'Buổi tập mới';
@@ -468,6 +510,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const timeRange = `${startTime} - ${endTime}`;
             const location = document.getElementById('createTapLuyenLocation').value.trim() || 'Gym Club';
             const repeatType = document.getElementById('createTapLuyenRepeat').value || 'weekly';
+            const batThongBao = document.getElementById('createTapLuyenBatThongBao')?.checked || false;
+            const soNgayNhac = parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1);
 
             newEvt = {
                 id: newId,
@@ -481,7 +525,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 location: location,
                 repeatType: repeatType,
                 repeatLabel: repeatLabelMap[repeatType] || 'Lặp hàng tuần',
-                excludedDays: []
+                excludedDays: [],
+                batThongBao: batThongBao,
+                soNgayNhac: soNgayNhac
             };
         } else if (tabId === 'deadline-tab') {
             const title = document.getElementById('createDeadlineTitle').value.trim() || 'Deadline mới';
@@ -489,6 +535,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const time = document.getElementById('createDeadlineTime').value || '23:59';
             const location = document.getElementById('createDeadlineLocation').value.trim() || 'Nộp online';
             const repeatType = document.getElementById('createDeadlineRepeat').value || 'once';
+            const batThongBao = document.getElementById('createDeadlineBatThongBao')?.checked || false;
+            const soNgayNhac = parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1);
 
             newEvt = {
                 id: newId,
@@ -502,7 +550,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 location: location,
                 repeatType: repeatType,
                 repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện 1 lần',
-                excludedDays: []
+                excludedDays: [],
+                batThongBao: batThongBao,
+                soNgayNhac: soNgayNhac
             };
         } else {
             const title = document.getElementById('createCaNhanTitle').value.trim() || 'Sự kiện cá nhân';
@@ -510,6 +560,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const time = document.getElementById('createCaNhanTime').value || '14:00';
             const location = document.getElementById('createCaNhanLocation').value.trim() || 'Địa điểm';
             const repeatType = document.getElementById('createCaNhanRepeat').value || 'once';
+            const batThongBao = document.getElementById('createCaNhanBatThongBao')?.checked || false;
+            const soNgayNhac = parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1);
 
             newEvt = {
                 id: newId,
@@ -523,7 +575,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 location: location,
                 repeatType: repeatType,
                 repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện 1 lần',
-                excludedDays: []
+                excludedDays: [],
+                batThongBao: batThongBao,
+                soNgayNhac: soNgayNhac
             };
         }
 
@@ -549,6 +603,21 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('editEventRepeat').value = evt.repeatType || 'weekly';
         document.getElementById('editEventLocation').value = evt.location;
 
+        // Điền dữ liệu thông báo hiện tại vào Modal Sửa
+        const editSw = document.getElementById('editEventBatThongBao');
+        const editSel = document.getElementById('editEventSoNgayNhac');
+        const editGrp = document.getElementById('editEventRemindGroup');
+
+        if (editSw) editSw.checked = evt.batThongBao || false;
+        if (editSel) editSel.value = evt.soNgayNhac || 1;
+        if (editGrp) {
+            if (evt.batThongBao) {
+                editGrp.classList.add('show');
+            } else {
+                editGrp.classList.remove('show');
+            }
+        }
+
         editEventModal?.show();
     }
 
@@ -565,6 +634,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
             const location = document.getElementById('editEventLocation').value;
             const repeatType = document.getElementById('editEventRepeat').value || 'weekly';
+            const batThongBao = document.getElementById('editEventBatThongBao')?.checked || false;
+            const soNgayNhac = parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1);
 
             eventsList[evtIndex] = {
                 ...eventsList[evtIndex],
@@ -576,13 +647,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 endTime,
                 location,
                 repeatType,
-                repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện'
+                repeatLabel: repeatLabelMap[repeatType] || 'Sự kiện',
+                batThongBao,
+                soNgayNhac
             };
         }
 
         editEventModal?.hide();
         renderCalendarGrid();
-        openDayDetailModal(eventsList[evtIndex].day);
+        if (evtIndex !== -1) {
+            openDayDetailModal(eventsList[evtIndex].day);
+        }
     });
 
     // Delete handling
