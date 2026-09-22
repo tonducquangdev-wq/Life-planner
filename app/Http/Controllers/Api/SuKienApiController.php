@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\SuKien;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+
 
 class SuKienApiController extends Controller
 {
@@ -33,7 +35,7 @@ class SuKienApiController extends Controller
         $validated = $request->validate([
             'tieu_de'           => 'required|string|max:255',
             'mo_ta'             => 'nullable|string',
-            'loai_su_kien'      => 'nullable|string|max:50',
+            'loai_su_kien'      => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan',
             'thoi_gian_bat_dau' => 'required|date',
             'thoi_gian_ket_thuc' => 'required|date|after_or_equal:thoi_gian_bat_dau',
             'mau_hien_thi'      => 'nullable|string|max:20',
@@ -90,16 +92,35 @@ class SuKienApiController extends Controller
             ], 403, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'tieu_de'           => 'sometimes|required|string|max:255',
             'mo_ta'             => 'nullable|string',
-            'loai_su_kien'      => 'nullable|string|max:50',
-            'thoi_gian_bat_dau' => 'sometimes|required|date',
-            'thoi_gian_ket_thuc' => 'sometimes|required|date|after_or_equal:thoi_gian_bat_dau',
+            'loai_su_kien'      => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan',
             'mau_hien_thi'      => 'nullable|string|max:20',
             'bat_thong_bao'     => 'nullable|boolean',
             'so_ngay_nhac'      => 'nullable|integer|min:1|max:30',
-        ]);
+        ];
+
+        $hasStartTime = $request->has('thoi_gian_bat_dau');
+        $hasEndTime   = $request->has('thoi_gian_ket_thuc');
+
+        if ($hasStartTime && $hasEndTime) {
+            $rules['thoi_gian_bat_dau'] = 'required|date';
+            $rules['thoi_gian_ket_thuc'] = 'required|date|after_or_equal:thoi_gian_bat_dau';
+        } elseif ($hasEndTime) {
+            $startTime = $suKien->thoi_gian_bat_dau
+                ? Carbon::parse($suKien->thoi_gian_bat_dau)->toDateTimeString()
+                : null;
+            $rules['thoi_gian_ket_thuc'] = 'required|date' . ($startTime ? '|after_or_equal:' . $startTime : '');
+        } elseif ($hasStartTime) {
+            $rules['thoi_gian_bat_dau'] = 'required|date';
+            if ($suKien->thoi_gian_ket_thuc) {
+                $endTime = Carbon::parse($suKien->thoi_gian_ket_thuc)->toDateTimeString();
+                $rules['thoi_gian_bat_dau'] .= '|before_or_equal:' . $endTime;
+            }
+        }
+
+        $validated = $request->validate($rules);
 
         $suKien->update($validated);
 
@@ -109,6 +130,7 @@ class SuKienApiController extends Controller
             'data'    => $suKien,
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
+
 
     /**
      * 5. DELETE /api/su-kien/{id} : Xóa sự kiện (Anti-IDOR + SoftDeletes)

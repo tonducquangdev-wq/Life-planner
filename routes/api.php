@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::as('api.')->group(function () {
 
     // MODULE 1: AUTHENTICATION (Public Login)
-    Route::post('/login', [AuthApiController::class, 'login'])->name('login');
+    Route::post('/login', [AuthApiController::class, 'login'])->middleware('throttle:login')->name('login');
 
     // PROTECTED ROUTES (Sanctum Middleware)
     Route::middleware('auth:sanctum')->group(function () {
@@ -41,6 +41,12 @@ Route::as('api.')->group(function () {
         Route::apiResource('su-kien', SuKienApiController::class);
 
         // MODULE 5: TẬP LUYỆN (RESTful & Specialized Workouts API)
+        // 5.1 Workout Schedule & History helpers (Đặt trước apiResource để tránh route shadowing)
+        Route::get('/tap-luyen/schedule', [TapLuyenApiController::class, 'schedule']);
+        Route::post('/tap-luyen/cap-nhat-buoi-tap', [TapLuyenApiController::class, 'capNhatBuoiTap']);
+        Route::post('/tap-luyen/hoan-thanh', [TapLuyenApiController::class, 'hoanThanh']);
+
+        // 5.2 Kế hoạch & Buổi tập theo tiền tố /tap-luyen/
         Route::get('/tap-luyen/ke-hoach', [TapLuyenApiController::class, 'indexPlans']);
         Route::post('/tap-luyen/ke-hoach', [TapLuyenApiController::class, 'storePlan']);
 
@@ -49,17 +55,17 @@ Route::as('api.')->group(function () {
 
         Route::get('/tap-luyen/lich-su', [TapLuyenApiController::class, 'indexHistory']);
 
+        // 5.3 RESTful Resource Kế hoạch tập luyện
         Route::apiResource('tap-luyen', TapLuyenApiController::class);
 
-        // Workout Schedule & History helpers
-        Route::get('/tap-luyen/schedule', [TapLuyenApiController::class, 'schedule']);
-        Route::post('/tap-luyen/cap-nhat-buoi-tap', [TapLuyenApiController::class, 'capNhatBuoiTap']);
-        Route::post('/tap-luyen/hoan-thanh', [TapLuyenApiController::class, 'hoanThanh']);
-
-        // Extended Workout Endpoints
+        // 5.4 RESTful Aliases & Extended Endpoints (Tương thích Feature Tests & REST client)
+        Route::get('/ke-hoach-tap-luyen', [TapLuyenApiController::class, 'indexPlans']);
+        Route::post('/ke-hoach-tap-luyen', [TapLuyenApiController::class, 'storePlan']);
         Route::post('/ke-hoach-tap-luyen/{id}/kich-hoat', [TapLuyenApiController::class, 'activatePlan']);
         Route::delete('/ke-hoach-tap-luyen/{id}', [TapLuyenApiController::class, 'destroyPlan']);
 
+        Route::get('/buoi-tap', [TapLuyenApiController::class, 'indexSessions']);
+        Route::post('/buoi-tap', [TapLuyenApiController::class, 'storeSession']);
         Route::put('/buoi-tap/{id}', [TapLuyenApiController::class, 'updateSession']);
         Route::delete('/buoi-tap/{id}', [TapLuyenApiController::class, 'destroySession']);
 

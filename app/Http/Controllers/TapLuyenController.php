@@ -366,11 +366,17 @@ class TapLuyenController extends Controller
         $buoiTapId = $request->input('buoi_tap_id');
 
         if ($buoiTapId) {
-            $exists = BuoiTap::where('id', $buoiTapId)->exists();
-            if (! $exists) {
-                $buoiTapId = null;
+            $isOwner = BuoiTap::where('id', $buoiTapId)
+                ->whereHas('keHoachTapLuyen', fn ($q) => $q->where('user_id', $userId))
+                ->exists();
+            if (! $isOwner) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Buổi tập không hợp lệ hoặc không thuộc quyền sở hữu của bạn.',
+                ], 403);
             }
         }
+
 
         if (! $buoiTapId) {
             $userBuoiTap = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {

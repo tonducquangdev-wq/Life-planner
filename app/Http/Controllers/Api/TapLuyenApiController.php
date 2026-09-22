@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class TapLuyenApiController extends Controller
 {
@@ -342,9 +343,10 @@ class TapLuyenApiController extends Controller
         $userId = Auth::id();
 
         $lichSu = LichSuTapLuyen::where('user_id', $userId)
-            ->with(['buoiTap', 'keHoachTapLuyen'])
+            ->with(['buoiTap.keHoachTapLuyen'])
             ->orderBy('thoi_gian_bat_dau', 'desc')
             ->get();
+
 
         return response()->json([
             'success' => true,
@@ -427,8 +429,27 @@ class TapLuyenApiController extends Controller
      */
     public function hoanThanh(Request $request): JsonResponse
     {
+        $userId = Auth::id();
+
+        $request->validate([
+            'buoi_tap_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('buoi_tap', 'id')->where(function ($query) use ($userId) {
+                    $query->whereIn('ke_hoach_tap_luyen_id', function ($sub) use ($userId) {
+                        $sub->select('id')->from('ke_hoach_tap_luyen')->where('user_id', $userId);
+                    });
+                }),
+            ],
+            'ten_buoi_tap' => 'nullable|string|max:255',
+            'seconds' => 'nullable|integer|min:0',
+            'tong_thoi_luong' => 'nullable|integer|min:0',
+            'ghi_chu' => 'nullable|string|max:1000',
+        ]);
+
         $controller = new TapLuyenController;
 
         return $controller->hoanThanh($request);
     }
+
 }
