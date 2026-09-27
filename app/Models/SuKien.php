@@ -23,6 +23,8 @@ class SuKien extends Model
         'mau_hien_thi',
         'bat_thong_bao',
         'so_ngay_nhac',
+        'quy_tac_lap',
+        'nhom_lap_id',
     ];
 
     protected function casts(): array

@@ -8,9 +8,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. STATE & CHỈ SỐ THỜI GIAN
     // ==========================================================================
     let eventsList = []; // Chứa dữ liệu thật fetch từ API backend
-    let currentYear = 2026;
-    let currentMonth = 9; // Tháng 9
-    let activeSelectedDay = 14;
+    const todayDate = new Date();
+    let currentYear = todayDate.getFullYear();
+    let currentMonth = todayDate.getMonth() + 1;
+    let activeSelectedDay = todayDate.getDate();
+
+    const currentMonthTitleEl = document.getElementById('currentMonthTitle');
+    if (currentMonthTitleEl) {
+        currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+    }
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -137,7 +143,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         endTime: endTimeStr,
                         location: evt.location || '',
                         batThongBao: Boolean(evt.bat_thong_bao),
-                        soNgayNhac: parseInt(evt.so_ngay_nhac || 1)
+                        soNgayNhac: parseInt(evt.so_ngay_nhac || 1),
+                        quyTacLap: evt.quy_tac_lap || 'once',
+                        nhomLapId: evt.nhom_lap_id || null
                     };
                 });
             }
@@ -258,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const evt = filteredEvents[i];
                 const iconClass = typeIconMap[evt.type] || 'bi-circle-fill';
                 const bellIconHtml = evt.batThongBao ? '🔔 ' : '';
+                const repeatIconHtml = (evt.quyTacLap && evt.quyTacLap !== 'once') ? '🔄 ' : '';
                 const tooltipTitle = evt.batThongBao
                     ? `Đang nhắc trước ${evt.soNgayNhac || 1} ngày • ${evt.title} (${evt.time})`
                     : `${evt.title} (${evt.time}) • ${evt.location}`;
@@ -265,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cellsHtml += `
                     <div class="event-pill ${evt.type}" data-event-id="${evt.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipTitle}">
                         <i class="bi ${iconClass} fs-8"></i>
-                        <span>${bellIconHtml}${evt.title}</span>
+                        <span>${bellIconHtml}${repeatIconHtml}${evt.title}</span>
                     </div>
                 `;
             }
@@ -353,6 +362,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     🔔 Nhắc trước ${evt.soNgayNhac || 1} ngày
                 </span>
             ` : '';
+            const repeatTag = (evt.quyTacLap && evt.quyTacLap !== 'once') ? `
+                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1">
+                    🔄 ${evt.quyTacLap === 'daily' ? 'Hằng ngày' : (evt.quyTacLap === 'weekly' ? 'Hằng tuần' : 'Hằng tháng')}
+                </span>
+            ` : '';
 
             html += `
                 <div class="day-event-detail-item ${evt.type}">
@@ -363,6 +377,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="text-truncate">
                             <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
                                 <span class="fw-bold text-dark fs-6 text-truncate">${evt.title}</span>
+                                ${repeatTag}
                                 ${notifTag}
                             </div>
                             <div class="d-flex align-items-center gap-3 text-muted fs-7">
@@ -476,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ==========================================================================
-    // 5. BƯỚC 5: TẠO SỰ KIỆN (POST /calendar/events)
+    // 5. TẠO SỰ KIỆN (POST /calendar/events)
     // ==========================================================================
     document.getElementById('btnSaveNewEvent')?.addEventListener('click', async function () {
         const activeTab = document.querySelector('#eventTab .nav-link.active');
@@ -491,6 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const startTime = document.getElementById('createHocTapTime').value || '08:00';
             const endTime = document.getElementById('createHocTapEndTime').value || '10:30';
             const location = document.getElementById('createHocTapLocation').value.trim();
+            const repeat = document.getElementById('createHocTapRepeat')?.value || 'weekly';
 
             payload = {
                 tieu_de: title,
@@ -499,7 +515,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1)
+                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat
             };
         } else if (tabId === 'tap-luyen-tab') {
             const title = document.getElementById('createTapLuyenTitle').value.trim();
@@ -508,6 +525,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const startTime = document.getElementById('createTapLuyenTime').value || '18:00';
             const endTime = document.getElementById('createTapLuyenEndTime').value || '19:30';
             const location = document.getElementById('createTapLuyenLocation').value.trim();
+            const repeat = document.getElementById('createTapLuyenRepeat')?.value || 'weekly';
 
             payload = {
                 tieu_de: title,
@@ -516,7 +534,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1)
+                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat
             };
         } else if (tabId === 'deadline-tab') {
             const title = document.getElementById('createDeadlineTitle').value.trim();
@@ -524,6 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const day = parseInt(document.getElementById('createDeadlineDay').value);
             const time = document.getElementById('createDeadlineTime').value || '23:59';
             const location = document.getElementById('createDeadlineLocation').value.trim();
+            const repeat = document.getElementById('createDeadlineRepeat')?.value || 'once';
 
             payload = {
                 tieu_de: title,
@@ -531,7 +551,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1)
+                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat
             };
         } else {
             const title = document.getElementById('createCaNhanTitle').value.trim();
@@ -539,6 +560,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const day = parseInt(document.getElementById('createCaNhanDay').value);
             const time = document.getElementById('createCaNhanTime').value || '14:00';
             const location = document.getElementById('createCaNhanLocation').value.trim();
+            const repeat = document.getElementById('createCaNhanRepeat')?.value || 'once';
 
             payload = {
                 tieu_de: title,
@@ -546,7 +568,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1)
+                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat
             };
         }
 
@@ -577,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ==========================================================================
-    // 6. BƯỚC 6: SỬA SỰ KIỆN (PUT /calendar/events/{id})
+    // 6. SỬA SỰ KIỆN (PUT /calendar/events/{id})
     // ==========================================================================
     function openEditModal(eventId) {
         const evt = eventsList.find(e => e.id === eventId);
@@ -592,6 +615,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editEventTime').value = evt.startTime || '08:00';
         document.getElementById('editEventEndTime').value = evt.endTime || '';
         document.getElementById('editEventLocation').value = evt.location || '';
+
+        const editRepeatSel = document.getElementById('editEventRepeat');
+        if (editRepeatSel) editRepeatSel.value = evt.quyTacLap || 'once';
 
         const editSw = document.getElementById('editEventBatThongBao');
         const editSel = document.getElementById('editEventSoNgayNhac');
@@ -617,6 +643,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const startTime = document.getElementById('editEventTime').value || '08:00';
         const endTime = document.getElementById('editEventEndTime').value;
         const location = document.getElementById('editEventLocation').value.trim();
+        const repeat = document.getElementById('editEventRepeat')?.value || 'once';
 
         if (!title) {
             showToast('Vui lòng nhập tiêu đề sự kiện.', false);
@@ -629,7 +656,8 @@ document.addEventListener('DOMContentLoaded', function () {
             thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
             mo_ta: location,
             bat_thong_bao: document.getElementById('editEventBatThongBao')?.checked || false,
-            so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1)
+            so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1),
+            quy_tac_lap: repeat
         };
 
         if (endTime) {
@@ -663,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ==========================================================================
-    // 7. BƯỚC 7: XÓA SỰ KIỆN (DELETE /calendar/events/{id})
+    // 7. XÓA SỰ KIỆN (DELETE /calendar/events/{id})
     // ==========================================================================
     let pendingDeleteEventId = null;
     let pendingDeleteDay = null;
@@ -672,14 +700,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const evt = eventsList.find(e => e.id === eventId);
         if (!evt) return;
 
-        if (confirm(`Bạn có chắc chắn muốn xóa sự kiện "${evt.title}" không?`)) {
-            executeDeleteApi(eventId, day);
+        if (evt.nhomLapId && evt.quyTacLap && evt.quyTacLap !== 'once') {
+            pendingDeleteEventId = eventId;
+            pendingDeleteDay = day;
+
+            const titleEl = document.getElementById('deleteEventChoiceTitle');
+            const dayEl = document.getElementById('deleteEventChoiceDay');
+            if (titleEl) titleEl.textContent = evt.title;
+            if (dayEl) dayEl.textContent = `${day}/${String(currentMonth).padStart(2, '0')}`;
+
+            dayDetailModal?.hide();
+            deleteChoiceModal?.show();
+        } else {
+            if (confirm(`Bạn có chắc chắn muốn xóa sự kiện "${evt.title}" không?`)) {
+                executeDeleteApi(eventId, day, 'single');
+            }
         }
     }
 
-    async function executeDeleteApi(eventId, day) {
+    async function executeDeleteApi(eventId, day, mode = 'single') {
         try {
-            const response = await fetch(`/calendar/events/${eventId}`, {
+            const response = await fetch(`/calendar/events/${eventId}?mode=${mode}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -704,13 +745,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('btnDeleteOnlyThisOccurrence')?.addEventListener('click', function () {
         if (pendingDeleteEventId && pendingDeleteDay) {
-            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay);
+            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay, 'single');
         }
     });
 
     document.getElementById('btnDeleteAllOccurrences')?.addEventListener('click', function () {
         if (pendingDeleteEventId && pendingDeleteDay) {
-            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay);
+            executeDeleteApi(pendingDeleteEventId, pendingDeleteDay, 'all');
         }
     });
 
@@ -783,7 +824,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             currentMonth--;
         }
-        document.getElementById('currentMonthTitle').textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        if (currentMonthTitleEl) {
+            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        }
         renderCalendarGrid();
     });
 
@@ -794,7 +837,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             currentMonth++;
         }
-        document.getElementById('currentMonthTitle').textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        if (currentMonthTitleEl) {
+            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        }
         renderCalendarGrid();
     });
 

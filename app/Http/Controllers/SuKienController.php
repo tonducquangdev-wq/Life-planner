@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\SuKien;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SuKienController extends Controller
 {
@@ -29,6 +31,8 @@ class SuKienController extends Controller
                 'location' => $evt->mo_ta,
                 'bat_thong_bao' => (bool) $evt->bat_thong_bao,
                 'so_ngay_nhac' => (int) ($evt->so_ngay_nhac ?? 1),
+                'quy_tac_lap' => $evt->quy_tac_lap ?? 'once',
+                'nhom_lap_id' => $evt->nhom_lap_id,
             ];
         });
 
@@ -39,7 +43,7 @@ class SuKienController extends Controller
     }
 
     /**
-     * Tạo mới sự kiện cho user hiện tại
+     * Tạo mới sự kiện cho user hiện tại (Hỗ trợ lặp hằng ngày, hằng tuần, hằng tháng)
      */
     public function store(Request $request): JsonResponse
     {
@@ -52,6 +56,7 @@ class SuKienController extends Controller
             'mau_hien_thi' => 'nullable|string',
             'bat_thong_bao' => 'nullable|boolean',
             'so_ngay_nhac' => 'nullable|integer|in:1,2',
+            'quy_tac_lap' => 'nullable|string|in:once,daily,weekly,monthly',
         ];
 
         if ($request->filled('thoi_gian_bat_dau') && $request->filled('thoi_gian_ket_thuc')) {
@@ -70,7 +75,47 @@ class SuKienController extends Controller
         $validated['bat_thong_bao'] = $request->boolean('bat_thong_bao');
         $validated['so_ngay_nhac'] = $request->input('so_ngay_nhac', 1);
 
-        $suKien = SuKien::create($validated);
+        $quyTacLap = $request->input('quy_tac_lap', 'once');
+        $validated['quy_tac_lap'] = $quyTacLap;
+
+        if (in_array($quyTacLap, ['daily', 'weekly', 'monthly'])) {
+            $nhomLapId = (string) Str::uuid();
+            $validated['nhom_lap_id'] = $nhomLapId;
+
+            $start = Carbon::parse($validated['thoi_gian_bat_dau']);
+            $end = !empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
+            $durationInSeconds = $end ? $start->diffInSeconds($end) : null;
+
+            $count = match ($quyTacLap) {
+                'daily' => 30,    // Tạo 30 ngày lặp liên tiếp
+                'weekly' => 12,   // Tạo 12 tuần lặp liên tiếp (3 tháng)
+                'monthly' => 6,   // Tạo 6 tháng lặp liên tiếp
+                default => 1,
+            };
+
+            $createdEvents = [];
+            for ($i = 0; $i < $count; $i++) {
+                $instanceStart = match ($quyTacLap) {
+                    'daily' => $start->copy()->addDays($i),
+                    'weekly' => $start->copy()->addWeeks($i),
+                    'monthly' => $start->copy()->addMonths($i),
+                    default => $start->copy(),
+                };
+
+                $instanceData = $validated;
+                $instanceData['thoi_gian_bat_dau'] = $instanceStart->toDateTimeString();
+                if ($end && $durationInSeconds !== null) {
+                    $instanceData['thoi_gian_ket_thuc'] = $instanceStart->copy()->addSeconds($durationInSeconds)->toDateTimeString();
+                }
+
+                $createdEvents[] = SuKien::create($instanceData);
+            }
+            $suKien = $createdEvents[0];
+        } else {
+            $validated['quy_tac_lap'] = 'once';
+            $validated['nhom_lap_id'] = null;
+            $suKien = SuKien::create($validated);
+        }
 
         return response()->json([
             'success' => true,
@@ -85,6 +130,8 @@ class SuKienController extends Controller
                 'location' => $suKien->mo_ta,
                 'bat_thong_bao' => (bool) $suKien->bat_thong_bao,
                 'so_ngay_nhac' => (int) ($suKien->so_ngay_nhac ?? 1),
+                'quy_tac_lap' => $suKien->quy_tac_lap ?? 'once',
+                'nhom_lap_id' => $suKien->nhom_lap_id,
             ],
         ], 201);
     }
@@ -105,10 +152,12 @@ class SuKienController extends Controller
             'mau_hien_thi' => 'nullable|string',
             'bat_thong_bao' => 'nullable|boolean',
             'so_ngay_nhac' => 'nullable|integer|in:1,2',
+            'quy_tac_lap' => 'nullable|string|in:once,daily,weekly,monthly',
+            'update_mode' => 'nullable|string|in:single,all',
         ];
 
-        $effectiveStart = $request->filled('thoi_gian_bat_dau') 
-            ? $request->input('thoi_gian_bat_dau') 
+        $effectiveStart = $request->filled('thoi_gian_bat_dau')
+            ? $request->input('thoi_gian_bat_dau')
             : ($suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null);
 
         if ($effectiveStart && $request->filled('thoi_gian_ket_thuc')) {
@@ -126,7 +175,66 @@ class SuKienController extends Controller
         $validated['bat_thong_bao'] = $request->boolean('bat_thong_bao');
         $validated['so_ngay_nhac'] = $request->input('so_ngay_nhac', 1);
 
-        $suKien->update($validated);
+        $newQuyTacLap = $request->input('quy_tac_lap', $suKien->quy_tac_lap ?? 'once');
+        $validated['quy_tac_lap'] = $newQuyTacLap;
+
+        $updateMode = $request->input('update_mode', 'single');
+
+        if ($updateMode === 'all' && !empty($suKien->nhom_lap_id)) {
+            // Cập nhật thông tin dùng chung cho tất cả các buổi lặp trong nhóm
+            SuKien::where('user_id', Auth::id())
+                ->where('nhom_lap_id', $suKien->nhom_lap_id)
+                ->update([
+                    'tieu_de' => $validated['tieu_de'],
+                    'loai_su_kien' => $validated['loai_su_kien'],
+                    'mo_ta' => $validated['mo_ta'] ?? null,
+                    'mau_hien_thi' => $validated['mau_hien_thi'] ?? '#3B82F6',
+                    'bat_thong_bao' => $validated['bat_thong_bao'],
+                    'so_ngay_nhac' => $validated['so_ngay_nhac'],
+                    'quy_tac_lap' => $validated['quy_tac_lap'],
+                ]);
+            $suKien->refresh();
+        } else {
+            // Nếu đổi từ 'once' sang chuỗi lặp mới khi sửa 1 buổi đơn
+            if ($suKien->quy_tac_lap === 'once' && in_array($newQuyTacLap, ['daily', 'weekly', 'monthly'])) {
+                $nhomLapId = (string) Str::uuid();
+                $validated['nhom_lap_id'] = $nhomLapId;
+
+                $start = Carbon::parse($validated['thoi_gian_bat_dau']);
+                $end = !empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
+                $durationInSeconds = $end ? $start->diffInSeconds($end) : null;
+
+                $count = match ($newQuyTacLap) {
+                    'daily' => 30,
+                    'weekly' => 12,
+                    'monthly' => 6,
+                    default => 1,
+                };
+
+                // Cập nhật sự kiện hiện tại thành buổi đầu
+                $suKien->update($validated);
+
+                // Tạo các buổi tương lai tiếp theo
+                for ($i = 1; $i < $count; $i++) {
+                    $instanceStart = match ($newQuyTacLap) {
+                        'daily' => $start->copy()->addDays($i),
+                        'weekly' => $start->copy()->addWeeks($i),
+                        'monthly' => $start->copy()->addMonths($i),
+                        default => $start->copy(),
+                    };
+
+                    $instanceData = $validated;
+                    $instanceData['thoi_gian_bat_dau'] = $instanceStart->toDateTimeString();
+                    if ($end && $durationInSeconds !== null) {
+                        $instanceData['thoi_gian_ket_thuc'] = $instanceStart->copy()->addSeconds($durationInSeconds)->toDateTimeString();
+                    }
+
+                    SuKien::create($instanceData);
+                }
+            } else {
+                $suKien->update($validated);
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -141,6 +249,8 @@ class SuKienController extends Controller
                 'location' => $suKien->mo_ta,
                 'bat_thong_bao' => (bool) $suKien->bat_thong_bao,
                 'so_ngay_nhac' => (int) ($suKien->so_ngay_nhac ?? 1),
+                'quy_tac_lap' => $suKien->quy_tac_lap ?? 'once',
+                'nhom_lap_id' => $suKien->nhom_lap_id,
             ],
         ]);
     }
@@ -151,7 +261,16 @@ class SuKienController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $suKien = SuKien::where('user_id', Auth::id())->findOrFail($id);
-        $suKien->delete();
+
+        $mode = request()->input('mode', request()->query('mode', 'single'));
+
+        if ($mode === 'all' && !empty($suKien->nhom_lap_id)) {
+            SuKien::where('user_id', Auth::id())
+                ->where('nhom_lap_id', $suKien->nhom_lap_id)
+                ->delete();
+        } else {
+            $suKien->delete();
+        }
 
         return response()->json([
             'success' => true,
