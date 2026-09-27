@@ -43,15 +43,26 @@ class SuKienController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'tieu_de' => 'required|string|max:255',
             'loai_su_kien' => 'required|string',
             'thoi_gian_bat_dau' => 'required|date',
-            'thoi_gian_ket_thuc' => 'nullable|date|after_or_equal:thoi_gian_bat_dau',
+            'thoi_gian_ket_thuc' => 'nullable|date',
             'mo_ta' => 'nullable|string',
             'mau_hien_thi' => 'nullable|string',
             'bat_thong_bao' => 'nullable|boolean',
             'so_ngay_nhac' => 'nullable|integer|in:1,2',
+        ];
+
+        if ($request->filled('thoi_gian_bat_dau') && $request->filled('thoi_gian_ket_thuc')) {
+            $rules['thoi_gian_ket_thuc'] .= '|after_or_equal:thoi_gian_bat_dau';
+        }
+
+        $validated = $request->validate($rules, [
+            'thoi_gian_ket_thuc.after_or_equal' => 'The thời gian kết thúc field must be a date after or equal to thời gian bắt đầu.',
+        ], [
+            'thoi_gian_bat_dau' => 'thời gian bắt đầu',
+            'thoi_gian_ket_thuc' => 'thời gian kết thúc',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -85,15 +96,30 @@ class SuKienController extends Controller
     {
         $suKien = SuKien::where('user_id', Auth::id())->findOrFail($id);
 
-        $validated = $request->validate([
+        $rules = [
             'tieu_de' => 'required|string|max:255',
             'loai_su_kien' => 'required|string',
             'thoi_gian_bat_dau' => 'required|date',
-            'thoi_gian_ket_thuc' => 'nullable|date|after_or_equal:thoi_gian_bat_dau',
+            'thoi_gian_ket_thuc' => 'nullable|date',
             'mo_ta' => 'nullable|string',
             'mau_hien_thi' => 'nullable|string',
             'bat_thong_bao' => 'nullable|boolean',
             'so_ngay_nhac' => 'nullable|integer|in:1,2',
+        ];
+
+        $effectiveStart = $request->filled('thoi_gian_bat_dau') 
+            ? $request->input('thoi_gian_bat_dau') 
+            : ($suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null);
+
+        if ($effectiveStart && $request->filled('thoi_gian_ket_thuc')) {
+            $rules['thoi_gian_ket_thuc'] .= '|after_or_equal:' . $effectiveStart;
+        }
+
+        $validated = $request->validate($rules, [
+            'thoi_gian_ket_thuc.after_or_equal' => 'The thời gian kết thúc field must be a date after or equal to thời gian bắt đầu.',
+        ], [
+            'thoi_gian_bat_dau' => 'thời gian bắt đầu',
+            'thoi_gian_ket_thuc' => 'thời gian kết thúc',
         ]);
 
         $validated['loai_su_kien'] = str_replace('-', '_', $validated['loai_su_kien']);

@@ -8,7 +8,7 @@ use App\Http\Controllers\TapLuyenController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('calendar.index');
 });
 
 // Route /dashboard tự động chuyển hướng sang Lịch (trang chính của ứng dụng)

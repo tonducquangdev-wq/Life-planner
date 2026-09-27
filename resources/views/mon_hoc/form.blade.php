@@ -114,7 +114,7 @@
                class="form-control @error('ngay_bat_dau') is-invalid @enderror" 
                id="ngay_bat_dau" 
                name="ngay_bat_dau" 
-               value="{{ old('ngay_bat_dau', isset($monHoc->ngay_bat_dau) ? $monHoc->ngay_bat_dau->format('Y-m-d') : '') }}">
+               value="{{ old('ngay_bat_dau', isset($monHoc) && $monHoc->ngay_bat_dau ? $monHoc->ngay_bat_dau->format('Y-m-d') : '') }}">
         @error('ngay_bat_dau')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -127,7 +127,7 @@
                class="form-control @error('ngay_ket_thuc') is-invalid @enderror" 
                id="ngay_ket_thuc" 
                name="ngay_ket_thuc" 
-               value="{{ old('ngay_ket_thuc', isset($monHoc->ngay_ket_thuc) ? $monHoc->ngay_ket_thuc->format('Y-m-d') : '') }}">
+               value="{{ old('ngay_ket_thuc', isset($monHoc) && $monHoc->ngay_ket_thuc ? $monHoc->ngay_ket_thuc->format('Y-m-d') : '') }}">
         @error('ngay_ket_thuc')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -163,3 +163,26 @@
         @enderror
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startInput = document.getElementById('ngay_bat_dau');
+        const endInput = document.getElementById('ngay_ket_thuc');
+
+        function syncDateConstraints() {
+            if (startInput && endInput) {
+                if (startInput.value) {
+                    endInput.min = startInput.value;
+                } else {
+                    endInput.removeAttribute('min');
+                }
+            }
+        }
+
+        if (startInput && endInput) {
+            syncDateConstraints();
+            startInput.addEventListener('change', syncDateConstraints);
+            startInput.addEventListener('input', syncDateConstraints);
+        }
+    });
+</script>

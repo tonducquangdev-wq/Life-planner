@@ -31,9 +31,53 @@ class MonHocController extends Controller
     /**
      * Lưu môn học mới vào CSDL
      */
+    /**
+     * Chuẩn hóa định dạng ngày từ d/m/Y hoặc Y-m-d về chuẩn Y-m-d.
+     * Trả về null nếu giá trị rỗng.
+     */
+    protected function normalizeDate(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        $value = trim($value);
+
+        // Trường hợp đã là Y-m-d
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return $value;
+        }
+
+        // Trường hợp dd/mm/yyyy hoặc dd-mm-yyyy
+        if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $value, $matches)) {
+            return sprintf('%04d-%02d-%02d', (int) $matches[3], (int) $matches[2], (int) $matches[1]);
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return $value;
+        }
+    }
+
+    /**
+     * Lưu môn học mới vào CSDL
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Chuẩn hóa ngày trước khi validate để tránh xung đột định dạng d/m/Y vs Y-m-d
+        $rawStart = $request->input('ngay_bat_dau');
+        $rawEnd = $request->input('ngay_ket_thuc');
+
+        $normalizedStart = $this->normalizeDate($rawStart);
+        $normalizedEnd = $this->normalizeDate($rawEnd);
+
+        $request->merge([
+            'ngay_bat_dau' => $normalizedStart,
+            'ngay_ket_thuc' => $normalizedEnd,
+        ]);
+
+        $rules = [
             'ma_mon' => 'required|string|max:50',
             'ten_mon' => 'required|string|max:255',
             'giang_vien' => 'nullable|string|max:255',
@@ -42,15 +86,30 @@ class MonHocController extends Controller
             'tien_do' => 'nullable|integer|min:0|max:100',
             'diem_so' => 'nullable|numeric|min:0|max:10',
             'ngay_bat_dau' => 'nullable|date',
-            'ngay_ket_thuc' => 'nullable|date|after_or_equal:ngay_bat_dau',
             'mau_sac' => 'nullable|string|max:20',
             'trang_thai' => 'required|in:dang_hoc,da_hoan_thanh,tam_dung',
+        ];
+
+        // Chỉ kiểm tra after_or_equal khi CẢ HAI ngày đều được cung cấp
+        if ($normalizedStart && $normalizedEnd) {
+            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:ngay_bat_dau';
+        } else {
+            $rules['ngay_ket_thuc'] = 'nullable|date';
+        }
+
+        $validated = $request->validate($rules, [
+            'ngay_ket_thuc.after_or_equal' => 'The ngày kết thúc field must be a date after or equal to ngày bắt đầu.',
+        ], [
+            'ngay_bat_dau' => 'ngày bắt đầu',
+            'ngay_ket_thuc' => 'ngày kết thúc',
         ]);
 
         // Gán user_id bằng Auth::id() và tạo môn học
         $validated['user_id'] = Auth::id();
         $validated['mau_sac'] = $request->input('mau_sac', '#6366f1');
         $validated['tien_do'] = $request->input('tien_do', 0);
+        $validated['ngay_bat_dau'] = $normalizedStart;
+        $validated['ngay_ket_thuc'] = $normalizedEnd;
 
         MonHoc::create($validated);
 
@@ -90,7 +149,24 @@ class MonHocController extends Controller
         // Kiểm tra quyền sở hữu môn học
         abort_if($monHoc->user_id !== Auth::id(), 403);
 
-        $validated = $request->validate([
+        $hasStart = $request->has('ngay_bat_dau');
+        $hasEnd = $request->has('ngay_ket_thuc');
+
+        $normalizedStart = $hasStart ? $this->normalizeDate($request->input('ngay_bat_dau')) : null;
+        $normalizedEnd = $hasEnd ? $this->normalizeDate($request->input('ngay_ket_thuc')) : null;
+
+        $mergeData = [];
+        if ($hasStart) {
+            $mergeData['ngay_bat_dau'] = $normalizedStart;
+        }
+        if ($hasEnd) {
+            $mergeData['ngay_ket_thuc'] = $normalizedEnd;
+        }
+        if (!empty($mergeData)) {
+            $request->merge($mergeData);
+        }
+
+        $rules = [
             'ma_mon' => 'required|string|max:50',
             'ten_mon' => 'required|string|max:255',
             'giang_vien' => 'nullable|string|max:255',
@@ -99,10 +175,44 @@ class MonHocController extends Controller
             'tien_do' => 'nullable|integer|min:0|max:100',
             'diem_so' => 'nullable|numeric|min:0|max:10',
             'ngay_bat_dau' => 'nullable|date',
-            'ngay_ket_thuc' => 'nullable|date|after_or_equal:ngay_bat_dau',
             'mau_sac' => 'nullable|string|max:20',
             'trang_thai' => 'required|in:dang_hoc,da_hoan_thanh,tam_dung',
+        ];
+
+        // Xác định ngày bắt đầu hiệu lực (effective start date)
+        $effectiveStartDate = null;
+        if ($hasStart) {
+            $effectiveStartDate = $normalizedStart;
+        } elseif ($monHoc->ngay_bat_dau) {
+            $effectiveStartDate = $monHoc->ngay_bat_dau->format('Y-m-d');
+        }
+
+        $effectiveEndDate = null;
+        if ($hasEnd) {
+            $effectiveEndDate = $normalizedEnd;
+        } elseif ($monHoc->ngay_ket_thuc) {
+            $effectiveEndDate = $monHoc->ngay_ket_thuc->format('Y-m-d');
+        }
+
+        if ($effectiveStartDate && $effectiveEndDate) {
+            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:' . $effectiveStartDate;
+        } else {
+            $rules['ngay_ket_thuc'] = 'nullable|date';
+        }
+
+        $validated = $request->validate($rules, [
+            'ngay_ket_thuc.after_or_equal' => 'The ngày kết thúc field must be a date after or equal to ngày bắt đầu.',
+        ], [
+            'ngay_bat_dau' => 'ngày bắt đầu',
+            'ngay_ket_thuc' => 'ngày kết thúc',
         ]);
+
+        if ($hasStart) {
+            $validated['ngay_bat_dau'] = $normalizedStart;
+        }
+        if ($hasEnd) {
+            $validated['ngay_ket_thuc'] = $normalizedEnd;
+        }
 
         $monHoc->update($validated);
 

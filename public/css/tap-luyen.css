@@ -1,66 +1,73 @@
 /* ==========================================================================
-   MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS) - STUDENT-LIFE / LIFE PLANNER
-   Chuẩn Bootstrap 5 - Tương thích 100% với Dashboard chung
+   MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS) - MODERN COMPACT DASHBOARD
+   Chuẩn Bootstrap 5 & Dark UI - Tối ưu hoàn hảo cho màn hình 1366x768
    ========================================================================== */
 
-/* 1. KHUNG HIỂN THỊ ĐỒNG HỒ TẬP LUYỆN TRUNG TÂM */
+/* 1. KHUNG HIỂN THỊ ĐỒNG HỒ TẬP LUYỆN TRUNG TÂM (COMPACT) */
 .workout-timer-box {
     background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
+    border-radius: 14px;
     position: relative;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 0.85rem 1rem !important;
+    transition: all 0.25s ease;
 }
 
 /* Con số đồng hồ bấm giờ to rõ ràng, cố định khoảng cách chữ số (tabular-nums) */
 .timer-display {
-    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    font-size: clamp(2rem, 3.2vw, 2.7rem);
     font-weight: 800;
     color: #0f172a;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    margin: 0.15rem 0 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Tiêu đề bài tập trong trình phát */
 .exercise-title-text {
-    font-size: clamp(1.25rem, 3vw, 1.85rem);
-    letter-spacing: -0.5px;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    letter-spacing: -0.3px;
+    margin-bottom: 2px !important;
 }
 
 /* 2. TRẠNG THÁI BUỔI TẬP (STATUS BADGES) */
 .workout-status-badge {
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    padding: 2px 10px !important;
+    border-radius: 20px;
     transition: all 0.25s ease;
 }
 
 .badge-not-started {
     background-color: #f1f5f9;
     color: #64748b;
-    border-color: #e2e8f0 !important;
+    border: 1px solid #e2e8f0 !important;
 }
 
 .badge-running {
-    background-color: #e0e7ff;
-    color: #4338ca;
-    border-color: #c7d2fe !important;
+    background-color: rgba(99, 102, 241, 0.15);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.35) !important;
     animation: statusPulse 2s infinite ease-in-out;
 }
 
 .badge-paused {
-    background-color: #fef3c7;
-    color: #b45309;
-    border-color: #fde68a !important;
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
 }
 
 .badge-completed {
-    background-color: #d1fae5;
-    color: #047857;
-    border-color: #a7f3d0 !important;
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
 }
 
 @keyframes statusPulse {
@@ -68,45 +75,67 @@
         box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
     }
     50% {
-        box-shadow: 0 0 0 6px rgba(99, 102, 241, 0);
+        box-shadow: 0 0 0 5px rgba(99, 102, 241, 0);
     }
 }
 
-/* 3. ĐỊNH HƯỚNG KẾ HOẠCH TUẦN (SCHEDULE ORIENTATION PILLS) */
+/* 3. ĐỊNH HƯỚNG KẾ HOẠCH TUẦN (COMPACT SINGLE ROW) */
 .schedule-orientation-card {
-    border-left: 4px solid #6366f1 !important;
+    border-left: 3px solid #6366f1 !important;
     background: #ffffff;
+    padding: 0.4rem 0.75rem !important;
+    border-radius: 12px;
+}
+
+#weekly-schedule-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#weekly-schedule-pills::-webkit-scrollbar {
+    display: none;
 }
 
 .schedule-day-pill {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    padding: 6px 12px;
-    border-radius: 12px;
+    padding: 2px 6px;
+    border-radius: 7px;
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     position: relative;
+    min-width: 52px;
+    flex: 1 1 0;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .schedule-day-pill .day-label {
     color: #64748b;
-    font-weight: 500;
-    font-size: 0.7rem;
+    font-weight: 600;
+    font-size: 0.62rem;
 }
 
 .schedule-day-pill .split-name {
     color: #1e293b;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 75px;
 }
 
 .schedule-day-pill.active-today {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     border-color: #4f46e5;
-    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 .schedule-day-pill.active-today .day-label,
@@ -127,34 +156,29 @@
 .schedule-day-pill.workout-day-pill:hover:not(.active-today) {
     background-color: #f1f5f9;
     border-color: #94a3b8;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
 .schedule-day-pill .today-marker {
     position: absolute;
-    top: -6px;
-    right: -4px;
+    top: -5px;
+    right: -3px;
     background-color: #ef4444;
     color: #ffffff;
-    font-size: 0.6rem;
+    font-size: 0.52rem;
     font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 8px;
+    padding: 1px 3px;
+    border-radius: 5px;
     line-height: 1;
-}
-
-.fs-9 {
-    font-size: 0.68rem;
 }
 
 /* 4. TABS PHÂN LOẠI BUỔI TẬP */
 .workout-type-tab {
     cursor: pointer;
-    border-radius: 30px;
-    padding: 6px 16px;
+    border-radius: 20px;
+    padding: 3px 10px;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.76rem;
     transition: all 0.2s ease;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
@@ -170,19 +194,62 @@
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #ffffff;
     border-color: #4f46e5;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
-/* 5. LƯỚI LỊCH TẬP HEATMAP 7 CỘT */
+/* 5. MICRO KPI STAT CARDS */
+.kpi-micro-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 0.45rem 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    transition: all 0.2s ease;
+}
+
+.kpi-micro-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.kpi-micro-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.kpi-micro-val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.kpi-micro-title {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0px;
+}
+
+/* 6. LƯỚI LỊCH TẬP HEATMAP 7 CỘT */
 .calendar-heatmap-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    gap: 4px;
 }
 
 .calendar-heatmap-cell {
     aspect-ratio: 1;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
     background-color: #f1f5f9;
     border: 1px solid rgba(0, 0, 0, 0.04);
@@ -196,8 +263,8 @@
 }
 
 .calendar-heatmap-cell:hover:not(.cell-empty) {
-    transform: scale(1.18);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    transform: scale(1.15);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
     z-index: 2;
 }
 
@@ -206,21 +273,23 @@
 }
 
 .legend-box {
-    width: 12px;
-    height: 12px;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* 6. EMPTY STATE KHU VỰC HOẠT ĐỘNG GẦN ĐÂY */
+/* 7. HOẠT ĐỘNG GẦN ĐÂY */
 .empty-activity-box {
     background-color: #f8fafc;
     border: 1px dashed #cbd5e1;
-    border-radius: 16px;
+    border-radius: 10px;
+    padding: 1rem 0.5rem !important;
 }
 
 .empty-icon-wrapper {
-    width: 56px;
-    height: 56px;
+    width: 38px;
+    height: 38px;
     background-color: #f1f5f9;
     border-radius: 50%;
     display: inline-flex;
@@ -231,32 +300,40 @@
 
 .activity-record-item {
     transition: background-color 0.2s ease, border-color 0.2s ease;
+    padding: 5px 6px !important;
+    border-radius: 7px;
 }
 
 .activity-record-item:hover {
     background-color: #f8fafc;
 }
 
-/* 7. HỘP ICON CHỈ SỐ */
+#history-items-list {
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+#history-items-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#history-items-list::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 4px;
+}
+
+/* 8. HỘP ICON CHỈ SỐ */
 .metric-icon-box {
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    font-size: 1.25rem;
+    border-radius: 8px;
+    font-size: 1rem;
     flex-shrink: 0;
-}
-
-/* Card hover animation tương thích dashboard */
-.kpi-card-hover {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.kpi-card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
 }
 
 .text-indigo {
@@ -275,6 +352,10 @@
     font-size: 0.72rem;
 }
 
+.fs-9 {
+    font-size: 0.65rem;
+}
+
 .shadow-xs {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
@@ -283,7 +364,7 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
 }
 
-/* 8. BADGES PHÂN LOẠI BÀI TẬP (STRENGTH, CORE, CARDIO, OTHER) */
+/* 9. BADGES PHÂN LOẠI BÀI TẬP */
 .badge-type-strength {
     background-color: #e0e7ff !important;
     color: #4338ca !important;
@@ -321,78 +402,146 @@
     cursor: pointer;
 }
 
-/* 9. RESPONSIVE DESIGN - KHÔNG DÙNG TRANSFORM SCALE HAY ZOOM */
-@media (max-width: 991.98px) {
-    .schedule-day-pill {
-        padding: 4px 8px;
-    }
-    .workout-timer-box {
-        padding: 1.5rem !important;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .calendar-heatmap-grid {
-        gap: 4px;
-    }
-    .timer-display {
-        font-size: 2.2rem;
-    }
-    .schedule-day-pill {
-        flex: 1 1 calc(25% - 4px);
-        text-align: center;
-    }
-    .exercise-title-text {
-        font-size: 1.35rem;
-    }
-}
-
 /* ==========================================================================
-   10. DARK MODE OVERRIDES FOR TAP LUYEN (BS 5.3 DATA-BS-THEME="DARK")
+   10. DARK MODE OVERRIDES CHO MODULE THỂ CHẤT (DATA-BS-THEME="DARK")
    ========================================================================== */
-[data-bs-theme="dark"] .calendar-heatmap-cell.empty-cell {
-    background-color: #0f172a !important;
+[data-bs-theme="dark"] .schedule-orientation-card {
+    background-color: #131d31 !important;
+    border-color: #1e293b !important;
+    border-left: 3px solid #6366f1 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill {
+    background-color: #0b1120 !important;
+    border-color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill .day-label {
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill .split-name {
+    color: #f1f5f9 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill.active-today {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border-color: #4f46e5 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill.active-today .split-name,
+[data-bs-theme="dark"] .schedule-day-pill.active-today .day-label {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-pill.workout-day-pill:hover:not(.active-today) {
+    background-color: #1e293b !important;
     border-color: #334155 !important;
-    color: #64748b !important;
+}
+
+/* WORKOUT TIMER BOX TRONG DARK MODE: GIAO DIỆN TỐI SANG TRỌNG, KHÔNG BỊ TRẮNG */
+[data-bs-theme="dark"] .workout-timer-box {
+    background: linear-gradient(180deg, #0b1120 0%, #080d19 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .timer-display {
+    color: #ffffff !important;
+    text-shadow: 0 0 18px rgba(99, 102, 241, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .exercise-title-text {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .kpi-micro-card {
+    background-color: #131d31 !important;
+    border-color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .kpi-micro-val {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .workout-type-tab {
+    background-color: #0b1120 !important;
+    border-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .workout-type-tab:hover {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .workout-type-tab.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    color: #ffffff !important;
+    border-color: #4f46e5 !important;
+}
+
+[data-bs-theme="dark"] .calendar-heatmap-cell {
+    background-color: #0b1120 !important;
+    border-color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .calendar-heatmap-cell.cell-empty {
+    visibility: hidden;
 }
 
 [data-bs-theme="dark"] .empty-activity-box {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+    background-color: #0b1120 !important;
+    border-color: #1e293b !important;
 }
 
 [data-bs-theme="dark"] .empty-icon-wrapper {
-    background-color: #1e293b !important;
+    background-color: #131d31 !important;
     color: #94a3b8 !important;
 }
 
 [data-bs-theme="dark"] .exercise-item-row:hover,
 [data-bs-theme="dark"] .activity-record-item:hover {
-    background-color: #334155 !important;
-    border-color: #475569 !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
 
 [data-bs-theme="dark"] .badge-type-other {
-    background-color: #334155 !important;
+    background-color: #1e293b !important;
     color: #cbd5e1 !important;
-    border-color: #475569 !important;
+    border-color: #334155 !important;
 }
 
 [data-bs-theme="dark"] .badge-type-strength {
-    background-color: rgba(99, 102, 241, 0.25) !important;
+    background-color: rgba(99, 102, 241, 0.2) !important;
     color: #a5b4fc !important;
-    border-color: rgba(165, 180, 252, 0.4) !important;
+    border-color: rgba(165, 180, 252, 0.3) !important;
 }
 
 [data-bs-theme="dark"] .badge-type-core {
-    background-color: rgba(20, 184, 166, 0.25) !important;
+    background-color: rgba(20, 184, 166, 0.2) !important;
     color: #99f6e4 !important;
-    border-color: rgba(153, 246, 228, 0.4) !important;
+    border-color: rgba(153, 246, 228, 0.3) !important;
 }
 
 [data-bs-theme="dark"] .badge-type-cardio {
-    background-color: rgba(244, 63, 94, 0.25) !important;
+    background-color: rgba(244, 63, 94, 0.2) !important;
     color: #fecdd3 !important;
-    border-color: rgba(254, 205, 211, 0.4) !important;
+    border-color: rgba(254, 205, 211, 0.3) !important;
 }
 
+[data-bs-theme="dark"] .badge-not-started {
+    background-color: #131d31 !important;
+    color: #94a3b8 !important;
+    border-color: #1e293b !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991.98px) {
+    .schedule-orientation-card {
+        padding: 0.4rem !important;
+    }
+    .workout-timer-box {
+        padding: 0.75rem !important;
+    }
+}
