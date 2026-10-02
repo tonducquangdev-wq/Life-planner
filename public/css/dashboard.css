@@ -843,3 +843,249 @@ html, body {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+/* ==========================================================================
+   6. FULL WIDTH WRAPPER (CALENDAR AS HOME - NO SIDEBAR)
+   ========================================================================== */
+.main-wrapper-full {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* ==========================================================================
+   7. BACK TO CALENDAR BUTTON (HEADER NÚT QUAY LẠI LỊCH)
+   ========================================================================== */
+.btn-back-to-calendar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.42rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.btn-back-to-calendar i {
+    font-size: 0.95rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-back-to-calendar:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    border-color: transparent;
+    transform: translateX(-3px);
+    box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.35);
+}
+
+.btn-back-to-calendar:hover i {
+    transform: translateX(-2px);
+}
+
+[data-bs-theme="dark"] .btn-back-to-calendar {
+    color: #cbd5e1;
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .btn-back-to-calendar:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+    border-color: transparent;
+}
+
+/* ==========================================================================
+   8. FLOATING ACTION MENU (GÓC PHẢI BÊN DƯỚI MÀN HÌNH)
+   ========================================================================== */
+.floating-menu-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 1060;
+}
+
+.floating-menu-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    cursor: pointer;
+    box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.45), 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+}
+
+.floating-menu-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 12px 30px -4px rgba(79, 70, 229, 0.6), 0 6px 16px 0 rgba(0, 0, 0, 0.12);
+    color: #ffffff;
+}
+
+.floating-menu-btn:active {
+    transform: scale(0.96);
+}
+
+.floating-menu-btn .icon-open {
+    display: inline-block;
+    transition: transform 0.28s ease;
+}
+
+.floating-menu-btn .icon-close {
+    display: none;
+    font-size: 1.25rem;
+}
+
+.floating-menu-container.active .floating-menu-btn {
+    background: #ef4444;
+    box-shadow: 0 8px 24px -4px rgba(239, 68, 68, 0.45);
+}
+
+.floating-menu-container.active .floating-menu-btn .icon-open {
+    display: none;
+}
+
+.floating-menu-container.active .floating-menu-btn .icon-close {
+    display: inline-block;
+    animation: rotateIn 0.25s ease-out;
+}
+
+/* POPUP MENU CARD */
+.floating-menu-popup {
+    position: absolute;
+    bottom: 68px;
+    right: 0;
+    min-width: 230px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 0.6rem;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px) scale(0.94);
+    transform-origin: bottom right;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(16px);
+}
+
+.floating-menu-container.active .floating-menu-popup {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.floating-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.floating-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.95rem;
+    border-radius: 12px;
+    color: #334155;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.floating-menu-item .menu-item-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.floating-menu-item:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    transform: translateX(3px);
+}
+
+.floating-menu-item:hover .menu-item-icon {
+    transform: scale(1.1);
+}
+
+.floating-menu-item.active {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    color: #4f46e5;
+}
+
+.floating-menu-divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 0.35rem 0.5rem;
+}
+
+/* DARK MODE CHO FLOATING MENU */
+[data-bs-theme="dark"] .floating-menu-popup {
+    background: #1e293b;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .floating-menu-item {
+    color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] .floating-menu-item:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .floating-menu-item.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+    color: #818cf8;
+}
+
+[data-bs-theme="dark"] .floating-menu-divider {
+    background-color: #334155;
+}
+
+@keyframes rotateIn {
+    from {
+        transform: rotate(-90deg) scale(0.6);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 576px) {
+    .floating-menu-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    .floating-menu-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+    .floating-menu-popup {
+        bottom: 60px;
+        min-width: 210px;
+    }
+}
+

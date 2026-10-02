@@ -38,18 +38,16 @@
 </head>
 <body>
 
-    <!-- SIDEBAR -->
-    @include('layouts.sidebar')
-
     <!-- MAIN WRAPPER -->
-    <div class="main-wrapper">
+    <div class="main-wrapper main-wrapper-full">
         
         <!-- HEADER -->
         <header class="top-header">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                    <i class="bi bi-list fs-4 text-primary"></i>
-                </button>
+                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Quay lại Lịch</span>
+                </a>
                 <h5 class="fw-bold text-dark mb-0">Chi tiết môn học</h5>
             </div>
 
@@ -234,5 +232,7 @@
             document.getElementById('sidebar')?.classList.toggle('show');
         });
     </script>
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 </body>
 </html>

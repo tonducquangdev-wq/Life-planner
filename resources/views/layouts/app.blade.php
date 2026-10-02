@@ -44,11 +44,8 @@
 
 <body>
 
-    <!-- SIDEBAR BÊN TRÁI -->
-    @include('layouts.sidebar')
-
-    <!-- MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH 100VH) -->
-    <div class="main-wrapper">
+    <!-- MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH FULL WIDTH - FLOATING MENU) -->
+    <div class="main-wrapper main-wrapper-full">
 
         <!-- TOPBAR TRÊN CÙNG -->
         @include('layouts.topbar', ['title' => $title ?? 'Hồ sơ'])
@@ -154,6 +151,8 @@
         });
     </script>
     @stack('scripts')
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 </body>
 
 </html>

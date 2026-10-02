@@ -40,18 +40,16 @@
 
 <body>
 
-    <!-- SIDEBAR -->
-    @include('layouts.sidebar')
-
     <!-- MAIN WRAPPER -->
-    <div class="main-wrapper">
+    <div class="main-wrapper main-wrapper-full">
 
         <!-- HEADER -->
         <header class="top-header">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                    <i class="bi bi-list fs-4 text-primary"></i>
-                </button>
+                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Quay lại Lịch</span>
+                </a>
                 <h5 class="fw-bold text-dark mb-0">Quản lý môn học</h5>
             </div>
 
@@ -92,9 +90,13 @@
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
                 <div>
                     <h4 class="fw-bold text-dark mb-1">Danh sách Môn Học</h4>
-                    <p class="text-muted mb-0">Quản lý danh sách các môn học, tiến độ và lịch học của bạn. jqk</p>
+                    <p class="text-muted mb-0">Quản lý danh sách các môn học, tiến độ và lịch học của bạn.</p>
                 </div>
-                <div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('study.tutors') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 shadow-xs d-inline-flex align-items-center gap-1.5">
+                        <i class="bi bi-person-video3"></i>
+                        <span class="fw-semibold">Tìm Gia sư</span>
+                    </a>
                     <a href="{{ route('mon-hoc.create') }}" class="btn btn-primary rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2">
                         <i class="bi bi-plus-circle fs-5"></i>
                         <span class="fw-semibold">Thêm môn học mới</span>
@@ -257,6 +259,8 @@
             document.getElementById('sidebar')?.classList.toggle('show');
         });
     </script>
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 </body>
 
 </html>

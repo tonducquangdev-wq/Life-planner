@@ -44,27 +44,28 @@
 <body>
 
     <!-- ==========================================================================
-         1. SIDEBAR BÊN TRÁI (DESKTOP FIXED & MOBILE OFFCANVAS)
+         MAIN WRAPPER (CALENDAR AS HOME - FULL WIDTH WITH FLOATING MENU)
          ========================================================================== -->
-    @include('layouts.sidebar')
-
-    <!-- ==========================================================================
-         MAIN WRAPPER (HEADER & NỘI DUNG CHÍNH)
-         ========================================================================== -->
-    <div class="main-wrapper">
+    <div class="main-wrapper main-wrapper-full">
 
         <!-- ==========================================================================
              2. HEADER THANH CÔNG CỤ TRÊN CÙNG
              ========================================================================== -->
         <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
             <div class="d-flex align-items-center gap-3">
-                <!-- Nút bật/tắt Sidebar Offcanvas trên Mobile & Tablet (< 992px) -->
-                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                    <i class="bi bi-list fs-4 text-primary"></i>
-                </button>
+                <!-- Brand logo hiển thị trên Header khi bỏ Sidebar -->
+                <a href="{{ route('calendar.index') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2.5">
+                    <div class="brand-icon-wrapper">
+                        <i class="bi bi-calendar2-check-fill"></i>
+                    </div>
+                    <div class="brand-text-group d-flex align-items-center gap-1.5">
+                        <span class="brand-name fw-bold fs-5 text-dark">Life Planner</span>
+                        <span class="badge bg-primary text-white rounded-pill px-2 py-0.5 fs-8 fw-semibold">PRO</span>
+                    </div>
+                </a>
 
                 <!-- Thanh tìm kiếm nhanh -->
-                <div class="search-box d-none d-md-block">
+                <div class="search-box d-none d-md-block ms-lg-3">
                     <i class="bi bi-search"></i>
                     <input type="text" class="form-control rounded-pill border-0 bg-light" id="searchCalendar" placeholder="Tìm kiếm lịch học, deadline, sự kiện...">
                 </div>
@@ -854,6 +855,9 @@
             });
         });
     </script>
+
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 
     <!-- Custom Calendar JS Engine -->
     <script src="{{ asset('js/calendar.js') }}"></script>

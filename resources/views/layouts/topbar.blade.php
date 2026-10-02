@@ -2,12 +2,13 @@
      TOP HEADER THANH CÔNG CỤ TRÊN CÙNG - LIFE PLANNER (COMPACT 58PX)
      ========================================================================== -->
 <header class="top-header">
-    <!-- BÊN TRÁI: MOBILE TOGGLE & TIÊU ĐỀ TRANG -->
+    <!-- BÊN TRÁI: NÚT QUAY LẠI LỊCH & TIÊU ĐỀ TRANG -->
     <div class="topbar-left d-flex align-items-center gap-3">
-        <!-- Nút bật/tắt Sidebar trên mobile & tablet (< 992px) -->
-        <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" aria-label="Toggle Sidebar">
-            <i class="bi bi-list fs-5 text-primary"></i>
-        </button>
+        <!-- Nút Quay lại Lịch (Luôn đưa người dùng trực tiếp về /calendar) -->
+        <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
+            <i class="bi bi-arrow-left"></i>
+            <span>Quay lại Lịch</span>
+        </a>
 
         <div class="page-title-box d-flex align-items-center gap-2">
             <h5 class="fw-bold topbar-title mb-0">{{ $title ?? 'Theo dõi thể chất' }}</h5>

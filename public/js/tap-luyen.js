@@ -176,6 +176,123 @@ document.addEventListener('DOMContentLoaded', function () {
                 emptyBanner.classList.remove('d-none');
             }
         }
+
+        if (typeof highlightActiveChecklistItem === 'function') {
+            highlightActiveChecklistItem();
+        }
+    }
+
+    // =========================================================================
+    // QUẢN LÝ CHECKLIST BÀI TẬP VÀ TIẾN ĐỘ BUỔI TẬP (INTERACTIVE CHECKLIST)
+    // =========================================================================
+    const progressBar = document.getElementById('workout-progress-bar');
+    const progressText = document.getElementById('workout-progress-text');
+    const btnUncheckAll = document.getElementById('btn-uncheck-all');
+
+    function getStorageKey() {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const buoiId = currentWorkout.buoiTapId || 'custom';
+        return `workout_checklist_${buoiId}_${todayStr}`;
+    }
+
+    function updateProgressUI() {
+        const checkboxes = document.querySelectorAll('.workout-exercise-checkbox');
+        const total = checkboxes.length;
+        let completed = 0;
+        const checkedIds = [];
+
+        checkboxes.forEach(cb => {
+            const row = cb.closest('.checklist-exercise-item');
+            const completedTag = row?.querySelector('.completed-tag');
+            if (cb.checked) {
+                completed++;
+                checkedIds.push(cb.dataset.id);
+                if (row) row.classList.add('completed');
+                if (completedTag) completedTag.classList.remove('d-none');
+            } else {
+                if (row) row.classList.remove('completed');
+                if (completedTag) completedTag.classList.add('d-none');
+            }
+        });
+
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        if (progressText) {
+            progressText.textContent = `${completed} / ${total} bài tập hoàn thành (${percent}%)`;
+        }
+        if (progressBar) {
+            progressBar.style.width = `${percent}%`;
+            progressBar.setAttribute('aria-valuenow', percent);
+        }
+
+        // Lưu trạng thái vào localStorage theo ngày
+        try {
+            localStorage.setItem(getStorageKey(), JSON.stringify(checkedIds));
+        } catch (e) {
+            console.warn('Lỗi lưu localStorage:', e);
+        }
+    }
+
+    function restoreChecklistState() {
+        try {
+            const saved = localStorage.getItem(getStorageKey());
+            if (saved) {
+                const checkedIds = JSON.parse(saved);
+                if (Array.isArray(checkedIds)) {
+                    document.querySelectorAll('.workout-exercise-checkbox').forEach(cb => {
+                        if (checkedIds.includes(cb.dataset.id)) {
+                            cb.checked = true;
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Lỗi đọc localStorage:', e);
+        }
+        updateProgressUI();
+    }
+
+    function highlightActiveChecklistItem() {
+        document.querySelectorAll('.checklist-exercise-item').forEach((item, idx) => {
+            if (idx === currentExerciseIndex) {
+                item.classList.add('active-exercise');
+            } else {
+                item.classList.remove('active-exercise');
+            }
+        });
+    }
+
+    function bindChecklistEvents() {
+        document.querySelectorAll('.workout-exercise-checkbox').forEach(cb => {
+            cb.addEventListener('change', function(e) {
+                e.stopPropagation();
+                updateProgressUI();
+            });
+        });
+
+        document.querySelectorAll('.checklist-exercise-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.type === 'checkbox') return;
+                const idx = parseInt(this.dataset.index);
+                if (!isNaN(idx)) {
+                    currentExerciseIndex = idx;
+                    renderPlayer();
+                }
+            });
+        });
+
+        if (btnUncheckAll) {
+            btnUncheckAll.addEventListener('click', function() {
+                if (confirm('Bạn có muốn bỏ chọn tất cả bài tập đã hoàn thành trong buổi hôm nay?')) {
+                    document.querySelectorAll('.workout-exercise-checkbox').forEach(cb => {
+                        cb.checked = false;
+                    });
+                    try {
+                        localStorage.removeItem(getStorageKey());
+                    } catch (e) {}
+                    updateProgressUI();
+                }
+            });
+        }
     }
 
     // Chuyển sang buổi tập bất kỳ
@@ -327,8 +444,27 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nextExBtn) {
         nextExBtn.addEventListener('click', function () {
             if (currentWorkout.exercises && currentWorkout.exercises.length > 0) {
+                // Tự động đánh dấu hoàn thành bài tập vừa làm trong checklist
+                const currentEx = currentWorkout.exercises[currentExerciseIndex];
+                if (currentEx) {
+                    const currentCb = document.querySelector(`.workout-exercise-checkbox[data-id="${currentEx.id}"]`);
+                    if (currentCb && !currentCb.checked) {
+                        currentCb.checked = true;
+                        updateProgressUI();
+                    }
+                }
+
                 currentExerciseIndex = (currentExerciseIndex + 1) % currentWorkout.exercises.length;
                 renderPlayer();
+
+                // Cuộn mượt tới bài tiếp theo trong checklist
+                const nextEx = currentWorkout.exercises[currentExerciseIndex];
+                if (nextEx) {
+                    const nextItem = document.getElementById(`checklist-item-${nextEx.id}`);
+                    if (nextItem) {
+                        nextItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
             }
         });
     }
@@ -1059,7 +1195,268 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // =========================================================================
+    // 7. FLOATING COMMUNITY MESSENGER POPUP (NO REDIRECT, NO REFRESH, NO TIMER PAUSE)
+    // =========================================================================
+    // 10. KÊNH CHAT THẾ GIỚI GYMER - GLOBAL COMMUNITY CHAT
+    // =========================================================================
+    function initCommunityMessenger() {
+        const toggleBtn = document.getElementById('floatingCommunityToggle');
+        const popup = document.getElementById('communityMessengerPopup');
+        const btnClose = document.getElementById('btnCloseCommunityPopup');
+        const btnRefresh = document.getElementById('btnRefreshWorldChat');
+        const messagesArea = document.getElementById('worldChatMessages');
+        const chatForm = document.getElementById('worldChatForm');
+        const chatInput = document.getElementById('worldChatMessageInput');
+        const iconOpen = toggleBtn?.querySelector('.icon-community-open');
+        const iconActive = toggleBtn?.querySelector('.icon-community-active');
+
+        if (!toggleBtn || !popup) return;
+
+        let isCommunityOpen = false;
+        const STORAGE_KEY = 'life_planner_world_chat_v1';
+
+        // Dữ liệu tin nhắn mẫu mặc định trên Kênh Thế Giới
+        const DEFAULT_WORLD_MESSAGES = [
+            {
+                isMe: false,
+                author: 'Hoàng Lâm',
+                avatar: 'HL',
+                text: 'Chào cả nhà gymer! Hôm nay ai tập ngực (Push Day) không? 💪',
+                time: '08:15 AM'
+            },
+            {
+                isMe: false,
+                author: 'Nguyễn Văn Hùng (HLV)',
+                avatar: 'VH',
+                text: 'Chào buổi sáng anh em! Nhớ khởi động xoay khớp vai kỹ trước khi đẩy tạ nặng nhé các bro!',
+                time: '08:24 AM'
+            },
+            {
+                isMe: false,
+                author: 'Tôn Đức Quang',
+                avatar: 'TQ',
+                text: 'Sáng nay vừa hoàn thành 4 sets Squat 110kg, chân mỏi nhừ nhưng phê quá anh em ơi! 🔥',
+                time: '08:50 AM'
+            },
+            {
+                isMe: false,
+                author: 'Trần Hoàng Nam',
+                avatar: 'HN',
+                text: 'Hôm nay ngày nghỉ (Rest Day) nạp đủ dinh dưỡng để mai vào việc tiếp. Chúc anh em tập cháy nhé!',
+                time: '09:10 AM'
+            }
+        ];
+
+        function loadWorldMessages() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            return [...DEFAULT_WORLD_MESSAGES];
+        }
+
+        function saveWorldMessages(messages) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+            } catch (e) {}
+        }
+
+        function renderWorldMessages() {
+            if (!messagesArea) return;
+            const messages = loadWorldMessages();
+
+            messagesArea.innerHTML = `
+                <div class="text-center my-1">
+                    <span class="badge bg-light text-muted border rounded-pill px-3 py-1 fs-9 fw-normal shadow-2xs">
+                        <i class="bi bi-broadcast me-1 text-primary"></i> Kênh Chat Thế Giới Gymer • Đang hoạt động
+                    </span>
+                </div>
+            `;
+
+            messages.forEach(msg => {
+                const row = document.createElement('div');
+                row.className = `world-msg-row ${msg.isMe ? 'sent-by-me' : ''}`;
+
+                if (msg.isMe) {
+                    row.innerHTML = `
+                        <div class="world-msg-bubble">
+                            <div>${msg.text}</div>
+                            <span class="world-msg-time">${msg.time}</span>
+                        </div>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <div class="world-msg-avatar">${msg.avatar || 'G'}</div>
+                        <div class="min-w-0">
+                            <div class="world-msg-author">${msg.author}</div>
+                            <div class="world-msg-bubble">
+                                <div>${msg.text}</div>
+                                <span class="world-msg-time">${msg.time}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                messagesArea.appendChild(row);
+            });
+
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function openPopup() {
+            popup.classList.add('active');
+            isCommunityOpen = true;
+            toggleBtn.classList.add('active');
+            if (iconOpen) iconOpen.classList.add('d-none');
+            if (iconActive) iconActive.classList.remove('d-none');
+            renderWorldMessages();
+            setTimeout(() => {
+                if (chatInput) chatInput.focus();
+            }, 100);
+        }
+
+        function closePopup() {
+            popup.classList.remove('active');
+            isCommunityOpen = false;
+            toggleBtn.classList.remove('active');
+            if (iconOpen) iconOpen.classList.remove('d-none');
+            if (iconActive) iconActive.classList.add('d-none');
+        }
+
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (isCommunityOpen) {
+                closePopup();
+            } else {
+                openPopup();
+            }
+        });
+
+        if (btnClose) {
+            btnClose.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closePopup();
+            });
+        }
+
+        if (btnRefresh) {
+            btnRefresh.addEventListener('click', function(e) {
+                e.stopPropagation();
+                renderWorldMessages();
+            });
+        }
+
+        // Đóng popup khi click ra ngoài nếu không gõ dở
+        document.addEventListener('click', function(e) {
+            if (isCommunityOpen && !popup.contains(e.target) && !toggleBtn.contains(e.target)) {
+                if (!chatInput || chatInput.value.trim().length === 0) {
+                    closePopup();
+                }
+            }
+        });
+
+        // Đóng popup khi nhấn phím Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isCommunityOpen) {
+                closePopup();
+            }
+        });
+
+        // Gửi tin nhắn lên Kênh Thế Giới
+        function sendWorldMessage() {
+            if (!chatInput) return;
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newMsg = {
+                isMe: true,
+                author: 'Bạn',
+                avatar: 'ME',
+                text: text,
+                time: timeStr
+            };
+
+            const messages = loadWorldMessages();
+            messages.push(newMsg);
+            saveWorldMessages(messages);
+
+            // Render ngay vào DOM
+            const row = document.createElement('div');
+            row.className = 'world-msg-row sent-by-me';
+            row.innerHTML = `
+                <div class="world-msg-bubble">
+                    <div>${text}</div>
+                    <span class="world-msg-time">${timeStr}</span>
+                </div>
+            `;
+            messagesArea.appendChild(row);
+            chatInput.value = '';
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Phản hồi ngẫu nhiên từ cộng đồng sau 1.2s tạo không khí sôi động
+            const replies = [
+                { author: 'Nguyễn Văn Hùng (HLV)', avatar: 'VH', text: 'Tuyệt vời bro! Giữ form chuẩn và tập đều đặn nhé 🔥' },
+                { author: 'Tôn Đức Quang', avatar: 'TQ', text: 'Cố lên bạn ơi, rep cuối đẩy cháy hết mình luôn nhé! 💪' },
+                { author: 'Trần Hoàng Nam', avatar: 'HN', text: 'Chuẩn luôn anh em, tập xong nhớ nạp đủ protein và uống nước nha!' },
+                { author: 'Hoàng Lâm', avatar: 'HL', text: 'Đồng đội rèn luyện cùng nhau thế này năng lượng lên hẳn! 🔥' }
+            ];
+
+            setTimeout(() => {
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                const replyMsg = {
+                    isMe: false,
+                    author: randomReply.author,
+                    avatar: randomReply.avatar,
+                    text: randomReply.text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+
+                const currentMsgs = loadWorldMessages();
+                currentMsgs.push(replyMsg);
+                saveWorldMessages(currentMsgs);
+
+                const replyRow = document.createElement('div');
+                replyRow.className = 'world-msg-row';
+                replyRow.innerHTML = `
+                    <div class="world-msg-avatar">${replyMsg.avatar}</div>
+                    <div class="min-w-0">
+                        <div class="world-msg-author">${replyMsg.author}</div>
+                        <div class="world-msg-bubble">
+                            <div>${replyMsg.text}</div>
+                            <span class="world-msg-time">${replyMsg.time}</span>
+                        </div>
+                    </div>
+                `;
+                messagesArea.appendChild(replyRow);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }, 1200);
+        }
+
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                sendWorldMessage();
+            });
+        }
+    }
+
     renderPlayer();
     updateStatusUI('NOT_STARTED');
+    if (typeof restoreChecklistState === 'function') {
+        restoreChecklistState();
+    }
+    if (typeof bindChecklistEvents === 'function') {
+        bindChecklistEvents();
+    }
+    if (typeof initCommunityMessenger === 'function') {
+        initCommunityMessenger();
+    }
     generateCalendar(viewMonth, viewYear);
 });

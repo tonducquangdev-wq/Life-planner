@@ -13,10 +13,13 @@ class KeHoachTapLuyen extends Model
         'ten_ke_hoach',
         'mo_ta',
         'is_active',
+        'share_code',
+        'is_shared',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_shared' => 'boolean',
     ];
 
     public function user()

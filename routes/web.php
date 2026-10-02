@@ -26,10 +26,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/calendar/events/{id}', [SuKienController::class, 'destroy'])->name('calendar.events.destroy');
 
     Route::get('/bao-cao-hoc-tap', [MonHocController::class, 'baoCaoHocTap'])->name('bao-cao-hoc-tap.index');
+    Route::get('/study/tutors', [MonHocController::class, 'danhSachGiaSu'])->name('study.tutors');
+    Route::get('/mon-hoc/gia-su', [MonHocController::class, 'danhSachGiaSu'])->name('mon-hoc.gia-su');
     Route::resource('mon-hoc', MonHocController::class);
 
     Route::get('/tap-luyen', [TapLuyenController::class, 'index'])->name('tap-luyen.index');
     Route::get('/bao-cao-tap-luyen', [TapLuyenController::class, 'baoCaoTapLuyen'])->name('bao-cao-tap-luyen.index');
+    Route::get('/workout/checklist', [TapLuyenController::class, 'checklist'])->name('workout.checklist');
+    Route::get('/workout/community', [TapLuyenController::class, 'community'])->name('workout.community');
+    Route::post('/workout/share/{id}', [TapLuyenController::class, 'generateShareCode'])->name('workout.share.generate');
+    Route::get('/workout/share/{code}', [TapLuyenController::class, 'viewSharedPlan'])->name('workout.share.view');
+    Route::post('/workout/copy/{code}', [TapLuyenController::class, 'copySharedPlan'])->name('workout.copy');
     Route::post('/tap-luyen/cap-nhat-buoi-tap', [TapLuyenController::class, 'capNhatBuoiTap'])->name('tap-luyen.cap-nhat-buoi-tap');
     Route::post('/tap-luyen/hoan-thanh', [TapLuyenController::class, 'hoanThanh'])->name('tap-luyen.hoan-thanh');
 

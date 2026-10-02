@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class TapLuyenController extends Controller
 {
@@ -304,12 +305,22 @@ class TapLuyenController extends Controller
                 $workoutPlansByType[mb_strtolower($bt->ten_buoi_tap)] = $sessionData;
             }
 
-            // Chọn buổi tập theo lịch hôm nay nếu có, hoặc buổi đầu tiên
-            if ($dinhHuongHomNay['buoi_tap_id']) {
+            // Xác định buổi tập:
+            // Ưu tiên: Nếu người dùng chọn trực tiếp qua query param (?buoi_tap_id=xxx)
+            $requestedBuoiTapId = $request->query('buoi_tap_id');
+            $isRestDay = !empty($dinhHuongHomNay['is_rest']);
+
+            if ($requestedBuoiTapId) {
+                $currentBuoiTap = $activePlan->buoiTaps->firstWhere('id', (int) $requestedBuoiTapId);
+                if ($currentBuoiTap) {
+                    $isRestDay = false; // Người dùng chủ động chọn xem/tập buổi này
+                }
+            } elseif (! $isRestDay && ! empty($dinhHuongHomNay['buoi_tap_id'])) {
                 $currentBuoiTap = $activePlan->buoiTaps->firstWhere('id', $dinhHuongHomNay['buoi_tap_id']);
             }
 
-            if (! $currentBuoiTap) {
+            // Nếu không phải ngày nghỉ và chưa có buổi tập, lấy buổi tập đầu tiên của kế hoạch
+            if (! $currentBuoiTap && ! $isRestDay) {
                 $currentBuoiTap = $activePlan->buoiTaps->first();
             }
 
@@ -317,6 +328,62 @@ class TapLuyenController extends Controller
                 $matchedSession = collect($buoiTapList)->firstWhere('id', $currentBuoiTap->id);
                 if ($matchedSession) {
                     $danhSachBaiTap = $matchedSession['exercises'];
+                }
+            }
+        }
+
+        // Danh sách thành viên cộng đồng Gymer để hiển thị trong Messenger Popup
+        $communityGymers = \App\Models\User::where('id', '!=', $userId)
+            ->select(['id', 'ho_ten', 'email', 'anh_dai_dien'])
+            ->take(10)
+            ->get()
+            ->map(function ($u, $idx) {
+                $statusList = ['Đang tập Push Day 💪', 'Vừa hoàn thành Leg Day 🔥', 'Online', 'Tập Cardio sáng 🏃', 'Đang nghỉ ngơi 😴'];
+                return [
+                    'id' => $u->id,
+                    'name' => $u->ho_ten ?? 'Gymer',
+                    'email' => $u->email,
+                    'avatar' => $u->avatar_url,
+                    'initials' => $u->initials,
+                    'status' => 'online',
+                    'activity' => $statusList[$idx % count($statusList)],
+                ];
+            });
+
+        // Bổ sung thêm thành viên mẫu nếu DB có ít user để cộng đồng luôn sinh động
+        if ($communityGymers->count() < 3) {
+            $sampleGymers = [
+                [
+                    'id' => 991,
+                    'name' => 'Nguyễn Văn Hùng (HLV)',
+                    'email' => 'hung.coach@gym.vn',
+                    'avatar' => null,
+                    'initials' => 'VH',
+                    'status' => 'online',
+                    'activity' => 'Đang tập Push Day 💪',
+                ],
+                [
+                    'id' => 992,
+                    'name' => 'Trần Hoàng Nam (PPL)',
+                    'email' => 'nam.fitness@gym.vn',
+                    'avatar' => null,
+                    'initials' => 'HN',
+                    'status' => 'online',
+                    'activity' => 'Vừa hoàn thành Leg Day 🔥',
+                ],
+                [
+                    'id' => 993,
+                    'name' => 'Lê Thảo Vy (Cardio)',
+                    'email' => 'vy.fit@gym.vn',
+                    'avatar' => null,
+                    'initials' => 'TV',
+                    'status' => 'online',
+                    'activity' => 'Online • Chia sẻ lịch tập',
+                ],
+            ];
+            foreach ($sampleGymers as $sample) {
+                if ($communityGymers->count() < 4) {
+                    $communityGymers->push($sample);
                 }
             }
         }
@@ -335,6 +402,8 @@ class TapLuyenController extends Controller
             'lichTuan' => $lichTuan,
             'dinhHuongHomNay' => $dinhHuongHomNay,
             'todayIso' => $todayIso,
+            'isRestDay' => $isRestDay ?? false,
+            'communityGymers' => $communityGymers,
             'hoatDongGanDay' => $hoatDongGanDay,
             'monthlyHeatmap' => $monthlyHeatmap,
             'currentMonth' => $currentMonth,
@@ -954,5 +1023,123 @@ class TapLuyenController extends Controller
             'currentMonth',
             'currentYear'
         ));
+    }
+
+    /**
+     * Giao diện Checklist bài tập tương tác
+     */
+    public function checklist(Request $request)
+    {
+        $params = $request->has('buoi_tap_id') ? ['buoi_tap_id' => $request->input('buoi_tap_id')] : [];
+        return redirect()->route('tap-luyen.index', $params);
+    }
+
+    /**
+     * Giao diện Cộng đồng Gymer & Tra cứu Lịch tập chia sẻ
+     */
+    public function community(Request $request)
+    {
+        $searchCode = trim($request->input('code', ''));
+
+        $query = KeHoachTapLuyen::with(['buoiTaps.chiTietBuoiTaps.baiTapTheChat', 'user'])
+            ->where('is_shared', true);
+
+        if (!empty($searchCode)) {
+            $query->where('share_code', 'like', "%{$searchCode}%");
+        }
+
+        $sharedPlans = $query->latest()->get();
+
+        // Kế hoạch cá nhân của user để cho phép bấm "Chia sẻ"
+        $myPlans = KeHoachTapLuyen::where('user_id', Auth::id())->with('buoiTaps')->get();
+
+        return view('tap_luyen.community', compact('sharedPlans', 'myPlans', 'searchCode'));
+    }
+
+    /**
+     * Tạo mã code chia sẻ công khai cho kế hoạch tập luyện
+     */
+    public function generateShareCode($id)
+    {
+        $plan = KeHoachTapLuyen::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        if (empty($plan->share_code)) {
+            $plan->share_code = 'PPL-' . strtoupper(Str::random(5));
+        }
+        $plan->is_shared = true;
+        $plan->save();
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'share_code' => $plan->share_code,
+                'share_url' => route('workout.share.view', ['code' => $plan->share_code]),
+                'message' => 'Tạo mã chia sẻ thành công!',
+            ]);
+        }
+
+        return redirect()->back()->with('status', "Đã tạo mã chia sẻ: {$plan->share_code}");
+    }
+
+    /**
+     * Xem chi tiết kế hoạch tập luyện được chia sẻ bằng Code hoặc Link
+     */
+    public function viewSharedPlan($code)
+    {
+        $plan = KeHoachTapLuyen::with(['buoiTaps.chiTietBuoiTaps.baiTapTheChat', 'user'])
+            ->where('share_code', $code)
+            ->firstOrFail();
+
+        return view('tap_luyen.share_view', compact('plan'));
+    }
+
+    /**
+     * Sao chép kế hoạch chia sẻ về tài khoản cá nhân (Deep Clone)
+     */
+    public function copySharedPlan(Request $request, $code)
+    {
+        $sourcePlan = KeHoachTapLuyen::with(['buoiTaps.chiTietBuoiTaps'])
+            ->where('share_code', $code)
+            ->firstOrFail();
+
+        $userId = Auth::id();
+
+        // Deep clone kế hoạch
+        DB::transaction(function () use ($sourcePlan, $userId) {
+            $newPlan = KeHoachTapLuyen::create([
+                'user_id' => $userId,
+                'ten_ke_hoach' => $sourcePlan->ten_ke_hoach . ' (Sao chép)',
+                'mo_ta' => $sourcePlan->mo_ta ?: 'Lịch tập được sao chép từ cộng đồng Gymer (Mã: ' . $sourcePlan->share_code . ')',
+                'is_active' => false,
+            ]);
+
+            foreach ($sourcePlan->buoiTaps as $bt) {
+                $newBt = BuoiTap::create([
+                    'ke_hoach_tap_luyen_id' => $newPlan->id,
+                    'ten_buoi_tap' => $bt->ten_buoi_tap,
+                    'mo_ta' => $bt->mo_ta,
+                    'thu_tu' => $bt->thu_tu,
+                    'ngay_trong_tuan' => $bt->ngay_trong_tuan,
+                ]);
+
+                foreach ($bt->chiTietBuoiTaps as $ct) {
+                    ChiTietBuoiTap::create([
+                        'buoi_tap_id' => $newBt->id,
+                        'bai_tap_the_chat_id' => $ct->bai_tap_the_chat_id,
+                        'thu_tu' => $ct->thu_tu,
+                        'loai_bai_tap' => $ct->loai_bai_tap,
+                        'so_sets' => $ct->so_sets,
+                        'so_reps' => $ct->so_reps,
+                        'thoi_luong' => $ct->thoi_luong,
+                        'don_vi_thoi_gian' => $ct->don_vi_thoi_gian,
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->route('tap-luyen.index')
+            ->with('status', "Đã sao chép lịch tập \"{$sourcePlan->ten_ke_hoach}\" vào danh sách kế hoạch của bạn!");
     }
 }

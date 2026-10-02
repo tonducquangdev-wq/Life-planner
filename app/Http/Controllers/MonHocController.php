@@ -328,4 +328,39 @@ class MonHocController extends Controller
             'tyLeHoanThanhBaiTap'
         ));
     }
+
+    /**
+     * Tìm kiếm và xem thông tin gia sư phục vụ sinh viên
+     */
+    public function danhSachGiaSu(Request $request)
+    {
+        $keyword = trim($request->input('q', ''));
+        $monHocId = $request->input('mon_hoc_id');
+        $mucGia = $request->input('muc_gia');
+
+        $query = \App\Models\GiaSu::with('monHoc');
+
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('ho_ten', 'like', "%{$keyword}%")
+                  ->orWhere('chuyen_mon', 'like', "%{$keyword}%")
+                  ->orWhere('mo_ta_kinh_nghiem', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($monHocId)) {
+            $query->where('mon_hoc_id', $monHocId);
+        }
+
+        if ($mucGia === 'duoi_180') {
+            $query->where('hoc_phi_theo_gio', '<=', 180000);
+        } elseif ($mucGia === 'tren_180') {
+            $query->where('hoc_phi_theo_gio', '>', 180000);
+        }
+
+        $giaSus = $query->orderByDesc('danh_gia')->get();
+        $monHocs = MonHoc::where('user_id', Auth::id())->get();
+
+        return view('mon_hoc.gia_su', compact('giaSus', 'monHocs', 'keyword', 'monHocId', 'mucGia'));
+    }
 }

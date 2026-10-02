@@ -44,17 +44,38 @@
 
 <body>
 
-    <!-- SIDEBAR BÊN TRÁI DÙNG CHUNG -->
-    @include('layouts.sidebar')
-
-    <!-- MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH 100VH) -->
-    <div class="main-wrapper">
+    <!-- MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH FULL WIDTH - FLOATING MENU) -->
+    <div class="main-wrapper main-wrapper-full">
 
         <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
         @include('layouts.topbar', ['title' => 'Theo dõi Thể chất'])
 
         <!-- CONTENT BODY (CUỘN ĐỘC LẬP) -->
         <main class="content-body">
+
+            <!-- SUB NAV TABS: THEO DÕI / BÁO CÁO -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <div class="d-inline-flex p-1 bg-white border rounded-pill shadow-xs">
+                    <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm px-3 py-1.5 rounded-pill btn-primary fw-semibold shadow-xs">
+                        <i class="bi bi-heart-pulse-fill me-1"></i> Theo dõi Thể chất
+                    </a>
+                    <a href="{{ route('bao-cao-tap-luyen.index') }}" class="btn btn-sm px-3 py-1.5 rounded-pill text-secondary fw-semibold">
+                        <i class="bi bi-bar-chart-fill me-1"></i> Báo cáo
+                    </a>
+                </div>
+
+                @if($activePlan)
+                    <div class="d-flex align-items-center gap-2">
+                        <form method="POST" action="{{ route('workout.share.generate', ['id' => $activePlan->id]) }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 shadow-2xs d-inline-flex align-items-center gap-1.5" title="Chia sẻ kế hoạch này cho bạn bè hoặc cộng đồng">
+                                <i class="bi bi-share-fill"></i>
+                                <span class="fw-semibold">{{ $activePlan->is_shared ? 'Mã: ' . $activePlan->share_code : 'Chia sẻ Plan này' }}</span>
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </div>
 
             <!-- 1. TIÊU ĐỀ TRANG & HÀNH ĐỘNG CHÍNH (COMPACT HEADER ROW) -->
             <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-2.5">
@@ -78,88 +99,27 @@
                 </div>
             </div>
 
-            <!-- 2. BỐN THẺ KPI THỐNG KÊ (MICRO KPI ROW - DATA THẬT TỪ DATABASE) -->
-            <div class="row g-2 mb-2.5">
-                <!-- 1. Thời gian tập hôm nay -->
-                <div class="col-6 col-md-3">
-                    <div class="kpi-micro-card shadow-2xs">
-                        <div class="kpi-micro-icon bg-primary-subtle text-primary">
-                            <i class="bi bi-stopwatch-fill"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="kpi-micro-title text-truncate">Thời gian hôm nay</div>
-                            <div class="kpi-micro-val text-truncate" id="kpi-duration">
-                                {{ $thoiGianTapHomNay }} <span class="fs-8 fw-normal text-muted">phút</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Buổi tập trong tuần -->
-                <div class="col-6 col-md-3">
-                    <div class="kpi-micro-card shadow-2xs">
-                        <div class="kpi-micro-icon bg-danger-subtle text-danger">
-                            <i class="bi bi-fire"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="kpi-micro-title text-truncate">Buổi trong tuần</div>
-                            <div class="kpi-micro-val text-truncate" id="kpi-week">
-                                {{ $buoiTapTuanNay }} <span class="fs-8 fw-normal text-muted">buổi</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Tổng số buổi tập đã hoàn thành -->
-                <div class="col-6 col-md-3">
-                    <div class="kpi-micro-card shadow-2xs">
-                        <div class="kpi-micro-icon bg-success-subtle text-success">
-                            <i class="bi bi-check2-all"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="kpi-micro-title text-truncate">Tổng hoàn thành</div>
-                            <div class="kpi-micro-val text-truncate" id="kpi-total">
-                                {{ $tongBuoiTap }} <span class="fs-8 fw-normal text-muted">buổi</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Chuỗi hoạt động liên tục (Streak) -->
-                <div class="col-6 col-md-3">
-                    <div class="kpi-micro-card shadow-2xs">
-                        <div class="kpi-micro-icon bg-warning-subtle text-warning">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="kpi-micro-title text-truncate">Chuỗi rèn luyện</div>
-                            <div class="kpi-micro-val text-truncate" id="kpi-streak">
-                                {{ $chuoiNgayTap }} <span class="fs-8 fw-normal text-muted">ngày</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. BANNER LỊCH TẬP TUẦN TỰ DO THEO DATABASE (COMPACT SINGLE ROW) -->
-            <div class="card border-0 shadow-2xs schedule-orientation-card mb-2.5">
+            <!-- 2. BANNER LỊCH TẬP TUẦN (COMPACT PILLS) -->
+            <div class="card border-0 shadow-2xs schedule-orientation-card mb-3">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
                     <div class="d-flex align-items-center gap-2 flex-shrink-0">
                         <span class="badge bg-indigo-subtle text-indigo px-2.5 py-1.5 rounded-pill fw-semibold fs-8">
                             <i class="bi bi-calendar-week me-1"></i> {{ $activePlan->ten_ke_hoach ?? 'Kế hoạch cá nhân' }}
                         </span>
-                        <span class="text-muted fs-8 d-none d-xl-inline">Bấm vào ngày có buổi tập để chọn:</span>
+                        <span class="text-muted fs-8 d-none d-xl-inline">Lịch trình tuần:</span>
                     </div>
                     <div class="flex-grow-1 min-w-0" id="weekly-schedule-pills">
                         @foreach($lichTuan as $dayIso => $dh)
                             @php
                                 $isToday = ($dayIso === $todayIso);
+                                $isSelected = ($currentBuoiTap && $dh['buoi_tap_id'] === $currentBuoiTap->id);
                             @endphp
-                            <div class="schedule-day-pill {{ $isToday ? 'active-today' : '' }} {{ $dh['is_rest'] ? 'rest-day-pill' : 'workout-day-pill' }}"
-                                title="{{ $dh['thu'] }}: {{ $dh['mo_ta'] }}"
-                                data-day="{{ $dayIso }}"
-                                data-buoi-tap-id="{{ $dh['buoi_tap_id'] ?? '' }}"
-                                data-name="{{ $dh['ten'] }}">
+                            <a href="{{ $dh['buoi_tap_id'] ? route('tap-luyen.index', ['buoi_tap_id' => $dh['buoi_tap_id']]) : route('tap-luyen.index') }}"
+                               class="schedule-day-pill text-decoration-none {{ $isToday ? 'active-today' : '' }} {{ $isSelected ? 'border-primary' : '' }} {{ $dh['is_rest'] ? 'rest-day-pill' : 'workout-day-pill' }}"
+                               title="{{ $dh['thu'] }}: {{ $dh['mo_ta'] }}"
+                               data-day="{{ $dayIso }}"
+                               data-buoi-tap-id="{{ $dh['buoi_tap_id'] ?? '' }}"
+                               data-name="{{ $dh['ten'] }}">
                                 <span class="day-label">{{ $dh['short'] ?? $dh['thu'] }}</span>
                                 <span class="split-name {{ $dh['is_rest'] ? 'text-muted fst-italic' : '' }}">
                                     @if($dh['is_rest'])
@@ -170,274 +130,210 @@
                                 @if($isToday)
                                     <span class="today-marker">Hôm nay</span>
                                 @endif
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            <!-- 4. KHU VỰC CHÍNH: TRÌNH TẬP LUYỆN (WORKOUT PLAYER) & CỘT BÊN PHẢI (LỊCH + HOẠT ĐỘNG) -->
-            <div class="row g-3 mb-3">
+            @if($isRestDay)
+                <!-- ==================== GIAO DIỆN REST DAY ==================== -->
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white rest-day-card mb-4 my-auto">
+                    <div class="rest-day-icon mb-3 rest-day-icon-bounce" style="font-size: 3.8rem;">😴</div>
+                    <h2 class="fw-bold text-dark mb-2 letter-spacing-1">REST DAY</h2>
+                    <h5 class="text-primary fw-bold mb-2">Buổi tập hôm nay: Hôm nay là ngày nghỉ</h5>
+                    <p class="text-muted fs-6 mb-4" style="max-width: 520px; margin: 0 auto; line-height: 1.6;">
+                        Hãy nghỉ ngơi, nạp đủ dinh dưỡng và phục hồi cơ bắp để sẵn sàng cho các buổi rèn luyện tiếp theo.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
+                        <span class="text-muted fs-7">Muốn tập luyện buổi khác hôm nay?</span>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold dropdown-toggle shadow-2xs" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-play-circle me-1.5"></i> Chọn buổi tập khác
+                            </button>
+                            <ul class="dropdown-menu shadow-sm border-0 rounded-3">
+                                @forelse($buoiTapList as $b)
+                                    <li>
+                                        <a class="dropdown-item py-2 fs-8" href="{{ route('tap-luyen.index', ['buoi_tap_id' => $b['id']]) }}">
+                                            <i class="bi bi-fire text-danger me-2"></i>{{ $b['title'] }} ({{ count($b['exercises']) }} bài)
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li><span class="dropdown-item text-muted fs-8">Chưa có buổi tập</span></li>
+                                @endforelse
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- ==================== GIAO DIỆN BUỔI TẬP THỰC CHIẾN ==================== -->
 
-                <!-- CỘT TRÁI: TRÌNH TẬP LUYỆN (WORKOUT PLAYER COMPACT) -->
-                <div class="col-12 col-xl-8">
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-35 h-100 d-flex flex-column justify-content-between">
-
-                        <!-- Header card & Tabs chọn buổi tập trong kế hoạch -->
-                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-2">
+                <!-- 1. TIẾN ĐỘ BUỔI TẬP (TOP PROGRESS BAR) -->
+                <div class="card border-0 shadow-sm rounded-4 p-3 p-md-35 mb-3 workout-progress-card">
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="bi bi-trophy-fill fs-6"></i>
+                            </div>
                             <div>
-                                <div class="d-flex align-items-center gap-2 mb-0.5">
-                                    <h6 class="fw-bold text-dark mb-0">Buổi tập hôm nay</h6>
-                                    @if($currentBuoiTap && $currentBuoiTap->ten_thu)
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-8">
-                                            {{ $currentBuoiTap->ten_thu }}
-                                        </span>
-                                    @endif
-                                    @if($dinhHuongHomNay['is_rest'])
-                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill fs-8">
-                                            <i class="bi bi-moon-stars me-1"></i> Hôm nay là ngày nghỉ
-                                        </span>
-                                    @endif
+                                <h6 class="fw-bold text-dark mb-0">Buổi tập hôm nay: <span class="text-primary" id="workout-title-display">{{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : 'Buổi rèn luyện' }}</span></h6>
+                                <small class="text-muted" id="workout-progress-subtitle">Tiến độ buổi tập • Đánh dấu bài tập trong checklist để cập nhật tiến độ</small>
+                            </div>
+                        </div>
+                        <div class="text-sm-end">
+                            <span class="fw-bold fs-7 text-primary" id="workout-progress-text">0 / {{ count($danhSachBaiTap) }} bài tập hoàn thành (0%)</span>
+                        </div>
+                    </div>
+                    <div class="progress rounded-pill" style="height: 10px; background-color: #f1f5f9;">
+                        <div class="progress-bar bg-success rounded-pill transition-all" id="workout-progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <!-- 2. KHU VỰC THỰC CHIẾN: CHECKLIST TRÁI + TIMER PHẢI -->
+                <div class="row g-3 mb-4">
+
+                    <!-- CỘT TRÁI: CHECKLIST BÀI TẬP (SCROLL ĐỘC LẬP) -->
+                    <div class="col-12 col-lg-7">
+                        <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-35 h-100 d-flex flex-column">
+                            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2.5">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-1.5">
+                                        <i class="bi bi-check2-square text-primary fs-5"></i>
+                                        <span>Checklist bài tập</span>
+                                    </h6>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-0.5 fs-8" id="checklist-count-badge">
+                                        {{ count($danhSachBaiTap) }} bài
+                                    </span>
                                 </div>
-                                <span class="text-muted fs-8" id="workout-title-display">
-                                    {{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : ($dinhHuongHomNay['ten'] ?? 'Tập tự do') }}
-                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-muted fs-8" id="btn-uncheck-all" title="Bỏ chọn tất cả bài tập">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Làm mới
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Tabs chọn loại buổi tập (Được sinh tự động từ các buổi tập trong Kế hoạch DB) -->
-                            <div class="d-flex flex-wrap gap-1.5" id="workout-tabs-container">
-                                @forelse($buoiTapList as $session)
-                                    <button type="button"
-                                            class="workout-type-tab workout-tab {{ ($currentBuoiTap && $currentBuoiTap->id === $session['id']) ? 'active' : '' }}"
-                                            data-id="{{ $session['id'] }}"
-                                            data-type="{{ $session['title'] }}">
-                                        {{ $session['title'] }}
-                                        @if(!empty($session['ten_thu']))
-                                            <span class="badge bg-light text-dark rounded-pill ms-1 fs-9">{{ $session['ten_thu'] }}</span>
-                                        @endif
-                                    </button>
+                            <!-- VÙNG SCROLL ĐỘC LẬP CHO CHECKLIST (KHÔNG KÉO TIMER) -->
+                            <div class="workout-checklist-container d-flex flex-column gap-2 flex-grow-1" id="workout-checklist-items">
+                                @forelse($danhSachBaiTap as $idx => $ex)
+                                    <div class="checklist-exercise-item card border rounded-3 p-2.5 {{ $idx === 0 ? 'active-exercise' : '' }}" 
+                                         id="checklist-item-{{ $ex['id'] }}" 
+                                         data-id="{{ $ex['id'] }}" 
+                                         data-index="{{ $idx }}"
+                                         data-name="{{ $ex['name'] }}"
+                                         data-type="{{ $ex['type'] ?? 'strength' }}"
+                                         data-metric="{{ $ex['metric_display'] ?: ($ex['sets'].' sets × '.$ex['reps'].' reps') }}">
+                                        <div class="d-flex align-items-center justify-content-between gap-2.5">
+                                            <div class="d-flex align-items-center gap-2.5 min-w-0 flex-grow-1">
+                                                <input type="checkbox" class="custom-check-box workout-exercise-checkbox" id="chk-ex-{{ $ex['id'] }}" data-id="{{ $ex['id'] }}" data-index="{{ $idx }}">
+                                                <div class="min-w-0 flex-grow-1">
+                                                    <div class="fw-bold text-dark fs-7 text-truncate exercise-title">
+                                                        {{ $idx + 1 }}. {{ $ex['name'] }}
+                                                    </div>
+                                                    <div class="d-flex flex-wrap align-items-center gap-1.5 fs-9 text-muted mt-0.5">
+                                                        <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5">{{ $ex['group'] ?: 'Toàn thân' }}</span>
+                                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 fw-semibold">{{ $ex['metric_display'] ?: ($ex['sets'].' sets × '.$ex['reps'].' reps') }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-9 completed-tag d-none">
+                                                <i class="bi bi-check-circle-fill me-1"></i>Xong
+                                            </span>
+                                        </div>
+                                    </div>
                                 @empty
-                                    <button type="button" class="workout-type-tab workout-tab active" data-id="" data-type="Tập tự do">Tập tự do</button>
+                                    <div class="text-center py-5 text-muted my-auto">
+                                        <div class="mb-2"><i class="bi bi-inbox fs-1 text-secondary"></i></div>
+                                        <h6 class="fw-bold text-dark mb-1">Chưa có bài tập nào</h6>
+                                        <p class="fs-8 text-muted mb-3">Buổi tập này chưa được thiết lập danh sách bài tập.</p>
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#editWorkoutModal">
+                                            <i class="bi bi-plus-lg me-1"></i>Thêm bài tập vào buổi này
+                                        </button>
+                                    </div>
                                 @endforelse
                             </div>
                         </div>
-
-                        <!-- Khung tập luyện trung tâm (Workout Box) GỌN GÀNG, KHÔNG DƯ THỪA KHOẢNG TRẮNG -->
-                        <div class="workout-timer-box d-flex flex-column align-items-center justify-content-center text-center my-auto">
-
-                            <!-- 1. [TRẠNG THÁI] -->
-                            <div class="mb-1" id="workout-status-badge-container">
-                                <span class="badge workout-status-badge badge-not-started shadow-2xs" id="workout-status-badge">
-                                    <i class="bi bi-circle-fill me-1 fs-9"></i>
-                                    <span id="workout-status-text">Chưa bắt đầu</span>
-                                </span>
-                            </div>
-
-                            <!-- 2. [TIMER] Cố định 00:00:00 ban đầu, không tự chạy -->
-                            <div class="timer-display" id="workout-timer">00:00:00</div>
-
-                            <!-- 3. [TÊN BÀI TẬP & BADGE LOẠI BÀI] -->
-                            <div class="mb-1" id="active-ex-type-container">
-                                <span class="badge exercise-type-badge badge-type-strength px-2.5 py-0.5 rounded-pill fs-8" id="active-ex-type-badge">Strength</span>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-0.5 exercise-title-text" id="active-ex-name">
-                                Chưa có bài tập
-                            </h5>
-
-                            <!-- 4. [SET / REP HOẶC THỜI LƯỢNG] -->
-                            <div class="text-muted fw-semibold fs-7 mb-2" id="active-ex-set-rep">-- x --</div>
-
-                            <!-- Thông báo bài tập / Empty state nhỏ trong player nếu rỗng -->
-                            <div id="exercise-empty-banner" class="alert alert-light border border-dashed rounded-3 py-1 px-3 mb-2 d-none text-muted fs-8" style="max-width: 460px;">
-                                <i class="bi bi-info-circle me-1 text-primary"></i> Buổi tập chưa có danh sách bài tập. Bạn có thể bấm <strong>"Thêm bài tập"</strong> hoặc bấm <strong>"Bắt đầu tập"</strong> để tính giờ tập tự do.
-                            </div>
-
-                            <!-- 5 & 6. BỘ NÚT ĐIỀU KHIỂN BUỔI TẬP HIỆN ĐẠI & GỌN GÀNG -->
-                            <div class="d-flex flex-wrap gap-2 justify-content-center w-100 mt-1" style="max-width: 520px;">
-                                <!-- Nút Bắt đầu tập / Tạm dừng / Tiếp tục -->
-                                <button class="btn btn-primary px-3.5 py-2 rounded-pill fw-bold shadow-xs d-inline-flex align-items-center gap-1.5" id="toggle-timer-btn">
-                                    <i class="bi bi-play-fill fs-5" id="toggle-timer-icon"></i>
-                                    <span id="toggle-timer-text">Bắt đầu tập</span>
-                                </button>
-
-                                <!-- Nút Bài tiếp theo -->
-                                <button class="btn btn-outline-secondary px-3 py-2 rounded-pill fw-semibold d-inline-flex align-items-center gap-1.5" id="next-ex-btn">
-                                    <i class="bi bi-skip-forward-fill"></i>
-                                    <span>Bài tiếp theo</span>
-                                </button>
-
-                                <!-- Nút Hoàn thành buổi tập -->
-                                <button class="btn btn-success px-3.5 py-2 rounded-pill fw-bold shadow-xs d-inline-flex align-items-center gap-1.5 text-white" id="finish-ex-btn">
-                                    <i class="bi bi-check2-circle fs-6"></i>
-                                    <span>Hoàn thành</span>
-                                </button>
-
-                                <!-- Nút Thêm bài tập (Mở Modal) -->
-                                <button class="btn btn-light border rounded-pill px-3 py-2 fw-semibold text-secondary d-inline-flex align-items-center gap-1.5"
-                                    data-bs-toggle="modal" data-bs-target="#editWorkoutModal">
-                                    <i class="bi bi-plus-circle"></i>
-                                    <span>Thêm bài tập</span>
-                                </button>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CỘT PHẢI: LỊCH TẬP & HOẠT ĐỘNG GẦN ĐÂY (COMPACT RIGHT PANEL) -->
-                <div class="col-12 col-xl-4 d-flex flex-column gap-3">
-
-                    <!-- CARD: LỊCH TẬP TRONG THÁNG (HEATMAP THẬT TỪ DATABASE) -->
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <h6 class="fw-bold text-dark mb-0">Lịch tập trong tháng</h6>
-                                <small class="text-muted fw-medium fs-8" id="calendar-month-title">Tháng {{ $currentMonth }}, {{ $currentYear }}</small>
-                            </div>
-                            <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-light border rounded-circle p-1 px-2" id="prev-month-btn" title="Tháng trước">
-                                    <i class="bi bi-chevron-left fs-8"></i>
-                                </button>
-                                <button class="btn btn-sm btn-light border rounded-circle p-1 px-2" id="next-month-btn" title="Tháng sau">
-                                    <i class="bi bi-chevron-right fs-8"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Grid 7 ngày trong tuần -->
-                        <div class="calendar-heatmap-grid" id="calendar-grid">
-                            <div class="text-center text-muted fw-semibold fs-8">T2</div>
-                            <div class="text-center text-muted fw-semibold fs-8">T3</div>
-                            <div class="text-center text-muted fw-semibold fs-8">T4</div>
-                            <div class="text-center text-muted fw-semibold fs-8">T5</div>
-                            <div class="text-center text-muted fw-semibold fs-8">T6</div>
-                            <div class="text-center text-muted fw-semibold fs-8">T7</div>
-                            <div class="text-center text-muted fw-semibold fs-8">CN</div>
-                        </div>
-
-                        <!-- Chú thích mức độ tập (Legend) -->
-                        <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
-                            <span class="text-muted fs-8">Ít</span>
-                            <div class="d-flex gap-1 align-items-center">
-                                <div class="rounded-1 legend-box" style="background-color: #f1f5f9;" title="Nghỉ / Chưa tập"></div>
-                                <div class="rounded-1 legend-box" style="background-color: #c7d2fe;" title="Nhẹ (1-20p)"></div>
-                                <div class="rounded-1 legend-box" style="background-color: #818cf8;" title="Vừa (20-40p)"></div>
-                                <div class="rounded-1 legend-box" style="background-color: #6366f1;" title="Nhiều (40-60p)"></div>
-                                <div class="rounded-1 legend-box" style="background-color: #4338ca;" title="Rất nhiều (>60p)"></div>
-                            </div>
-                            <span class="text-muted fs-8">Nhiều</span>
-                        </div>
                     </div>
 
-                    <!-- CARD: HOẠT ĐỘNG GẦN ĐÂY (DỮ LIỆU THẬT & EMPTY STATE CHUẨN) -->
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 flex-grow-1" id="recent-activities-card">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold text-dark mb-0">Hoạt động gần đây</h6>
-                            <span class="badge bg-light text-primary border rounded-pill px-2.5 py-0.5 fs-8">Lịch sử</span>
-                        </div>
+                    <!-- CỘT PHẢI: TIMER TẬP LUYỆN (STICKY CỐ ĐỊNH, KHÔNG BỊ TRÔI) -->
+                    <div class="col-12 col-lg-5">
+                        <div class="workout-timer-sticky">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4">
+                                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-1.5">
+                                        <i class="bi bi-stopwatch text-primary fs-5"></i>
+                                        <span>Đồng hồ tập</span>
+                                    </h6>
+                                    <span class="badge workout-status-badge badge-not-started" id="workout-status-badge">
+                                        <i class="bi bi-circle-fill me-1 fs-9"></i>
+                                        <span id="workout-status-text">Chưa bắt đầu</span>
+                                    </span>
+                                </div>
 
-                        <!-- Vùng hiển thị danh sách hoặc Empty State -->
-                        <div id="recent-activities-container">
-                            @if($hoatDongGanDay->isEmpty())
-                                <!-- EMPTY STATE -->
-                                <div class="text-center py-3 px-2 empty-activity-box">
-                                    <div class="empty-icon-wrapper mb-2">
-                                        <i class="bi bi-clock-history fs-3 text-muted"></i>
+                                <!-- HỘP TIMER KỸ THUẬT SỐ -->
+                                <div class="workout-timer-box text-center py-3 mb-3">
+                                    <div class="timer-display" id="workout-timer">00:00:00</div>
+                                    <small class="text-muted fs-8">Bấm "Bắt đầu tập" để tính thời gian rèn luyện</small>
+                                </div>
+
+                                <!-- BÀI TẬP ĐANG ACTIVE TRONG PLAYER -->
+                                <div class="card bg-light border-0 rounded-3 p-2.5 mb-3 text-center">
+                                    <div class="mb-1" id="active-ex-type-container">
+                                        <span class="badge exercise-type-badge badge-type-strength px-2.5 py-0.5 rounded-pill fs-9" id="active-ex-type-badge">Strength</span>
                                     </div>
-                                    <h6 class="fw-bold text-dark mb-1 fs-7">Chưa có hoạt động gần đây</h6>
-                                    <p class="text-muted fs-8 mb-2">Hãy bắt đầu buổi tập đầu tiên để lịch sử của bạn xuất hiện tại đây.</p>
-                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fs-8" id="quick-start-workout-btn">
-                                        <i class="bi bi-play-fill me-1"></i>Bắt đầu tập ngay
+                                    <h6 class="fw-bold text-dark mb-1 exercise-title-text text-truncate px-2" id="active-ex-name">
+                                        {{ !empty($danhSachBaiTap[0]) ? '1. ' . $danhSachBaiTap[0]['name'] : 'Chưa có bài tập' }}
+                                    </h6>
+                                    <div class="text-muted fw-semibold fs-8" id="active-ex-set-rep">
+                                        {{ !empty($danhSachBaiTap[0]) ? ($danhSachBaiTap[0]['metric_display'] ?: ($danhSachBaiTap[0]['sets'].' sets × '.$danhSachBaiTap[0]['reps'].' reps')) : '-- x --' }}
+                                    </div>
+                                </div>
+
+                                <!-- BỘ NÚT ĐIỀU KHIỂN TIMER -->
+                                <div class="d-flex flex-column gap-2">
+                                    <!-- Nút Bắt đầu tập / Tạm dừng / Tiếp tục -->
+                                    <button class="btn btn-primary py-2.5 rounded-pill fw-bold shadow-xs d-flex align-items-center justify-content-center gap-2" id="toggle-timer-btn">
+                                        <i class="bi bi-play-fill fs-5" id="toggle-timer-icon"></i>
+                                        <span id="toggle-timer-text">Bắt đầu tập</span>
                                     </button>
+
+                                    <div class="d-flex gap-2">
+                                        <!-- Nút Bài tiếp theo -->
+                                        <button class="btn btn-outline-secondary py-2 rounded-pill fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-1.5" id="next-ex-btn">
+                                            <i class="bi bi-skip-forward-fill"></i>
+                                            <span>Bài tiếp theo</span>
+                                        </button>
+
+                                        <!-- Nút Hoàn thành buổi tập -->
+                                        <button class="btn btn-success py-2 rounded-pill fw-bold text-white flex-grow-1 shadow-xs d-flex align-items-center justify-content-center gap-1.5" id="finish-ex-btn">
+                                            <i class="bi bi-check2-circle fs-6"></i>
+                                            <span>Hoàn thành</span>
+                                        </button>
+                                    </div>
                                 </div>
-                            @else
-                                <!-- DANH SÁCH LỊCH SỬ THẬT TỪ DATABASE -->
-                                <div class="d-flex flex-column gap-1.5" id="history-items-list">
-                                    @foreach($hoatDongGanDay as $hoatDong)
-                                    <div class="d-flex align-items-center justify-content-between p-1.5 rounded-3 border-bottom activity-record-item">
-                                        <div class="d-flex align-items-center gap-2.5 min-w-0">
-                                            <div class="metric-icon-box bg-{{ $hoatDong['color'] }}-subtle text-{{ $hoatDong['color'] }}">
-                                                <i class="bi {{ $hoatDong['icon'] }}"></i>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <div class="fw-bold text-dark fs-7 text-truncate">{{ $hoatDong['loai'] }}</div>
-                                                <small class="text-muted fs-8 text-truncate d-block">{{ $hoatDong['thoi_gian'] }} • {{ $hoatDong['so_bai'] }}</small>
-                                            </div>
-                                        </div>
-                                        <div class="flex-shrink-0 ms-2">
-                                            <span class="badge bg-light text-dark border rounded-pill fs-8">{{ $hoatDong['thoi_diem'] }}</span>
+
+                                <!-- Tabs chọn nhanh buổi tập khác nếu có -->
+                                @if(count($buoiTapList) > 1)
+                                    <div class="mt-3 pt-2.5 border-top">
+                                        <small class="text-muted d-block mb-1.5 fs-9 fw-semibold text-uppercase">Các buổi tập trong kế hoạch:</small>
+                                        <div class="d-flex flex-wrap gap-1" id="workout-tabs-container">
+                                            @foreach($buoiTapList as $session)
+                                                <a href="{{ route('tap-luyen.index', ['buoi_tap_id' => $session['id']]) }}"
+                                                   class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 fs-9 workout-tab {{ ($currentBuoiTap && $currentBuoiTap->id === $session['id']) ? 'active bg-primary text-white border-primary' : 'text-dark' }}"
+                                                   data-id="{{ $session['id'] }}"
+                                                   data-type="{{ $session['title'] }}">
+                                                    {{ $session['title'] }}
+                                                </a>
+                                            @endforeach
                                         </div>
                                     </div>
-                                    @endforeach
-                                </div>
-                            @endif
+                                @endif
+
+                            </div>
                         </div>
                     </div>
 
                 </div>
-
-            </div>
-
-            <!-- 5. CARD: CÁC CHỈ SỐ SỨC KHỎE (COMPACT BOTTOM SECTION) -->
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-2">
-                <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
-                    <h6 class="fw-bold text-dark mb-0 fs-7">
-                        <i class="bi bi-heart-pulse-fill text-danger me-2"></i>Chỉ số sức khỏe & sinh trắc
-                    </h6>
-                    <small class="text-muted fs-8">Cập nhật theo thiết bị / hồ sơ</small>
-                </div>
-
-                <div class="row g-2">
-                    <div class="col-6 col-md-3">
-                        <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2.5">
-                            <div class="metric-icon-box bg-danger-subtle text-danger">
-                                <i class="bi bi-heart-pulse"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted fw-semibold fs-8">Nhịp tim trung bình</small>
-                                <div class="fw-bold text-dark fs-7">-- <span class="fs-9 fw-normal text-muted">bpm</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-6 col-md-3">
-                        <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2.5">
-                            <div class="metric-icon-box bg-success-subtle text-success">
-                                <i class="bi bi-speedometer2"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted fw-semibold fs-8">Cân nặng</small>
-                                <div class="fw-bold text-dark fs-7">-- <span class="fs-9 fw-normal text-muted">kg</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-6 col-md-3">
-                        <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2.5">
-                            <div class="metric-icon-box bg-warning-subtle text-warning">
-                                <i class="bi bi-person-standing"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted fw-semibold fs-8">Tỷ lệ mỡ</small>
-                                <div class="fw-bold text-dark fs-7">-- <span class="fs-9 fw-normal text-muted">%</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-6 col-md-3">
-                        <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2.5">
-                            <div class="metric-icon-box bg-info-subtle text-info">
-                                <i class="bi bi-droplet-half"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted fw-semibold fs-8">Lượng nước</small>
-                                <div class="fw-bold text-dark fs-7">-- <span class="fs-9 fw-normal text-muted">lít</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
 
         </main>
     </div>
@@ -851,6 +747,76 @@
             }
         });
     </script>
+    <!-- =========================================================================
+         KÊNH CHAT THẾ GIỚI GYMER - GLOBAL COMMUNITY POPUP (GÓC PHẢI BÊN DƯỚI)
+         ========================================================================= -->
+    <div class="community-messenger-popup shadow-lg" id="communityMessengerPopup" role="dialog" aria-modal="true" aria-label="Kênh Chat Thế Giới Gymer">
+        
+        <!-- HEADER KÊNH CHAT THẾ GIỚI -->
+        <div class="community-popup-header d-flex align-items-center justify-content-between px-3 py-2.5 border-bottom">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <div class="header-icon-circle bg-primary-subtle text-primary flex-shrink-0">
+                    <i class="bi bi-globe-americas"></i>
+                </div>
+                <div class="min-w-0">
+                    <h6 class="fw-bold mb-0 text-dark fs-7 text-truncate">Kênh Chat Thế Giới</h6>
+                    <small class="text-success fs-9 d-flex align-items-center gap-1 fw-medium">
+                        <span class="online-indicator-dot"></span>
+                        <span id="worldOnlineCountText">{{ max(count($communityGymers ?? []), 4) + 8 }} Gymer đang online</span>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Nút công cụ & đóng -->
+            <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                <button type="button" class="btn btn-sm btn-light rounded-circle p-1 text-muted" id="btnRefreshWorldChat" title="Tải lại tin nhắn">
+                    <i class="bi bi-arrow-clockwise fs-8"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light rounded-circle p-1 text-muted" id="btnCloseCommunityPopup" aria-label="Đóng popup" title="Đóng">
+                    <i class="bi bi-x-lg fs-7"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- BODY: DÒNG THỜI GIAN TIN NHẮN THẾ GIỚI (CUỘN ĐỘC LẬP) -->
+        <div class="world-chat-body flex-grow-1 p-3 d-flex flex-column min-h-0" id="worldChatContainer">
+            <div class="world-chat-messages d-flex flex-column gap-2.5 flex-grow-1 overflow-y-auto" id="worldChatMessages">
+                <!-- Tin nhắn chào mừng Kênh Thế Giới -->
+                <div class="text-center my-1">
+                    <span class="badge bg-light text-muted border rounded-pill px-3 py-1 fs-9 fw-normal shadow-2xs">
+                        <i class="bi bi-broadcast me-1 text-primary"></i> Chào mừng bạn đến với Kênh Chat Thế Giới Gymer!
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER: KHUNG NHẬP LIỆU GỬI TIN NHẮN LÊN KÊNH THẾ GIỚI -->
+        <div class="world-chat-footer p-2.5 border-top bg-white">
+            <form id="worldChatForm" class="d-flex align-items-center gap-2" onsubmit="return false;">
+                <input type="text" class="form-control form-control-sm rounded-pill px-3 py-1.5 fs-8" id="worldChatMessageInput" placeholder="Nhắn tin lên kênh thế giới..." autocomplete="off">
+                <button type="submit" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" id="btnSendWorldMessage" style="width: 34px; height: 34px;" title="Gửi lên kênh thế giới">
+                    <i class="bi bi-send-fill fs-8"></i>
+                </button>
+            </form>
+            <div class="mt-1 px-1 d-flex align-items-center justify-content-between text-nowrap">
+                <small class="text-muted fs-10 text-truncate me-2">Tin nhắn công khai toàn cầu</small>
+                <a href="{{ route('workout.community') }}" class="text-decoration-none fs-10 text-primary fw-semibold flex-shrink-0">
+                    <i class="bi bi-collection-play me-0.5"></i> Thư viện giáo án
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nút Cộng đồng Gymer nổi (Mở Messenger Popup) -->
+    <button type="button" class="floating-community-btn" id="floatingCommunityToggle" title="Cộng đồng Gymer" aria-label="Cộng đồng Gymer">
+        <i class="bi bi-globe2 icon-community-open"></i>
+        <i class="bi bi-chat-dots-fill icon-community-active d-none"></i>
+        <span class="community-tooltip">Cộng đồng Gymer</span>
+    </button>
+
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 </body>
 
 </html>

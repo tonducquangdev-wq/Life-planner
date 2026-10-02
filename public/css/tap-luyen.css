@@ -545,3 +545,357 @@
         padding: 0.75rem !important;
     }
 }
+
+/* ==========================================================================
+   CHECKLIST & FIXED TIMER REFACTOR - LIFE PLANNER WORKOUT
+   ========================================================================== */
+
+/* 1. TIẾN ĐỘ BUỔI TẬP */
+.workout-progress-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.25s ease;
+}
+[data-bs-theme="dark"] .workout-progress-card {
+    background: #131d31;
+    border-color: #1e293b;
+}
+
+/* 2. CHECKLIST BÀI TẬP (BÊN TRÁI - SCROLL ĐỘC LẬP) */
+.workout-checklist-container {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.workout-checklist-container::-webkit-scrollbar {
+    width: 6px;
+}
+.workout-checklist-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.workout-checklist-container::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
+    background-color: #334155;
+}
+
+.checklist-exercise-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid #6366f1;
+    background: #ffffff;
+    cursor: pointer;
+}
+.checklist-exercise-item:hover {
+    transform: translateX(3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.checklist-exercise-item.active-exercise {
+    border-left-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.04);
+}
+.checklist-exercise-item.completed {
+    border-left-color: #10b981;
+    background-color: #f0fdf4 !important;
+}
+[data-bs-theme="dark"] .checklist-exercise-item {
+    background: #131d31;
+    border-color: #1e293b;
+}
+[data-bs-theme="dark"] .checklist-exercise-item.completed {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+}
+.checklist-exercise-item.completed .exercise-title {
+    text-decoration: line-through;
+    color: #64748b !important;
+}
+.custom-check-box {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: #10b981;
+    flex-shrink: 0;
+}
+
+/* 3. TIMER TẬP LUYỆN (BÊN PHẢI - STICKY) */
+.workout-timer-sticky {
+    position: sticky;
+    top: 24px;
+    z-index: 10;
+}
+@media (max-width: 991.98px) {
+    .workout-timer-sticky {
+        position: static;
+    }
+}
+
+/* 4. REST DAY CARD */
+.rest-day-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px dashed #cbd5e1;
+    border-radius: 20px;
+}
+[data-bs-theme="dark"] .rest-day-card {
+    background: linear-gradient(145deg, #131d31 0%, #0b1120 100%);
+    border-color: #334155;
+}
+.rest-day-icon-bounce {
+    animation: gentleBounce 2.5s infinite ease-in-out;
+}
+@keyframes gentleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* 5. FLOATING COMMUNITY BUTTON (NẰM TRÊN FLOATING MENU) */
+.floating-community-btn {
+    position: fixed;
+    bottom: 94px;
+    right: 28px;
+    z-index: 1059;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    cursor: pointer;
+    box-shadow: 0 8px 24px -4px rgba(14, 165, 233, 0.45), 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-decoration: none;
+}
+.floating-community-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 12px 30px -4px rgba(14, 165, 233, 0.6), 0 6px 16px 0 rgba(0, 0, 0, 0.12);
+    color: #ffffff;
+}
+.floating-community-btn:active {
+    transform: scale(0.96);
+}
+.floating-community-btn .community-tooltip {
+    position: absolute;
+    right: 66px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.floating-community-btn:hover .community-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+@media (max-width: 767.98px) {
+    .floating-community-btn {
+        bottom: 84px;
+        right: 18px;
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}
+
+/* ==========================================================================
+   6. MESSENGER-LIKE FLOATING COMMUNITY CHAT POPUP
+   ========================================================================== */
+.community-messenger-popup {
+    position: fixed;
+    bottom: 142px;
+    right: 24px;
+    width: 375px;
+    max-width: calc(100vw - 32px);
+    height: 440px;
+    max-height: calc(100vh - 165px);
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    z-index: 1065;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px) scale(0.95);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.community-messenger-popup.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+[data-bs-theme="dark"] .community-messenger-popup {
+    background: #131d31;
+    border-color: #1e293b;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Header */
+.community-popup-header {
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+}
+[data-bs-theme="dark"] .community-popup-header {
+    background: #131d31;
+    border-bottom-color: #1e293b;
+}
+
+.header-icon-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+}
+
+/* Online Indicator Dot */
+.online-indicator-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* World Chat Body & Messages */
+.world-chat-body {
+    background: #f8fafc;
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+}
+[data-bs-theme="dark"] .world-chat-body {
+    background: #0b1120;
+}
+
+.world-chat-messages {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+    padding-right: 4px;
+    scroll-behavior: smooth;
+}
+.world-chat-messages::-webkit-scrollbar {
+    width: 5px;
+}
+.world-chat-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+[data-bs-theme="dark"] .world-chat-messages::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* World Chat Message Row */
+.world-msg-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    max-width: 88%;
+}
+.world-msg-row.sent-by-me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.world-msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.world-msg-bubble {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 7px 11px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    word-break: break-word;
+}
+[data-bs-theme="dark"] .world-msg-bubble {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+.world-msg-row.sent-by-me .world-msg-bubble {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border-color: transparent;
+    border-bottom-right-radius: 3px;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.world-msg-author {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 2px;
+}
+[data-bs-theme="dark"] .world-msg-author {
+    color: #60a5fa;
+}
+.world-msg-row.sent-by-me .world-msg-author {
+    display: none;
+}
+
+.world-msg-time {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 3px;
+    display: block;
+}
+.world-msg-row.sent-by-me .world-msg-time {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+}
+
+.world-chat-footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+[data-bs-theme="dark"] .world-chat-footer {
+    background: #131d31;
+    border-top-color: #1e293b;
+}
+
+/* Responsive for mobile */
+@media (max-width: 480px) {
+    .community-messenger-popup {
+        right: 12px;
+        width: calc(100vw - 24px);
+        bottom: 140px;
+        height: 420px;
+    }
+}
+
+

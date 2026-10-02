@@ -67,18 +67,16 @@
 
 <body>
 
-    <!-- 1. SIDEBAR BÊN TRÁI -->
-    @include('layouts.sidebar')
-
-    <!-- 2. MAIN WRAPPER -->
-    <div class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper main-wrapper-full">
 
         <!-- HEADER THANH CÔNG CỤ TRÊN CÙNG -->
         <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                    <i class="bi bi-list fs-4 text-primary"></i>
-                </button>
+                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Quay lại Lịch</span>
+                </a>
                 <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
                     <i class="bi bi-bar-chart-line-fill text-primary"></i> Báo Cáo Học Tập & GPA
                 </h5>
@@ -466,5 +464,7 @@
             });
         });
     </script>
+    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <x-floating-menu />
 </body>
 </html>

@@ -210,4 +210,47 @@ class TapLuyenTest extends TestCase
             'ghi_chu' => 'Hoàn thành buổi tập Push đầy đủ',
         ]);
     }
+
+    /**
+     * TEST: Giao diện tập luyện mới có nút Quay lại Lịch, Floating Community icon và không chứa KPI sức khỏe/hoạt động gần đây
+     */
+    public function test_workout_page_has_back_to_calendar_and_floating_community_icon(): void
+    {
+        $response = $this->actingAs($this->user)->get('/tap-luyen');
+
+        $response->assertStatus(200);
+        $response->assertSee('Quay lại Lịch');
+        $response->assertSee('floating-community-btn');
+        $response->assertSee('Cộng đồng Gymer');
+        $response->assertSee('workout/community');
+        // Đảm bảo không còn các phần bị loại bỏ
+        $response->assertDontSee('Chỉ số sức khỏe & sinh trắc');
+        $response->assertDontSee('Hoạt động gần đây');
+    }
+
+    /**
+     * TEST: Truy cập buổi tập cụ thể hiển thị đầy đủ Checklist, Timer và Tiến độ buổi tập
+     */
+    public function test_workout_session_view_displays_checklist_and_timer(): void
+    {
+        // Khởi tạo trang tập luyện để sinh kế hoạch mặc định nếu chưa có
+        $this->actingAs($this->user)->get('/tap-luyen');
+
+        $activePlan = \App\Models\KeHoachTapLuyen::where('user_id', $this->user->id)->first();
+        $this->assertNotNull($activePlan);
+
+        $pushSession = $activePlan->buoiTaps()->first();
+        $this->assertNotNull($pushSession);
+
+        // Truy cập với buoi_tap_id cụ thể
+        $response = $this->actingAs($this->user)->get('/tap-luyen?buoi_tap_id=' . $pushSession->id);
+
+        $response->assertStatus(200);
+        $response->assertSee('Checklist bài tập');
+        $response->assertSee('Đồng hồ tập');
+        $response->assertSee('Tiến độ buổi tập');
+        $response->assertSee('workout-exercise-checkbox');
+        $response->assertSee('Bắt đầu tập');
+    }
 }
+
