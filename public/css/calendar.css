@@ -33,6 +33,12 @@
     --event-purple-text: #7e22ce;
     --event-purple-border: #e9d5ff;
     --event-purple-dot: #a855f7;
+
+    /* 5. Công việc: Chàm (#6366f1) */
+    --event-indigo-bg: #eef2ff;
+    --event-indigo-text: #4338ca;
+    --event-indigo-border: #c7d2fe;
+    --event-indigo-dot: #6366f1;
 }
 
 /* ==========================================================================
@@ -86,6 +92,12 @@
     border-color: var(--event-purple-border);
 }
 
+.legend-pill.cong-viec, .legend-btn.cong-viec {
+    background-color: var(--event-indigo-bg);
+    color: var(--event-indigo-text);
+    border-color: var(--event-indigo-border);
+}
+
 .legend-btn.active[data-filter="all"] {
     background-color: #4f46e5;
     color: #ffffff;
@@ -116,6 +128,7 @@
 .tap-luyen .legend-dot { background-color: var(--event-green-dot); }
 .deadline .legend-dot { background-color: var(--event-orange-dot); }
 .ca-nhan .legend-dot { background-color: var(--event-purple-dot); }
+.cong-viec .legend-dot { background-color: var(--event-indigo-dot); }
 
 /* ==========================================================================
    2. LƯỚI LỊCH THÁNG LỚN (MONTHLY CALENDAR GRID - NOTION/GOOGLE STYLE)
@@ -276,6 +289,12 @@
     border-color: var(--event-purple-border);
 }
 
+.event-pill.cong-viec {
+    background-color: var(--event-indigo-bg);
+    color: var(--event-indigo-text);
+    border-color: var(--event-indigo-border);
+}
+
 .event-more-pill {
     font-size: 0.7rem;
     font-weight: 700;
@@ -336,6 +355,7 @@
 .schedule-item.tap-luyen { border-left-color: #22c55e; }
 .schedule-item.deadline { border-left-color: #f97316; }
 .schedule-item.ca-nhan { border-left-color: #a855f7; }
+.schedule-item.cong-viec { border-left-color: #6366f1; }
 
 .schedule-item:hover {
     background-color: #ffffff;
@@ -415,6 +435,7 @@
 .day-event-detail-item.tap-luyen { border-left: 4px solid var(--event-green-dot); }
 .day-event-detail-item.deadline { border-left: 4px solid var(--event-orange-dot); }
 .day-event-detail-item.ca-nhan { border-left: 4px solid var(--event-purple-dot); }
+.day-event-detail-item.cong-viec { border-left: 4px solid var(--event-indigo-dot); }
 
 .day-event-detail-item .event-icon-badge {
     width: 38px;
@@ -431,6 +452,7 @@
 .day-event-detail-item.tap-luyen .event-icon-badge { background-color: var(--event-green-bg); color: var(--event-green-text); }
 .day-event-detail-item.deadline .event-icon-badge { background-color: var(--event-orange-bg); color: var(--event-orange-text); }
 .day-event-detail-item.ca-nhan .event-icon-badge { background-color: var(--event-purple-bg); color: var(--event-purple-text); }
+.day-event-detail-item.cong-viec .event-icon-badge { background-color: var(--event-indigo-bg); color: var(--event-indigo-text); }
 
 .day-event-detail-item .repeat-tag {
     font-size: 0.7rem;
@@ -601,6 +623,11 @@
     --event-purple-text: #f0abfc;
     --event-purple-border: rgba(240, 171, 252, 0.3);
     --event-purple-dot: #c084fc;
+
+    --event-indigo-bg: rgba(99, 102, 241, 0.2);
+    --event-indigo-text: #a5b4fc;
+    --event-indigo-border: rgba(165, 180, 252, 0.3);
+    --event-indigo-dot: #818cf8;
 }
 
 [data-bs-theme="dark"] .calendar-grid-container {

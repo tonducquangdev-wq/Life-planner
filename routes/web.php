@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CongViecController;
+use App\Http\Controllers\CongViecDashboardController;
+use App\Http\Controllers\DuAnController;
 use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SuKienController;
@@ -47,6 +50,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/tap-luyen/buoi-tap', [TapLuyenController::class, 'themBuoiTap'])->name('tap-luyen.buoi-tap.store');
     Route::put('/tap-luyen/buoi-tap/{id}', [TapLuyenController::class, 'suaBuoiTap'])->name('tap-luyen.buoi-tap.update');
     Route::delete('/tap-luyen/buoi-tap/{id}', [TapLuyenController::class, 'xoaBuoiTap'])->name('tap-luyen.buoi-tap.destroy');
+
+    // Module Công việc & Dự án
+    Route::get('/cong-viec/dashboard', [CongViecDashboardController::class, 'index'])->name('cong-viec.dashboard');
+    Route::resource('du-an', DuAnController::class);
+    Route::resource('cong-viec', CongViecController::class);
+    Route::patch('/cong-viec/{id}/trang-thai', [CongViecController::class, 'updateStatus'])->name('cong-viec.update-status');
+    Route::patch('/cong-viec/{id}/tien-do', [CongViecController::class, 'updateProgress'])->name('cong-viec.update-progress');
+    Route::post('/cong-viec/{id}/sync-calendar', [CongViecController::class, 'syncToCalendar'])->name('cong-viec.sync-calendar');
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');

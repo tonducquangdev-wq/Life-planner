@@ -30,6 +30,15 @@
                 </a>
             </li>
 
+            <!-- 2. Công việc & Dự án -->
+            <li class="nav-item">
+                <a href="{{ route('cong-viec.index') }}" 
+                   class="nav-link {{ request()->routeIs(['cong-viec.*', 'du-an.*']) ? 'active' : '' }}">
+                    <span class="nav-icon-box"><i class="bi bi-briefcase-fill"></i></span>
+                    <span class="nav-text">Công việc & Dự án</span>
+                </a>
+            </li>
+
             <!-- 2. Báo cáo học tập -->
             <li class="nav-item">
                 <a href="{{ Route::has('bao-cao-hoc-tap.index') ? route('bao-cao-hoc-tap.index') : '#' }}" 
@@ -104,6 +113,14 @@
                     <a href="{{ route('calendar.index') }}" class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }} d-flex align-items-center gap-3 py-2 px-3 rounded-3">
                         <i class="bi bi-calendar3 fs-5"></i>
                         <span>Lịch</span>
+                    </a>
+                </li>
+
+                <!-- 2. Công việc & Dự án -->
+                <li class="nav-item">
+                    <a href="{{ route('cong-viec.index') }}" class="nav-link {{ request()->routeIs(['cong-viec.*', 'du-an.*']) ? 'active' : '' }} d-flex align-items-center gap-3 py-2 px-3 rounded-3">
+                        <i class="bi bi-briefcase-fill fs-5"></i>
+                        <span>Công việc & Dự án</span>
                     </a>
                 </li>
 

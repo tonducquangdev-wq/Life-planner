@@ -231,6 +231,9 @@
                                 <button type="button" class="legend-btn ca-nhan" data-filter="ca-nhan">
                                     <span class="legend-dot"></span>🎉 Cá nhân
                                 </button>
+                                <button type="button" class="legend-btn cong-viec" data-filter="cong-viec">
+                                    <span class="legend-dot"></span>💼 Công việc
+                                </button>
                             </div>
                         </div>
 
@@ -415,6 +418,10 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mb-3" id="createHocTapEndRepeatGroup">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control rounded-3" id="createHocTapEndRepeat">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold fs-7 text-secondary">Phòng học & Giảng viên</label>
                                     <input type="text" class="form-control rounded-3" id="createHocTapLocation" placeholder="Ví dụ: Phòng B2.04 • Thầy Nguyễn Văn A">
@@ -480,6 +487,10 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mb-3" id="createTapLuyenEndRepeatGroup">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control rounded-3" id="createTapLuyenEndRepeat">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm tập / Ghi chú</label>
                                     <input type="text" class="form-control rounded-3" id="createTapLuyenLocation" placeholder="Ví dụ: Fitness Center • 4 hiệp Bench Press">
@@ -541,6 +552,10 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mb-3 d-none" id="createDeadlineEndRepeatGroup">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control rounded-3" id="createDeadlineEndRepeat">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold fs-7 text-secondary">Ghi chú deadline</label>
                                     <input type="text" class="form-control rounded-3" id="createDeadlineLocation" placeholder="Ví dụ: Nộp file .zip trên LMS">
@@ -601,6 +616,10 @@
                                             <option value="monthly">📆 Lặp hàng tháng</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="mb-3 d-none" id="createCaNhanEndRepeatGroup">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control rounded-3" id="createCaNhanEndRepeat">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú</label>
@@ -699,6 +718,10 @@
                                 <option value="monthly">📆 Lặp hàng tháng</option>
                                 <option value="once">📌 Sự kiện 1 lần</option>
                             </select>
+                        </div>
+                        <div class="mb-3 d-none" id="editEventEndRepeatGroup">
+                            <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control rounded-3" id="editEventEndRepeat">
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú</label>
@@ -828,7 +851,7 @@
                 if (quickThemeIcon) quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-5';
             }
 
-            quickThemeBtn?.addEventListener('click', function () {
+            quickThemeBtn?.addEventListener('click', function() {
                 const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
                 const newTheme = isDark ? 'light' : 'dark';
 
@@ -850,11 +873,51 @@
                         'X-CSRF-TOKEN': csrfToken || '',
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ giao_dien: newTheme })
+                    body: JSON.stringify({
+                        giao_dien: newTheme
+                    })
                 });
             });
         });
     </script>
+
+    <!-- ==========================================================================
+         MODAL CẢNH BÁO TRÙNG LỊCH (CONFLICT WARNING MODAL)
+         ========================================================================== -->
+    <div class="modal fade" id="modalConflictWarning" tabindex="-1" aria-labelledby="modalConflictWarningLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-warning-subtle text-warning-emphasis border-0 py-3">
+                    <h5 class="modal-title fw-bold fs-6 d-flex align-items-center gap-2" id="modalConflictWarningLabel">
+                        <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+                        <span>Phát hiện lịch bị trùng</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-secondary fs-7 mb-3">
+                        Sự kiện bạn đang tạo có thời gian trùng với các lịch hiện có. Bạn có muốn tiếp tục lưu không?
+                    </p>
+
+                    <!-- Danh sách lịch trùng -->
+                    <div class="conflict-list-container bg-light rounded-3 p-3 border mb-3" id="conflictListContainer" style="max-height: 220px; overflow-y: auto;">
+                        <!-- Content rendered dynamically via JS -->
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 py-2.5 px-4 d-flex justify-content-between">
+                    <!-- Nút 1: Hủy / Chỉnh sửa sự kiện -->
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-3 fs-7 fw-semibold" data-bs-dismiss="modal">
+                        <i class="bi bi-pencil me-1"></i>Hủy / Chỉnh sửa sự kiện
+                    </button>
+
+                    <!-- Nút 2: Vẫn lưu sự kiện -->
+                    <button type="button" class="btn btn-warning text-dark fw-bold rounded-3 px-3 fs-7" id="btnConfirmForceSave">
+                        <i class="bi bi-check-lg me-1"></i>Vẫn lưu sự kiện
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Floating Action Menu (Góc phải bên dưới) -->
     <x-floating-menu />

@@ -24,7 +24,9 @@ class SuKien extends Model
         'bat_thong_bao',
         'so_ngay_nhac',
         'quy_tac_lap',
+        'ngay_ket_thuc_lap',
         'nhom_lap_id',
+        'cong_viec_id',
     ];
 
     protected function casts(): array
@@ -34,12 +36,18 @@ class SuKien extends Model
             'so_ngay_nhac' => 'integer',
             'thoi_gian_bat_dau' => 'datetime',
             'thoi_gian_ket_thuc' => 'datetime',
+            'ngay_ket_thuc_lap' => 'date',
         ];
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function congViec(): BelongsTo
+    {
+        return $this->belongsTo(CongViec::class, 'cong_viec_id');
     }
 
     /**

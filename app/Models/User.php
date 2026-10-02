@@ -133,4 +133,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ThongBao::class);
     }
+
+    public function duAns()
+    {
+        return $this->hasMany(DuAn::class);
+    }
+
+    public function congViecs()
+    {
+        return $this->hasMany(CongViec::class);
+    }
 }

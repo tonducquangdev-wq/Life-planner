@@ -41,14 +41,16 @@ document.addEventListener('DOMContentLoaded', function () {
         'hoc-tap': 'bi-book-fill',
         'tap-luyen': 'bi-activity',
         'deadline': 'bi-exclamation-triangle-fill',
-        'ca-nhan': 'bi-person-fill'
+        'ca-nhan': 'bi-person-fill',
+        'cong-viec': 'bi-briefcase-fill'
     };
 
     const typeLabelMap = {
         'hoc-tap': '📘 Học tập',
         'tap-luyen': '🏋️ Tập luyện',
         'deadline': '⏰ Deadline',
-        'ca-nhan': '🎉 Cá nhân'
+        'ca-nhan': '🎉 Cá nhân',
+        'cong-viec': '💼 Công việc'
     };
 
     // Helper Toast Thông báo
@@ -145,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         batThongBao: Boolean(evt.bat_thong_bao),
                         soNgayNhac: parseInt(evt.so_ngay_nhac || 1),
                         quyTacLap: evt.quy_tac_lap || 'once',
+                        ngayKetThucLap: evt.ngay_ket_thuc_lap || null,
                         nhomLapId: evt.nhom_lap_id || null
                     };
                 });
@@ -491,91 +494,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ==========================================================================
-    // 5. TẠO SỰ KIỆN (POST /calendar/events)
+    // 5. HELPER CHECK TRÙNG LỊCH (HTTP 409 CONFLICT MODAL ENGINE)
     // ==========================================================================
-    document.getElementById('btnSaveNewEvent')?.addEventListener('click', async function () {
-        const activeTab = document.querySelector('#eventTab .nav-link.active');
-        const tabId = activeTab ? activeTab.getAttribute('id') : 'hoc-tap-tab';
+    const conflictModalEl = document.getElementById('modalConflictWarning');
+    const conflictModal = conflictModalEl ? new bootstrap.Modal(conflictModalEl) : null;
+    const conflictListContainer = document.getElementById('conflictListContainer');
+    const btnConfirmForceSave = document.getElementById('btnConfirmForceSave');
 
-        let payload = {};
-
-        if (tabId === 'hoc-tap-tab') {
-            const title = document.getElementById('createHocTapTitle').value.trim();
-            if (!title) { showToast('Vui lòng nhập tên môn học.', false); return; }
-            const day = parseInt(document.getElementById('createHocTapDay').value);
-            const startTime = document.getElementById('createHocTapTime').value || '08:00';
-            const endTime = document.getElementById('createHocTapEndTime').value || '10:30';
-            const location = document.getElementById('createHocTapLocation').value.trim();
-            const repeat = document.getElementById('createHocTapRepeat')?.value || 'weekly';
-
-            payload = {
-                tieu_de: title,
-                loai_su_kien: 'hoc_tap',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
-                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
-                mo_ta: location,
-                bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1),
-                quy_tac_lap: repeat
-            };
-        } else if (tabId === 'tap-luyen-tab') {
-            const title = document.getElementById('createTapLuyenTitle').value.trim();
-            if (!title) { showToast('Vui lòng nhập tên buổi tập.', false); return; }
-            const day = parseInt(document.getElementById('createTapLuyenDay').value);
-            const startTime = document.getElementById('createTapLuyenTime').value || '18:00';
-            const endTime = document.getElementById('createTapLuyenEndTime').value || '19:30';
-            const location = document.getElementById('createTapLuyenLocation').value.trim();
-            const repeat = document.getElementById('createTapLuyenRepeat')?.value || 'weekly';
-
-            payload = {
-                tieu_de: title,
-                loai_su_kien: 'tap_luyen',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
-                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
-                mo_ta: location,
-                bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1),
-                quy_tac_lap: repeat
-            };
-        } else if (tabId === 'deadline-tab') {
-            const title = document.getElementById('createDeadlineTitle').value.trim();
-            if (!title) { showToast('Vui lòng nhập tiêu đề deadline.', false); return; }
-            const day = parseInt(document.getElementById('createDeadlineDay').value);
-            const time = document.getElementById('createDeadlineTime').value || '23:59';
-            const location = document.getElementById('createDeadlineLocation').value.trim();
-            const repeat = document.getElementById('createDeadlineRepeat')?.value || 'once';
-
-            payload = {
-                tieu_de: title,
-                loai_su_kien: 'deadline',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
-                mo_ta: location,
-                bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1),
-                quy_tac_lap: repeat
-            };
-        } else {
-            const title = document.getElementById('createCaNhanTitle').value.trim();
-            if (!title) { showToast('Vui lòng nhập tên sự kiện.', false); return; }
-            const day = parseInt(document.getElementById('createCaNhanDay').value);
-            const time = document.getElementById('createCaNhanTime').value || '14:00';
-            const location = document.getElementById('createCaNhanLocation').value.trim();
-            const repeat = document.getElementById('createCaNhanRepeat')?.value || 'once';
-
-            payload = {
-                tieu_de: title,
-                loai_su_kien: 'ca_nhan',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
-                mo_ta: location,
-                bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1),
-                quy_tac_lap: repeat
-            };
-        }
-
+    async function sendEventRequestWithConflictCheck(url, method, payload, modalToHide, targetDay) {
         try {
-            const response = await fetch('/calendar/events', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -585,22 +514,203 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const result = await response.json();
+
+            // Nếu phát hiện trùng lịch (HTTP 409)
+            if (response.status === 409 && result.has_conflict) {
+                if (conflictModal && conflictListContainer) {
+                    let html = '<div class="fw-bold text-danger mb-2 fs-7"><i class="bi bi-exclamation-triangle-fill me-1"></i>Phát hiện ' + (result.conflicts ? result.conflicts.length : 0) + ' lịch bị trùng:</div>';
+                    html += '<ul class="list-unstyled m-0 d-flex flex-column gap-2">';
+                    if (Array.isArray(result.conflicts)) {
+                        result.conflicts.forEach(item => {
+                            html += `
+                                <li class="p-2.5 rounded-3 bg-white border shadow-2xs d-flex align-items-center justify-content-between gap-2">
+                                    <div>
+                                        <div class="fw-bold text-dark fs-7">${item.title}</div>
+                                        <div class="text-muted fs-8"><i class="bi bi-clock me-1"></i>${item.date}: <strong>${item.time}</strong></div>
+                                    </div>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fs-8 flex-shrink-0">Trùng lịch</span>
+                                </li>
+                            `;
+                        });
+                    }
+                    html += '</ul>';
+                    conflictListContainer.innerHTML = html;
+
+                    // Handler khi nhấn "Vẫn lưu sự kiện"
+                    btnConfirmForceSave.onclick = async function () {
+                        conflictModal.hide();
+                        const forcedPayload = { ...payload, force: true };
+                        await sendEventRequestWithConflictCheck(url, method, forcedPayload, modalToHide, targetDay);
+                    };
+
+                    conflictModal.show();
+                }
+                return;
+            }
+
             if (response.ok && result.success) {
-                createEventModal?.hide();
-                showToast(result.message || 'Thêm sự kiện thành công!');
+                modalToHide?.hide();
+                showToast(result.message || 'Lưu sự kiện thành công!');
                 await loadEventsFromDatabase();
-                openDayDetailModal(payload.thoi_gian_bat_dau ? parseInt(payload.thoi_gian_bat_dau.split(' ')[0].split('-')[2]) : activeSelectedDay);
+                if (targetDay) {
+                    openDayDetailModal(targetDay);
+                }
             } else {
-                showToast(result.message || 'Lỗi khi tạo sự kiện.', false);
+                showToast(result.message || 'Lỗi khi lưu sự kiện.', false);
             }
         } catch (error) {
-            console.error('Lỗi API POST /calendar/events:', error);
-            showToast('Lỗi gửi yêu cầu tạo sự kiện.', false);
+            console.error('Lỗi API event request:', error);
+            showToast('Lỗi gửi yêu cầu đến máy chủ.', false);
         }
+    }
+
+    // Helper Ẩn/Hiện Ngày kết thúc lặp theo Quy tắc lặp
+    function toggleEndRepeatVisibility(repeatSelectId, groupContainerId) {
+        const select = document.getElementById(repeatSelectId);
+        const group = document.getElementById(groupContainerId);
+        if (!select || !group) return;
+        if (select.value === 'once') {
+            group.classList.add('d-none');
+        } else {
+            group.classList.remove('d-none');
+        }
+    }
+
+    const repeatToggleMap = {
+        'createHocTapRepeat': 'createHocTapEndRepeatGroup',
+        'createTapLuyenRepeat': 'createTapLuyenEndRepeatGroup',
+        'createDeadlineRepeat': 'createDeadlineEndRepeatGroup',
+        'createCaNhanRepeat': 'createCaNhanEndRepeatGroup',
+        'editEventRepeat': 'editEventEndRepeatGroup'
+    };
+
+    Object.keys(repeatToggleMap).forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.addEventListener('change', () => toggleEndRepeatVisibility(selectId, repeatToggleMap[selectId]));
     });
 
     // ==========================================================================
-    // 6. SỬA SỰ KIỆN (PUT /calendar/events/{id})
+    // 6. TẠO SỰ KIỆN (POST /calendar/events)
+    // ==========================================================================
+    document.getElementById('btnSaveNewEvent')?.addEventListener('click', async function () {
+        const activeTab = document.querySelector('#eventTab .nav-link.active');
+        const tabId = activeTab ? activeTab.getAttribute('id') : 'hoc-tap-tab';
+
+        let payload = {};
+        let targetDay = activeSelectedDay;
+
+        if (tabId === 'hoc-tap-tab') {
+            const title = document.getElementById('createHocTapTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên môn học.', false); return; }
+            const day = parseInt(document.getElementById('createHocTapDay').value);
+            targetDay = day;
+            const startTime = document.getElementById('createHocTapTime').value || '08:00';
+            const endTime = document.getElementById('createHocTapEndTime').value || '10:30';
+            const location = document.getElementById('createHocTapLocation').value.trim();
+            const repeat = document.getElementById('createHocTapRepeat')?.value || 'weekly';
+            const endRepeat = document.getElementById('createHocTapEndRepeat')?.value;
+
+            if (repeat !== 'once' && !endRepeat) {
+                showToast('Vui lòng chọn ngày kết thúc lặp.', false);
+                return;
+            }
+
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'hoc_tap',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat,
+                ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
+            };
+        } else if (tabId === 'tap-luyen-tab') {
+            const title = document.getElementById('createTapLuyenTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên buổi tập.', false); return; }
+            const day = parseInt(document.getElementById('createTapLuyenDay').value);
+            targetDay = day;
+            const startTime = document.getElementById('createTapLuyenTime').value || '18:00';
+            const endTime = document.getElementById('createTapLuyenEndTime').value || '19:30';
+            const location = document.getElementById('createTapLuyenLocation').value.trim();
+            const repeat = document.getElementById('createTapLuyenRepeat')?.value || 'weekly';
+            const endRepeat = document.getElementById('createTapLuyenEndRepeat')?.value;
+
+            if (repeat !== 'once' && !endRepeat) {
+                showToast('Vui lòng chọn ngày kết thúc lặp.', false);
+                return;
+            }
+
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'tap_luyen',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat,
+                ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
+            };
+        } else if (tabId === 'deadline-tab') {
+            const title = document.getElementById('createDeadlineTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tiêu đề deadline.', false); return; }
+            const day = parseInt(document.getElementById('createDeadlineDay').value);
+            targetDay = day;
+            const time = document.getElementById('createDeadlineTime').value || '23:59';
+            const location = document.getElementById('createDeadlineLocation').value.trim();
+            const repeat = document.getElementById('createDeadlineRepeat')?.value || 'once';
+            const endRepeat = document.getElementById('createDeadlineEndRepeat')?.value;
+
+            if (repeat !== 'once' && !endRepeat) {
+                showToast('Vui lòng chọn ngày kết thúc lặp.', false);
+                return;
+            }
+
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'deadline',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat,
+                ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
+            };
+        } else {
+            const title = document.getElementById('createCaNhanTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên sự kiện.', false); return; }
+            const day = parseInt(document.getElementById('createCaNhanDay').value);
+            targetDay = day;
+            const time = document.getElementById('createCaNhanTime').value || '14:00';
+            const location = document.getElementById('createCaNhanLocation').value.trim();
+            const repeat = document.getElementById('createCaNhanRepeat')?.value || 'once';
+            const endRepeat = document.getElementById('createCaNhanEndRepeat')?.value;
+
+            if (repeat !== 'once' && !endRepeat) {
+                showToast('Vui lòng chọn ngày kết thúc lặp.', false);
+                return;
+            }
+
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'ca_nhan',
+                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
+                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1),
+                quy_tac_lap: repeat,
+                ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
+            };
+        }
+
+        await sendEventRequestWithConflictCheck('/calendar/events', 'POST', payload, createEventModal, targetDay);
+    });
+
+    // ==========================================================================
+    // 7. SỬA SỰ KIỆN (PUT /calendar/events/{id})
     // ==========================================================================
     function openEditModal(eventId) {
         const evt = eventsList.find(e => e.id === eventId);
@@ -618,6 +728,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const editRepeatSel = document.getElementById('editEventRepeat');
         if (editRepeatSel) editRepeatSel.value = evt.quyTacLap || 'once';
+
+        const editEndRepeatInput = document.getElementById('editEventEndRepeat');
+        if (editEndRepeatInput) editEndRepeatInput.value = evt.ngayKetThucLap || '';
+        toggleEndRepeatVisibility('editEventRepeat', 'editEventEndRepeatGroup');
 
         const editSw = document.getElementById('editEventBatThongBao');
         const editSel = document.getElementById('editEventSoNgayNhac');
@@ -644,9 +758,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const endTime = document.getElementById('editEventEndTime').value;
         const location = document.getElementById('editEventLocation').value.trim();
         const repeat = document.getElementById('editEventRepeat')?.value || 'once';
+        const endRepeat = document.getElementById('editEventEndRepeat')?.value;
 
         if (!title) {
             showToast('Vui lòng nhập tiêu đề sự kiện.', false);
+            return;
+        }
+
+        if (repeat !== 'once' && !endRepeat) {
+            showToast('Vui lòng chọn ngày kết thúc lặp.', false);
             return;
         }
 
@@ -657,37 +777,15 @@ document.addEventListener('DOMContentLoaded', function () {
             mo_ta: location,
             bat_thong_bao: document.getElementById('editEventBatThongBao')?.checked || false,
             so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1),
-            quy_tac_lap: repeat
+            quy_tac_lap: repeat,
+            ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
         };
 
         if (endTime) {
             payload.thoi_gian_ket_thuc = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`;
         }
 
-        try {
-            const response = await fetch(`/calendar/events/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-            if (response.ok && result.success) {
-                editEventModal?.hide();
-                showToast(result.message || 'Cập nhật sự kiện thành công!');
-                await loadEventsFromDatabase();
-                openDayDetailModal(day);
-            } else {
-                showToast(result.message || 'Lỗi khi cập nhật sự kiện.', false);
-            }
-        } catch (error) {
-            console.error('Lỗi API PUT /calendar/events:', error);
-            showToast('Lỗi gửi yêu cầu cập nhật.', false);
-        }
+        await sendEventRequestWithConflictCheck(`/calendar/events/${id}`, 'PUT', payload, editEventModal, day);
     });
 
     // ==========================================================================
