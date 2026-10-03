@@ -426,46 +426,47 @@ body::before {
    DARK MODE OVERRIDES (BS 5.3 DATA-BS-THEME="DARK")
    ========================================== */
 [data-bs-theme="dark"] body::before {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%) !important;
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.94) 0%, rgba(26, 26, 29, 0.9) 100%) !important;
 }
 
 [data-bs-theme="dark"] .login-card-2026 {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+    background: #1E1E22 !important;
+    border-color: #2E2E34 !important;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
-    color: #f8fafc !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .login-title-2026 {
-    color: #ffffff !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .login-subtitle-2026,
 [data-bs-theme="dark"] .form-label-2026 {
-    color: #cbd5e1 !important;
+    color: #A0A0A8 !important;
 }
 
 [data-bs-theme="dark"] .form-control-2026 {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #ffffff !important;
+    background-color: #1A1A1E !important;
+    border-color: #33333A !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .form-control-2026:focus {
-    background-color: #1e293b !important;
-    border-color: #6366f1 !important;
+    background-color: #1A1A1E !important;
+    border-color: #6C8CFF !important;
+    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25) !important;
 }
 
 [data-bs-theme="dark"] .demo-card-minimal {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+    background-color: #1A1A1E !important;
+    border-color: #2E2E34 !important;
 }
 
 [data-bs-theme="dark"] .demo-title {
-    color: #a5b4fc !important;
+    color: #6C8CFF !important;
 }
 
 [data-bs-theme="dark"] .demo-details {
-    color: #94a3b8 !important;
+    color: #A0A0A8 !important;
 }
 

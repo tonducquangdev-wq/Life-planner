@@ -10,18 +10,72 @@
     --sidebar-bg: #0b1120;
     --header-height: 58px;
     --card-radius: 16px;
-    --card-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-    --card-shadow-hover: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+    --input-radius: 12px;
+    --button-radius: 12px;
+    --modal-radius: 20px;
+    --card-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    --card-shadow-hover: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
 }
 
 html, body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.55;
+    letter-spacing: -0.006em;
     background-color: #f1f5f9;
     color: #1e293b;
     overflow: hidden; /* Cố định chuẩn 100vh trên Desktop */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   GLOBAL UI POLISH COMPONENT STANDARDS
+   ========================================================================== */
+.card, .custom-card, .stat-card, .side-card, .kanban-column {
+    border-radius: var(--card-radius) !important;
+}
+
+.form-control, .form-select, textarea, .search-box input {
+    border-radius: var(--input-radius) !important;
+}
+
+.btn, .btn-primary, .btn-secondary, .btn-danger, .btn-outline-primary, .btn-outline-secondary {
+    border-radius: var(--button-radius) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.modal-content {
+    border-radius: var(--modal-radius) !important;
+}
+
+.sidebar .nav-link,
+.top-header,
+.custom-card,
+.stat-card,
+.timeline-card,
+.deadline-item,
+.kanban-card,
+.dropdown-menu,
+.event-pill,
+.legend-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.custom-card:hover,
+.stat-card:hover,
+.timeline-card:hover,
+.deadline-item:hover,
+.kanban-card:hover {
+    transform: translateY(-2px);
 }
 
 /* ==========================================================================
@@ -648,156 +702,311 @@ html, body {
 /* ==========================================================================
    5. GLOBAL DARK MODE STYLES & OVERRIDES (BS 5.3 DATA-BS-THEME="DARK")
    ========================================================================== */
+/* ==========================================================================
+   5. GLOBAL DARK MODE STYLES & OVERRIDES (BS 5.3 DATA-BS-THEME="DARK")
+   ========================================================================== */
+/* ==========================================================================
+   5. GLOBAL DARK MODE STYLES & OVERRIDES (BS 5.3 DATA-BS-THEME="DARK")
+   STRICT DESIGN SYSTEM SPECIFICATION
+   ========================================================================== */
 [data-bs-theme="dark"] {
-    --bs-body-bg: #0f172a;
-    --bs-body-color: #f8fafc;
-    --bs-border-color: #334155;
-    --bs-secondary-color: #94a3b8;
-    --bs-tertiary-bg: #1e293b;
-    --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-    --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.6);
+    /* Color Palette Design System */
+    --bg-main: #121212;
+    --bg-navbar: #1A1A1D;
+    --bg-sidebar: #1A1A1D;
+    --bg-card: #1E1E22;
+    --bg-card-hover: #26262B;
+    --bg-modal: #26262B;
+    --bg-dropdown: #26262B;
+    --bg-table-header: #26262B;
+    --bg-kanban-column: #1E1E22;
+    --bg-kanban-card: #26262B;
+    --bg-footer: #0F0F11;
+    --border-color: #2E2E34;
+    
+    /* Text Tokens */
+    --text-primary: #E8E8EA;
+    --text-secondary: #A0A0A8;
+    --text-placeholder: #6B6B73;
+    --color-link: #8AB4FF;
+    --color-link-hover: #B3CDFF;
+    
+    /* Button Tokens */
+    --btn-primary-bg: #6C8CFF;
+    --btn-primary-text: #0B1020;
+    --btn-primary-hover: #8AA3FF;
+    --btn-primary-active: #5775E6;
+    
+    --btn-secondary-bg: transparent;
+    --btn-secondary-border: #3A3A42;
+    --btn-secondary-text: #E8E8EA;
+    --btn-secondary-hover: #26262B;
+    --btn-secondary-active: #2E2E34;
+    
+    --btn-danger-bg: #F87171;
+    --btn-danger-text: #1A0A0A;
+    --btn-danger-hover: #FCA5A5;
+    --btn-danger-active: #EF4444;
+
+    --btn-disabled-bg: #2A2A2F;
+    --btn-disabled-text: #6B6B73;
+
+    /* Form Tokens */
+    --input-bg: #1A1A1E;
+    --input-border: #33333A;
+    --input-focus-border: #6C8CFF;
+    --focus-ring: rgba(108, 140, 255, 0.25);
+
+    /* Status Colors */
+    --status-success: #4ADE80;
+    --status-warning: #FBBF24;
+    --status-error: #F87171;
+    --status-info: #60A5FA;
+
+    /* Bootstrap 5.3 System Overrides */
+    --bs-body-bg: #121212;
+    --bs-body-color: #E8E8EA;
+    --bs-border-color: #2E2E34;
+    --bs-secondary-color: #A0A0A8;
+    --bs-tertiary-bg: #1A1A1D;
+    --bs-tertiary-color: #6B6B73;
+    
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+    --sidebar-bg: #1A1A1D;
 }
 
 [data-bs-theme="dark"] body {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
+    background-color: #121212 !important;
+    color: #E8E8EA !important;
 }
 
-/* Header & Topbar trong Dark Mode */
+/* 1. SIDEBAR IN DARK MODE */
+[data-bs-theme="dark"] .sidebar {
+    background-color: #1A1A1D !important;
+    border-right: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .sidebar .brand-logo {
+    border-bottom-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .brand-name {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .sidebar-label {
+    color: #A0A0A8 !important;
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link {
+    color: #A0A0A8 !important;
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link .nav-icon-box {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link:hover {
+    color: #E8E8EA !important;
+    background-color: #26262B !important;
+    transform: translateX(2px);
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link:hover .nav-icon-box {
+    color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link.active {
+    color: #6C8CFF !important;
+    background-color: rgba(108, 140, 255, 0.15) !important;
+    border-left-color: #6C8CFF !important;
+    font-weight: 600;
+}
+
+[data-bs-theme="dark"] .sidebar-menu .nav-link.active .nav-icon-box {
+    color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .sidebar-user-footer {
+    background-color: #0F0F11 !important;
+    border-top: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .sidebar-user-card:hover {
+    background-color: #26262B !important;
+}
+
+[data-bs-theme="dark"] .sidebar-user-info .user-name {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .sidebar-user-info .user-email {
+    color: #A0A0A8 !important;
+}
+
+/* 2. HEADER & TOPBAR IN DARK MODE */
 [data-bs-theme="dark"] .top-header,
 [data-bs-theme="dark"] header.top-header {
-    background-color: #1e293b !important;
-    border-bottom: 1px solid #334155 !important;
+    background-color: #1A1A1D !important;
+    border-bottom: 1px solid #2E2E34 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 [data-bs-theme="dark"] .topbar-title,
 [data-bs-theme="dark"] .user-display-name,
 [data-bs-theme="dark"] .topbar-user-name {
-    color: #ffffff !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .search-box input {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #f8fafc !important;
+    background-color: #1A1A1E !important;
+    border: 1px solid #33333A !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .search-box input::placeholder {
+    color: #6B6B73 !important;
 }
 
 [data-bs-theme="dark"] .search-box input:focus {
-    background-color: #1e293b !important;
-    border-color: var(--primary-color) !important;
+    background-color: #1A1A1E !important;
+    border-color: #6C8CFF !important;
+    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25) !important;
 }
 
-[data-bs-theme="dark"] .notification-btn {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #cbd5e1 !important;
+[data-bs-theme="dark"] .notification-btn,
+[data-bs-theme="dark"] .theme-toggle-btn {
+    background-color: #1A1A1E !important;
+    border-color: #33333A !important;
+    color: #A0A0A8 !important;
 }
 
-[data-bs-theme="dark"] .notification-btn:hover {
-    background-color: #334155 !important;
-    color: #ffffff !important;
+[data-bs-theme="dark"] .notification-btn:hover,
+[data-bs-theme="dark"] .theme-toggle-btn:hover {
+    background-color: #26262B !important;
+    color: #E8E8EA !important;
 }
 
-/* Cards & Components trong Dark Mode */
+/* 3. CARDS & CONTAINERS IN DARK MODE */
 [data-bs-theme="dark"] .custom-card,
 [data-bs-theme="dark"] .stat-card,
 [data-bs-theme="dark"] .timeline-card,
 [data-bs-theme="dark"] .deadline-item,
 [data-bs-theme="dark"] .kpi-card,
 [data-bs-theme="dark"] .card {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
-    color: #f8fafc !important;
+    background-color: #1E1E22 !important;
+    border: 1px solid #2E2E34 !important;
+    color: #E8E8EA !important;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+[data-bs-theme="dark"] .custom-card:hover,
+[data-bs-theme="dark"] .stat-card:hover {
+    background-color: #26262B !important;
+    border-color: #3A3A42 !important;
+    box-shadow: var(--card-shadow-hover);
 }
 
 [data-bs-theme="dark"] .timeline-card:hover,
-[data-bs-theme="dark"] .deadline-item:hover {
-    background-color: #273549 !important;
-    border-color: #475569 !important;
+[data-bs-theme="dark"] .deadline-item:hover,
+[data-bs-theme="dark"] .kanban-card:hover {
+    background-color: #2E2E34 !important;
+    border-color: #3A3A42 !important;
 }
 
 [data-bs-theme="dark"] .card-header-custom {
-    border-bottom-color: #334155 !important;
+    border-bottom: 1px solid #2E2E34 !important;
 }
 
 [data-bs-theme="dark"] .card-title-custom,
 [data-bs-theme="dark"] .stat-card-value {
-    color: #ffffff !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .stat-card-title,
 [data-bs-theme="dark"] .text-muted {
-    color: #94a3b8 !important;
+    color: #A0A0A8 !important;
 }
 
 [data-bs-theme="dark"] .activity-icon-box {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #cbd5e1 !important;
+    background-color: #1A1A1E !important;
+    border-color: #2E2E34 !important;
+    color: #A0A0A8 !important;
 }
 
 [data-bs-theme="dark"] .activity-item {
-    border-bottom-color: #334155 !important;
+    border-bottom-color: #2E2E34 !important;
 }
 
-/* Modals & Dropdowns trong Dark Mode */
+/* 4. MODALS & DROPDOWNS IN DARK MODE */
 [data-bs-theme="dark"] .modal-content,
 [data-bs-theme="dark"] .dropdown-menu {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    color: #f8fafc !important;
+    background-color: #26262B !important;
+    border: 1px solid #2E2E34 !important;
+    color: #E8E8EA !important;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6) !important;
 }
 
 [data-bs-theme="dark"] .modal-header,
 [data-bs-theme="dark"] .modal-footer,
 [data-bs-theme="dark"] .notif-header-bg {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+    background-color: #1A1A1D !important;
+    border-color: #2E2E34 !important;
 }
 
 [data-bs-theme="dark"] .dropdown-item {
-    color: #cbd5e1 !important;
+    color: #A0A0A8 !important;
 }
 
 [data-bs-theme="dark"] .dropdown-item:hover,
 [data-bs-theme="dark"] .dropdown-item:focus {
-    background-color: #334155 !important;
-    color: #ffffff !important;
+    background-color: #1E1E22 !important;
+    color: #E8E8EA !important;
 }
 
-/* Form Controls & Inputs trong Dark Mode */
+/* 5. FORM CONTROLS IN DARK MODE */
 [data-bs-theme="dark"] .form-control,
-[data-bs-theme="dark"] .form-select {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #f8fafc !important;
+[data-bs-theme="dark"] .form-select,
+[data-bs-theme="dark"] textarea {
+    background-color: #1A1A1E !important;
+    border: 1px solid #33333A !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder,
+[data-bs-theme="dark"] textarea::placeholder {
+    color: #6B6B73 !important;
 }
 
 [data-bs-theme="dark"] .form-control:focus,
-[data-bs-theme="dark"] .form-select:focus {
-    background-color: #1e293b !important;
-    border-color: #6366f1 !important;
-    color: #ffffff !important;
+[data-bs-theme="dark"] .form-select:focus,
+[data-bs-theme="dark"] textarea:focus {
+    background-color: #1A1A1E !important;
+    border-color: #6C8CFF !important;
+    color: #E8E8EA !important;
+    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25) !important;
 }
 
 [data-bs-theme="dark"] .form-label,
 [data-bs-theme="dark"] label {
-    color: #cbd5e1 !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .bg-light {
-    background-color: #0f172a !important;
-    color: #cbd5e1 !important;
+    background-color: #121212 !important;
+    color: #A0A0A8 !important;
 }
 
 [data-bs-theme="dark"] .bg-white {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+    background-color: #1E1E22 !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .text-dark {
-    color: #f8fafc !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .border-bottom,
@@ -805,38 +1014,212 @@ html, body {
 [data-bs-theme="dark"] .border-start,
 [data-bs-theme="dark"] .border-end,
 [data-bs-theme="dark"] .border {
-    border-color: #334155 !important;
+    border-color: #2E2E34 !important;
 }
 
-/* Tables trong Dark Mode */
+/* LINKS IN DARK MODE */
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(.dropdown-item) {
+    color: #8AB4FF;
+}
+
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
+    color: #B3CDFF;
+}
+
+/* 6. BUTTONS IN DARK MODE (STRICT DESIGN SYSTEM) */
+[data-bs-theme="dark"] .btn-primary {
+    background-color: #6C8CFF !important;
+    border-color: #6C8CFF !important;
+    color: #0B1020 !important;
+    font-weight: 700;
+}
+
+[data-bs-theme="dark"] .btn-primary:hover,
+[data-bs-theme="dark"] .btn-primary:focus {
+    background-color: #8AA3FF !important;
+    border-color: #8AA3FF !important;
+    color: #0B1020 !important;
+    box-shadow: 0 4px 14px rgba(108, 140, 255, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .btn-primary:active {
+    background-color: #5775E6 !important;
+    border-color: #5775E6 !important;
+    color: #0B1020 !important;
+}
+
+[data-bs-theme="dark"] .btn-secondary,
+[data-bs-theme="dark"] .btn-outline-secondary {
+    background-color: transparent !important;
+    border: 1px solid #3A3A42 !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .btn-secondary:hover,
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #26262B !important;
+    border-color: #4A4A52 !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .btn-secondary:active,
+[data-bs-theme="dark"] .btn-outline-secondary:active {
+    background-color: #2E2E34 !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .btn-danger {
+    background-color: #F87171 !important;
+    border-color: #F87171 !important;
+    color: #1A0A0A !important;
+    font-weight: 700;
+}
+
+[data-bs-theme="dark"] .btn-danger:hover {
+    background-color: #FCA5A5 !important;
+    border-color: #FCA5A5 !important;
+    color: #1A0A0A !important;
+}
+
+[data-bs-theme="dark"] .btn-danger:active {
+    background-color: #EF4444 !important;
+    border-color: #EF4444 !important;
+    color: #1A0A0A !important;
+}
+
+[data-bs-theme="dark"] .btn:disabled,
+[data-bs-theme="dark"] .btn.disabled {
+    background-color: #2A2A2F !important;
+    border-color: transparent !important;
+    color: #6B6B73 !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    border-color: #6C8CFF !important;
+    color: #6C8CFF !important;
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:hover,
+[data-bs-theme="dark"] .btn-outline-primary.active {
+    background-color: #6C8CFF !important;
+    color: #0B1020 !important;
+}
+
+/* 7. TABLES IN DARK MODE */
 [data-bs-theme="dark"] table,
 [data-bs-theme="dark"] .table {
-    --bs-table-bg: #1e293b;
-    --bs-table-color: #f8fafc;
-    --bs-table-hover-bg: #334155;
-    --bs-table-border-color: #334155;
-    color: #f8fafc !important;
+    --bs-table-bg: #1E1E22;
+    --bs-table-color: #E8E8EA;
+    --bs-table-hover-bg: #26262B;
+    --bs-table-border-color: #2E2E34;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .table th {
-    background-color: #0f172a !important;
-    color: #cbd5e1 !important;
-    border-color: #334155 !important;
+    background-color: #26262B !important;
+    color: #E8E8EA !important;
+    border-color: #2E2E34 !important;
+    font-weight: 700;
 }
 
 [data-bs-theme="dark"] .table td {
-    border-color: #334155 !important;
+    border-color: #2E2E34 !important;
+    color: #E8E8EA !important;
 }
 
-/* Offcanvas Mobile */
+[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-bg-type: #161619;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .table-hover > tbody > tr:hover > * {
+    --bs-table-bg-state: #26262B;
+    color: #E8E8EA !important;
+}
+
+/* 8. BADGES & STATUS NOTIFICATIONS IN DARK MODE */
+[data-bs-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(108, 140, 255, 0.18) !important;
+    color: #6C8CFF !important;
+    border: 1px solid rgba(108, 140, 255, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-success-subtle {
+    background-color: rgba(74, 222, 128, 0.18) !important;
+    color: #4ADE80 !important;
+    border: 1px solid rgba(74, 222, 128, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-danger-subtle {
+    background-color: rgba(248, 113, 113, 0.18) !important;
+    color: #F87171 !important;
+    border: 1px solid rgba(248, 113, 113, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-warning-subtle {
+    background-color: rgba(251, 191, 36, 0.18) !important;
+    color: #FBBF24 !important;
+    border: 1px solid rgba(251, 191, 36, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-info-subtle {
+    background-color: rgba(96, 165, 250, 0.18) !important;
+    color: #60A5FA !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-secondary-subtle {
+    background-color: rgba(160, 160, 168, 0.18) !important;
+    color: #A0A0A8 !important;
+    border: 1px solid rgba(160, 160, 168, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .progress {
+    background-color: #2E2E34 !important;
+    border-radius: 10px;
+    height: 8px;
+}
+
+[data-bs-theme="dark"] .progress-bar {
+    background-color: #6C8CFF !important;
+    border-radius: 10px;
+}
+
+/* 9. KANBAN BOARD IN DARK MODE */
+[data-bs-theme="dark"] .kanban-column {
+    background-color: #1E1E22 !important;
+    border: 1px solid #2E2E34 !important;
+    border-radius: 16px;
+}
+
+[data-bs-theme="dark"] .kanban-card {
+    background-color: #26262B !important;
+    border: 1px solid #2E2E34 !important;
+    color: #E8E8EA !important;
+    border-radius: 14px;
+}
+
+[data-bs-theme="dark"] .kanban-card:hover {
+    background-color: #2E2E34 !important;
+    border-color: #3A3A42 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 10. OFFCANVAS MOBILE IN DARK MODE */
 [data-bs-theme="dark"] .offcanvas {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+    background-color: #1A1A1D !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .offcanvas-header {
-    background-color: #0f172a !important;
-    border-bottom: 1px solid #334155 !important;
+    background-color: #121212 !important;
+    border-bottom: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .offcanvas .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 [data-bs-theme="dark"] .offcanvas .btn-close {

@@ -601,93 +601,153 @@
 }
 
 /* ==========================================================================
-   DARK MODE OVERRIDES FOR CALENDAR (BS 5.3 DATA-BS-THEME="DARK")
+   DARK MODE OVERRIDES FOR CALENDAR (STRICT DESIGN SYSTEM SPECIFICATION)
    ========================================================================== */
 [data-bs-theme="dark"] {
-    --event-blue-bg: rgba(59, 130, 246, 0.2);
-    --event-blue-text: #93c5fd;
-    --event-blue-border: rgba(147, 197, 253, 0.3);
-    --event-blue-dot: #60a5fa;
+    /* 1. Học tập: #60A5FA */
+    --event-blue-bg: rgba(96, 165, 250, 0.18);
+    --event-blue-text: #60A5FA;
+    --event-blue-border: rgba(96, 165, 250, 0.35);
+    --event-blue-dot: #60A5FA;
 
-    --event-green-bg: rgba(34, 197, 94, 0.2);
-    --event-green-text: #86efac;
-    --event-green-border: rgba(134, 239, 172, 0.3);
-    --event-green-dot: #4ade80;
+    /* 2. Tập luyện: #4ADE80 */
+    --event-green-bg: rgba(74, 222, 128, 0.18);
+    --event-green-text: #4ADE80;
+    --event-green-border: rgba(74, 222, 128, 0.35);
+    --event-green-dot: #4ADE80;
 
-    --event-orange-bg: rgba(249, 115, 22, 0.2);
-    --event-orange-text: #fdba74;
-    --event-orange-border: rgba(253, 186, 116, 0.3);
-    --event-orange-dot: #fb923c;
+    /* 3. Deadline: #F87171 */
+    --event-orange-bg: rgba(248, 113, 113, 0.18);
+    --event-orange-text: #F87171;
+    --event-orange-border: rgba(248, 113, 113, 0.35);
+    --event-orange-dot: #F87171;
 
-    --event-purple-bg: rgba(168, 85, 247, 0.2);
-    --event-purple-text: #f0abfc;
-    --event-purple-border: rgba(240, 171, 252, 0.3);
-    --event-purple-dot: #c084fc;
+    /* 4. Cá nhân: #C084FC */
+    --event-purple-bg: rgba(192, 132, 252, 0.18);
+    --event-purple-text: #C084FC;
+    --event-purple-border: rgba(192, 132, 252, 0.35);
+    --event-purple-dot: #C084FC;
 
-    --event-indigo-bg: rgba(99, 102, 241, 0.2);
-    --event-indigo-text: #a5b4fc;
-    --event-indigo-border: rgba(165, 180, 252, 0.3);
-    --event-indigo-dot: #818cf8;
+    /* 5. Công việc: #6C8CFF */
+    --event-indigo-bg: rgba(108, 140, 255, 0.18);
+    --event-indigo-text: #6C8CFF;
+    --event-indigo-border: rgba(108, 140, 255, 0.35);
+    --event-indigo-dot: #6C8CFF;
 }
 
 [data-bs-theme="dark"] .calendar-grid-container {
-    background-color: #334155 !important;
-    border-color: #334155 !important;
+    background-color: #2E2E34 !important;
+    border: 1px solid #2E2E34 !important;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 [data-bs-theme="dark"] .calendar-header-day {
-    background-color: #0f172a !important;
-    color: #94a3b8 !important;
+    background-color: #1A1A1D !important;
+    color: #A0A0A8 !important;
+    font-weight: 700;
 }
 
 [data-bs-theme="dark"] .calendar-day-cell {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+    background-color: #1E1E22 !important;
+    color: #E8E8EA !important;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell:hover {
+    background-color: #26262B !important;
 }
 
 [data-bs-theme="dark"] .calendar-day-cell.other-month {
-    background-color: #0f172a !important;
-    opacity: 0.6;
+    background-color: #121212 !important;
+    opacity: 0.45;
 }
 
+[data-bs-theme="dark"] .calendar-day-cell.is-today,
 [data-bs-theme="dark"] .calendar-day-cell.today {
-    background-color: rgba(99, 102, 241, 0.12) !important;
+    background-color: rgba(108, 140, 255, 0.15) !important;
+    box-shadow: inset 0 0 0 1.5px #6C8CFF !important;
 }
 
 [data-bs-theme="dark"] .day-number {
-    color: #cbd5e1 !important;
+    color: #E8E8EA !important;
 }
 
+[data-bs-theme="dark"] .calendar-day-cell.is-today .day-number,
 [data-bs-theme="dark"] .calendar-day-cell.today .day-number {
-    background-color: #6366f1 !important;
-    color: #ffffff !important;
+    background-color: #6C8CFF !important;
+    color: #0B1020 !important;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(108, 140, 255, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .event-pill {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+}
+
+[data-bs-theme="dark"] .event-pill:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .event-more-pill {
+    background-color: rgba(108, 140, 255, 0.18) !important;
+    color: #6C8CFF !important;
+    border: 1px solid rgba(108, 140, 255, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .event-more-pill:hover {
+    background-color: #6C8CFF !important;
+    color: #0B1020 !important;
 }
 
 [data-bs-theme="dark"] .legend-btn {
-    background-color: #0f172a !important;
-    color: #cbd5e1 !important;
-    border-color: #334155 !important;
+    background-color: #1A1A1E !important;
+    color: #A0A0A8 !important;
+    border: 1px solid #2E2E34 !important;
 }
 
 [data-bs-theme="dark"] .legend-btn:hover {
-    background-color: #334155 !important;
-    color: #ffffff !important;
+    background-color: #26262B !important;
+    color: #E8E8EA !important;
+    border-color: #3A3A42 !important;
+}
+
+[data-bs-theme="dark"] .side-card {
+    background-color: #1E1E22 !important;
+    border: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .side-card-header {
+    border-bottom: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .side-card-title {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .schedule-item {
+    background-color: #1A1A1D !important;
+    border-color: #2E2E34 !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .notification-item {
-    color: #f8fafc !important;
+    color: #E8E8EA !important;
 }
 
 [data-bs-theme="dark"] .notification-item:hover {
-    background-color: #334155 !important;
+    background-color: #26262B !important;
 }
 
 [data-bs-theme="dark"] .notification-item.unread {
-    background-color: rgba(99, 102, 241, 0.15) !important;
+    background-color: rgba(108, 140, 255, 0.15) !important;
 }
 
 [data-bs-theme="dark"] .notification-item.unread:hover {
-    background-color: rgba(99, 102, 241, 0.25) !important;
+    background-color: rgba(108, 140, 255, 0.25) !important;
 }
 
 /* ==========================================================================
