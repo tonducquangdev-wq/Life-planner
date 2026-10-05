@@ -12,6 +12,49 @@ use Illuminate\Support\Facades\Hash;
 class AuthApiController extends Controller
 {
     /**
+     * Format user array payload for authentication responses.
+     */
+    private function formatUser(User $user): array
+    {
+        return [
+            'id'           => $user->id,
+            'ho_ten'       => $user->ho_ten,
+            'email'        => $user->email,
+            'anh_dai_dien' => $user->anh_dai_dien,
+            'avatar_url'   => $user->avatar_url,
+            'initials'     => $user->initials,
+        ];
+    }
+
+    /**
+     * POST /api/register
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'ho_ten'   => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'ho_ten'   => $validated['ho_ten'],
+            'email'    => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success'      => true,
+            'message'      => 'Đăng ký tài khoản thành công!',
+            'access_token' => $token,
+            'token_type'   => 'Bearer',
+            'user'         => $this->formatUser($user),
+        ], 201, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    }
+
+    /**
      * POST /api/login
      */
     public function login(Request $request): JsonResponse
@@ -38,12 +81,7 @@ class AuthApiController extends Controller
             'message'      => 'Đăng nhập thành công!',
             'access_token' => $token,
             'token_type'   => 'Bearer',
-            'user'         => [
-                'id'           => $user->id,
-                'ho_ten'       => $user->ho_ten,
-                'email'        => $user->email,
-                'anh_dai_dien' => $user->avatar_url,
-            ],
+            'user'         => $this->formatUser($user),
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -75,7 +113,8 @@ class AuthApiController extends Controller
                 'id'                 => $user->id,
                 'ho_ten'             => $user->ho_ten,
                 'email'              => $user->email,
-                'anh_dai_dien'       => $user->avatar_url,
+                'anh_dai_dien'       => $user->anh_dai_dien,
+                'avatar_url'         => $user->avatar_url,
                 'initials'           => $user->initials,
                 'thong_bao_enabled'  => $user->thong_bao_enabled,
                 'thong_bao_lich_hoc' => $user->thong_bao_lich_hoc,

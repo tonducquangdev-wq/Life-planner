@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::as('api.')->group(function () {
 
-    // MODULE 1: AUTHENTICATION (Public Login)
+    // MODULE 1: AUTHENTICATION (Public Routes)
+    Route::post('/register', [AuthApiController::class, 'register'])->name('register');
     Route::post('/login', [AuthApiController::class, 'login'])->middleware('throttle:login')->name('login');
 
     // PROTECTED ROUTES (Sanctum Middleware)
