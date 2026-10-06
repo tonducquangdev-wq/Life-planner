@@ -38,6 +38,45 @@ class MonHoc extends Model
         ];
     }
 
+    protected $appends = [
+        'ten_mon_hoc',
+        'diem_hien_tai',
+        'hoc_ky',
+        'nam_hoc',
+    ];
+
+    public function getTenMonHocAttribute(): ?string
+    {
+        return $this->ten_mon;
+    }
+
+    public function getDiemHienTaiAttribute(): mixed
+    {
+        return $this->diem_so;
+    }
+
+    public function getHocKyAttribute(): ?int
+    {
+        if ($this->ngay_bat_dau) {
+            $month = (int) $this->ngay_bat_dau->format('m');
+            return ($month >= 9 || $month <= 1) ? 1 : (($month >= 2 && $month <= 6) ? 2 : 3);
+        }
+
+        return null;
+    }
+
+    public function getNamHocAttribute(): ?string
+    {
+        if ($this->ngay_bat_dau) {
+            $year = (int) $this->ngay_bat_dau->format('Y');
+            $month = (int) $this->ngay_bat_dau->format('m');
+
+            return $month >= 9 ? "{$year}-" . ($year + 1) : ($year - 1) . "-{$year}";
+        }
+
+        return null;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -26,6 +26,11 @@ class GiaSu extends Model
         'trang_thai',
     ];
 
+    protected $appends = [
+        'hoc_phi_formatted',
+        'avatar_url',
+    ];
+
     protected function casts(): array
     {
         return [
