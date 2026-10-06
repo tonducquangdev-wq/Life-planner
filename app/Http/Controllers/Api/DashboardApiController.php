@@ -5,55 +5,165 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BaiTap;
 use App\Models\BuoiTap;
-use App\Models\LichSuTapLuyen;
-use App\Models\MonHoc;
+use App\Models\SuKien;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardApiController extends Controller
 {
     /**
      * GET /api/dashboard
-     * Trả về thông số tổng quan phục vụ báo cáo Dashboard
+     * Action-First Personal Assistant Engine Endpoint
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $userId = Auth::id();
+        $user = $request->user();
+        $userId = $user->id;
+        $now = Carbon::now();
 
-        // 1. Tổng số môn học của User
-        $tongMonHoc = MonHoc::where('user_id', $userId)->count();
+        // 1. Time-of-day Dynamic Greeting
+        $hour = (int) $now->format('H');
+        if ($hour >= 5 && $hour < 12) {
+            $greetingText = "Good Morning";
+        } elseif ($hour >= 12 && $hour < 18) {
+            $greetingText = "Good Afternoon";
+        } else {
+            $greetingText = "Good Evening";
+        }
 
-        // 2. Tổng số bài tập thuộc môn học của User
-        $tongBaiTap = BaiTap::whereHas('monHoc', function ($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })->count();
+        $greeting = [
+            'text'     => $greetingText . ', ' . ($user->ho_ten ?? $user->name ?? 'User'),
+            'date_str' => $now->format('l, F j'),
+        ];
 
-        // 3. Số bài tập deadline sắp tới (hạn nộp trong 7 ngày tới & chưa hoàn thành)
-        $deadlineSapToi = BaiTap::whereHas('monHoc', function ($q) use ($userId) {
+        // 2. Today's Events (Scope Today)
+        $todayStart = $now->copy()->startOfDay();
+        $todayEnd   = $now->copy()->endOfDay();
+
+        $todayEvents = SuKien::where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->whereBetween('thoi_gian_bat_dau', [$todayStart, $todayEnd])
+            ->orderBy('thoi_gian_bat_dau', 'asc')
+            ->get();
+
+        $totalCount     = $todayEvents->count();
+        $completedCount = $todayEvents->where('trang_thai', 'da_hoan_thanh')->count();
+        $remainingCount = $totalCount - $completedCount;
+
+        // 3. 🔥 NEXT ACTION / HERO EVENT ENGINE
+        // Find ongoing event first
+        $nowLiveEvent = SuKien::where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->where('thoi_gian_bat_dau', '<=', $now)
+            ->where('thoi_gian_ket_thuc', '>=', $now)
+            ->first();
+
+        $nextAction = null;
+
+        if ($nowLiveEvent) {
+            $end = Carbon::parse($nowLiveEvent->thoi_gian_ket_thuc);
+            $remainingMinutes = max(1, (int) $now->diffInMinutes($end));
+
+            $nextAction = [
+                'status_type'       => 'now_live',
+                'status_badge'      => '🔴 Đang diễn ra',
+                'id'                => $nowLiveEvent->id,
+                'tieu_de'           => $nowLiveEvent->tieu_de,
+                'thoi_gian_bat_dau' => Carbon::parse($nowLiveEvent->thoi_gian_bat_dau)->format('H:i A'),
+                'thoi_gian_ket_thuc'=> Carbon::parse($nowLiveEvent->thoi_gian_ket_thuc)->format('H:i A'),
+                'time_range'        => Carbon::parse($nowLiveEvent->thoi_gian_bat_dau)->format('H:i A') . ' - ' . Carbon::parse($nowLiveEvent->thoi_gian_ket_thuc)->format('H:i A'),
+                'countdown_text'    => "Còn {$remainingMinutes} phút",
+            ];
+        } else {
+            // Find next upcoming event today or future
+            $upcomingEvent = SuKien::where('user_id', $userId)
+                ->whereNull('deleted_at')
+                ->where('thoi_gian_bat_dau', '>', $now)
+                ->orderBy('thoi_gian_bat_dau', 'asc')
+                ->first();
+
+            if ($upcomingEvent) {
+                $start = Carbon::parse($upcomingEvent->thoi_gian_bat_dau);
+                $diffMinutes = (int) $now->diffInMinutes($start);
+                if ($diffMinutes >= 60) {
+                    $hours = floor($diffMinutes / 60);
+                    $countdownText = "Còn {$hours} tiếng nữa";
+                } else {
+                    $countdownText = "Còn {$diffMinutes} phút nữa";
+                }
+
+                $nextAction = [
+                    'status_type'       => 'next_up',
+                    'status_badge'      => '🔥 Tiếp theo',
+                    'id'                => $upcomingEvent->id,
+                    'tieu_de'           => $upcomingEvent->tieu_de,
+                    'thoi_gian_bat_dau' => $start->format('H:i A'),
+                    'thoi_gian_ket_thuc'=> $upcomingEvent->thoi_gian_ket_thuc ? Carbon::parse($upcomingEvent->thoi_gian_ket_thuc)->format('H:i A') : null,
+                    'time_range'        => $start->format('H:i A') . ($upcomingEvent->thoi_gian_ket_thuc ? ' - ' . Carbon::parse($upcomingEvent->thoi_gian_ket_thuc)->format('H:i A') : ''),
+                    'countdown_text'    => $countdownText,
+                ];
+            } else {
+                $nextAction = [
+                    'status_type'    => 'empty',
+                    'status_badge'   => '🎉 Thư giãn',
+                    'tieu_de'        => 'Hôm nay không có sự kiện nào',
+                    'countdown_text' => 'Tận hưởng thời gian nghỉ ngơi!',
+                ];
+            }
+        }
+
+        // 4. ⚠️ URGENT DEADLINE (Conditional - Single most urgent deadline in 72h)
+        $urgentDeadlineModel = BaiTap::whereHas('monHoc', function ($q) use ($userId) {
             $q->where('user_id', $userId);
         })
             ->where('trang_thai', '!=', 'da_hoan_thanh')
-            ->whereBetween('han_nop', [Carbon::now(), Carbon::now()->addDays(7)])
-            ->count();
+            ->where('han_nop', '>=', $now)
+            ->where('han_nop', '<=', $now->copy()->addDays(3))
+            ->orderBy('han_nop', 'asc')
+            ->first();
 
-        // 4. Tổng số buổi tập trong kế hoạch đang kích hoạt
-        $tongBuoiTap = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {
+        $urgentDeadline = null;
+        if ($urgentDeadlineModel) {
+            $hanNop = Carbon::parse($urgentDeadlineModel->han_nop);
+            $daysLeft = ceil($now->diffInDays($hanNop, false));
+            $urgentDeadline = [
+                'id'            => $urgentDeadlineModel->id,
+                'tieu_de'       => $urgentDeadlineModel->tieu_de,
+                'remaining_text'=> $daysLeft > 0 ? "Còn {$daysLeft} ngày" : "Còn hôm nay",
+                'priority'      => 'Ưu tiên cao',
+            ];
+        }
+
+        // 5. 🏋 TODAY WORKOUT SUMMARY
+        $activeWorkout = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {
             $q->where('user_id', $userId)->where('is_active', true);
-        })->count();
+        })->first();
 
-        // 5. Số buổi tập đã hoàn thành trong lịch sử tập luyện của User
-        $soBuoiDaHoanThanh = LichSuTapLuyen::where('user_id', $userId)->count();
+        $todayWorkout = null;
+        if ($activeWorkout) {
+            $todayWorkout = [
+                'id'               => $activeWorkout->id,
+                'ten_buoi_tap'     => $activeWorkout->ten_buoi_tap ?? 'Push Day',
+                'exercise_count'   => 5,
+                'duration_minutes' => 60,
+            ];
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Lấy dữ liệu tổng quan thành công!',
+            'message' => 'Lấy dữ liệu Action-First Dashboard thành công!',
             'data'    => [
-                'tong_mon_hoc'          => $tongMonHoc,
-                'tong_bai_tap'          => $tongBaiTap,
-                'deadline_sap_toi'      => $deadlineSapToi,
-                'tong_buoi_tap'         => $tongBuoiTap,
-                'so_buoi_da_hoan_thanh' => $soBuoiDaHoanThanh,
+                'greeting'        => $greeting,
+                'next_action'     => $nextAction,
+                'urgent_deadline' => $urgentDeadline,
+                'today_events'    => [
+                    'total_count'     => $totalCount,
+                    'completed_count' => $completedCount,
+                    'remaining_count' => $remainingCount,
+                    'items'           => $todayEvents,
+                ],
+                'today_workout'   => $todayWorkout,
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
