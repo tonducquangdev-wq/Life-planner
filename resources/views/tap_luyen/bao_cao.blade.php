@@ -85,54 +85,36 @@
     <!-- MAIN WRAPPER -->
     <div class="main-wrapper main-wrapper-full">
 
-        <!-- HEADER THANH CÔNG CỤ TRÊN CÙNG -->
-        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Quay lại Lịch</span>
-                </a>
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-activity text-success"></i> Báo Cáo Tập Luyện & Thể Chất
-                </h5>
-            </div>
-
-            <!-- Khu vực người dùng & Nút Thao tác -->
-            <div class="header-actions d-flex align-items-center gap-3">
-                <a href="{{ route('tap-luyen.index') }}" class="btn btn-outline-success rounded-pill px-3 btn-sm fw-semibold">
-                    <i class="bi bi-play-circle-fill me-1"></i> Bắt đầu tập ngay
-                </a>
-
-                <!-- User Profile Dropdown -->
-                <div class="user-profile dropdown">
-                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-                        <div class="user-avatar">
-                            @if(!empty(Auth::user()->avatar_url))
-                                <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-100 h-100 rounded-circle object-fit-cover">
-                            @else
-                                {{ Auth::user()->initials ?? 'U' }}
-                            @endif
-                        </div>
-                        <div class="d-none d-md-block text-start">
-                            <div class="fw-bold text-dark fs-6 leading-tight">{{ Auth::user()->ho_ten ?? 'User' }}</div>
-                        </div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </header>
+        <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
+        @include('layouts.topbar', ['title' => 'Báo Cáo Tập Luyện'])
 
         <!-- NỘI DUNG CHÍNH (CONTENT BODY) -->
         <main class="content-body p-3 p-lg-4">
+
+            <!-- SUB NAV SWITCHER (THEO DÕI / BÁO CÁO) -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2.5 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="workout-title-icon"><i class="bi bi-bar-chart-fill text-primary"></i></span>
+                    <div>
+                        <h4 class="workout-page-title mb-0">Báo Cáo Rèn Luyện</h4>
+                        <p class="workout-page-subtitle mb-0">Thống kê tần suất, thời gian và phân tích tiến độ</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <div class="nav-segment-control d-inline-flex p-1 rounded-pill shadow-2xs">
+                        <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm px-3 rounded-pill text-secondary fw-semibold">
+                            <i class="bi bi-lightning-charge-fill me-1"></i>Buổi tập
+                        </a>
+                        <a href="{{ route('bao-cao-tap-luyen.index') }}" class="btn btn-sm px-3 rounded-pill btn-primary fw-semibold shadow-xs">
+                            <i class="bi bi-bar-chart-fill me-1"></i>Báo cáo
+                        </a>
+                    </div>
+                    <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-2xs">
+                        <i class="bi bi-play-circle me-1"></i>Vào tập ngay
+                    </a>
+                </div>
+            </div>
 
             <!-- 1. HÀNG THỐNG KÊ KPI CARDS -->
             <div class="row g-3 mb-4">

@@ -48,16 +48,18 @@
 
             <li class="floating-menu-divider"></li>
 
-            <!-- 4. Hồ sơ cá nhân -->
+            <!-- 4. Hồ sơ cá nhân (Mở Modal, không chuyển trang) -->
             <li>
-                <a href="{{ route('profile.edit') }}" 
-                   class="floating-menu-item {{ request()->routeIs('profile.*') ? 'active' : '' }}"
-                   title="Hồ sơ & Cài đặt">
+                <button type="button" 
+                   class="floating-menu-item btn-open-profile-modal w-100 text-start border-0 bg-transparent cursor-pointer"
+                   data-bs-toggle="modal"
+                   data-bs-target="#profileModal"
+                   title="Hồ sơ & Cài đặt (Popup)">
                     <span class="menu-item-icon bg-secondary-subtle text-secondary">
                         <i class="bi bi-person-fill-gear"></i>
                     </span>
                     <span>👤 Hồ sơ</span>
-                </a>
+                </button>
             </li>
         </ul>
     </div>
@@ -69,6 +71,9 @@
     </button>
 </div>
 
+<!-- PROFILE MODAL DÙNG CHUNG TOÀN HỆ THỐNG -->
+@include('components.profile-modal')
+
 <script>
     (function() {
         const container = document.getElementById('floatingMenuContainer');
@@ -76,22 +81,59 @@
 
         if (!container || !toggleBtn) return;
 
+        // Cung cấp các helper toàn cục để quản lý trạng thái Menu
+        window.isFloatingMenuOpen = function() {
+            return container.classList.contains('active');
+        };
+
+        window.closeFloatingMenu = function() {
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+                return true;
+            }
+            return false;
+        };
+
+        window.openFloatingMenu = function() {
+            // Khi mở Menu: tự động đóng Chat nếu Chat đang mở
+            if (typeof window.closeCommunityChat === 'function') {
+                window.closeCommunityChat();
+            } else {
+                const chatPopup = document.getElementById('communityMessengerPopup');
+                const chatBtn = document.getElementById('floatingCommunityToggle');
+                if (chatPopup) chatPopup.classList.remove('active');
+                if (chatBtn) chatBtn.classList.remove('active');
+            }
+            container.classList.add('active');
+        };
+
         toggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            container.classList.toggle('active');
+            if (container.classList.contains('active')) {
+                window.closeFloatingMenu();
+            } else {
+                window.openFloatingMenu();
+            }
+        });
+
+        // Đóng menu khi bấm vào bất kỳ mục nào (đặc biệt là nút Hồ sơ)
+        container.querySelectorAll('.floating-menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                window.closeFloatingMenu();
+            });
         });
 
         // Đóng menu khi bấm ra ngoài
         document.addEventListener('click', function(e) {
             if (!container.contains(e.target)) {
-                container.classList.remove('active');
+                window.closeFloatingMenu();
             }
         });
 
         // Đóng menu khi nhấn Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && container.classList.contains('active')) {
-                container.classList.remove('active');
+                window.closeFloatingMenu();
             }
         });
     })();

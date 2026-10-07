@@ -224,6 +224,22 @@ document.addEventListener('DOMContentLoaded', function () {
             progressBar.setAttribute('aria-valuenow', percent);
         }
 
+        // Đồng bộ Header inline progress và số lượng bài đã hoàn thành
+        const headerCountText = document.getElementById('checklist-header-count-text');
+        const inlineProgressBar = document.getElementById('checklist-inline-progress-bar');
+        const inlineProgressPercent = document.getElementById('checklist-inline-progress-percent');
+
+        if (headerCountText) {
+            headerCountText.textContent = `${completed} / ${total} bài đã hoàn thành`;
+        }
+        if (inlineProgressBar) {
+            inlineProgressBar.style.width = `${percent}%`;
+            inlineProgressBar.setAttribute('aria-valuenow', percent);
+        }
+        if (inlineProgressPercent) {
+            inlineProgressPercent.textContent = `${percent}%`;
+        }
+
         // Lưu trạng thái vào localStorage theo ngày
         try {
             localStorage.setItem(getStorageKey(), JSON.stringify(checkedIds));
@@ -251,6 +267,16 @@ document.addEventListener('DOMContentLoaded', function () {
         updateProgressUI();
     }
 
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function highlightActiveChecklistItem() {
         document.querySelectorAll('.checklist-exercise-item').forEach((item, idx) => {
             if (idx === currentExerciseIndex) {
@@ -261,26 +287,152 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function bindChecklistEvents() {
-        document.querySelectorAll('.workout-exercise-checkbox').forEach(cb => {
-            cb.addEventListener('change', function(e) {
-                e.stopPropagation();
-                updateProgressUI();
-            });
+    // Render động khung Checklist bài tập ngay trên UI (Không cần reload trang)
+    function renderChecklist(exercises) {
+        const container = document.getElementById('workout-checklist-items');
+        if (!container) return;
+
+        exercises = exercises || [];
+
+        // 1. Cập nhật các badge số lượng và tiêu đề
+        const checklistCountBadge = document.getElementById('checklist-count-badge');
+        if (checklistCountBadge) {
+            checklistCountBadge.textContent = `${exercises.length} bài`;
+        }
+
+        const workoutProgressSubtitle = document.getElementById('workout-progress-subtitle');
+        if (workoutProgressSubtitle) {
+            workoutProgressSubtitle.textContent = exercises.length > 0 
+                ? 'Đánh dấu bài tập trong checklist để cập nhật tiến độ thực tế' 
+                : 'Chưa có bài tập nào được thiết lập cho buổi này';
+        }
+
+        if (titleDisplay) {
+            titleDisplay.textContent = currentWorkout.title || 'Buổi rèn luyện';
+        }
+
+        // Cập nhật tên buổi tập trên weekly pills nếu có
+        if (currentWorkout.buoiTapId) {
+            const activePillName = document.querySelector(`#weekly-schedule-pills .schedule-day-pill[data-buoi-tap-id="${currentWorkout.buoiTapId}"] .session-name`);
+            if (activePillName) {
+                activePillName.textContent = currentWorkout.title;
+            }
+        }
+
+        // 2. Nếu danh sách bài tập rỗng
+        if (exercises.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-muted my-auto">
+                    <div class="mb-2"><i class="bi bi-inbox fs-2 text-secondary opacity-50"></i></div>
+                    <h6 class="fw-bold text-dark mb-1 fs-7">Chưa có bài tập nào</h6>
+                    <p class="fs-8 text-muted mb-2.5">Buổi tập này chưa được thiết lập danh sách bài tập.</p>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fs-8" data-bs-toggle="modal" data-bs-target="#editWorkoutModal">
+                        <i class="bi bi-plus-lg me-1"></i>Thêm bài tập vào buổi này
+                    </button>
+                </div>
+            `;
+            updateProgressUI();
+            return;
+        }
+
+        // 3. Render danh sách bài tập chuẩn cấu trúc 4 vùng (4-Zone Layout)
+        let html = '';
+        exercises.forEach((ex, idx) => {
+            const exId = ex.id || ('tmp-' + idx);
+            const exName = escapeHtml(ex.name || 'Bài tập');
+            const exType = escapeHtml(ex.type || 'strength');
+            const metricDisplay = escapeHtml(ex.metric_display || formatExerciseMetric(ex));
+            const groupTag = ex.group ? escapeHtml(ex.group) : '';
+            const isActive = (idx === currentExerciseIndex) ? 'active-exercise' : '';
+
+            html += `
+                <div class="checklist-exercise-item ${isActive}" 
+                     id="checklist-item-${exId}" 
+                     data-id="${exId}" 
+                     data-index="${idx}"
+                     data-name="${exName}"
+                     data-type="${exType}"
+                     data-metric="${metricDisplay}"
+                     title="Bấm để chọn bài tập này trong trình tập luyện">
+
+                    <!-- CỘT 1: CHECKBOX (18x18px, căn lề thẳng hàng) -->
+                    <div class="checklist-item-checkbox-col">
+                        <input type="checkbox" 
+                               class="custom-check-box workout-exercise-checkbox" 
+                               id="chk-ex-${exId}" 
+                               data-id="${exId}" 
+                               data-index="${idx}"
+                               aria-label="${exName}">
+                    </div>
+
+                    <!-- THÂN ITEM (4-ZONE STRUCTURE) -->
+                    <div class="checklist-item-content">
+                        <!-- CỘT 2: TÊN BÀI TẬP (BẮT ĐẦU CÙNG MỘT VỊ TRÍ, TỐI ĐA 2 DÒNG) -->
+                        <div class="checklist-item-title-col">
+                            <h6 class="exercise-title" title="${exName}">
+                                ${exName}
+                            </h6>
+                        </div>
+
+                        <!-- CONTAINER PHỤ CHO RESPONSIVE MOBILE -->
+                        <div class="checklist-item-bottom-row d-flex align-items-center">
+                            <!-- CỘT 3: SETS / REPS / THÔNG TIN PHỤ (TABULAR DEDICATED ZONE) -->
+                            <div class="checklist-item-meta-col">
+                                <span class="checklist-item-metric-val">
+                                    ${metricDisplay}
+                                </span>
+                                ${groupTag ? `<span class="checklist-item-group-tag d-none d-xxl-inline-block">${groupTag}</span>` : ''}
+                            </div>
+
+                            <!-- CỘT 4: ACTION & TRẠNG THÁI -->
+                            <div class="checklist-item-action-area">
+                                <span class="badge bg-success-subtle text-success rounded-pill completed-tag d-none">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Xong
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         });
 
-        document.querySelectorAll('.checklist-exercise-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (e.target.type === 'checkbox') return;
-                const idx = parseInt(this.dataset.index);
-                if (!isNaN(idx)) {
-                    currentExerciseIndex = idx;
-                    renderPlayer();
+        container.innerHTML = html;
+
+        // Khôi phục trạng thái hoàn thành từ localStorage & cập nhật tiến độ
+        restoreChecklistState();
+    }
+
+    function bindChecklistEvents() {
+        const container = document.getElementById('workout-checklist-items');
+        if (container && !container.dataset.eventsBound) {
+            container.dataset.eventsBound = 'true';
+
+            // Xử lý sự kiện thay đổi checkbox qua Event Delegation
+            container.addEventListener('change', function(e) {
+                if (e.target.classList.contains('workout-exercise-checkbox')) {
+                    e.stopPropagation();
+                    updateProgressUI();
                 }
             });
-        });
 
-        if (btnUncheckAll) {
+            // Xử lý sự kiện click item để chuyển bài tập trong Player qua Event Delegation
+            container.addEventListener('click', function(e) {
+                if (e.target.type === 'checkbox' || e.target.closest('.custom-check-box') || e.target.closest('.checklist-item-checkbox-col')) {
+                    return;
+                }
+                const item = e.target.closest('.checklist-exercise-item');
+                if (item) {
+                    const idx = parseInt(item.dataset.index);
+                    if (!isNaN(idx)) {
+                        currentExerciseIndex = idx;
+                        renderPlayer();
+                    }
+                }
+            });
+        }
+
+        if (btnUncheckAll && !btnUncheckAll.dataset.bound) {
+            btnUncheckAll.dataset.bound = 'true';
             btnUncheckAll.addEventListener('click', function() {
                 if (confirm('Bạn có muốn bỏ chọn tất cả bài tập đã hoàn thành trong buổi hôm nay?')) {
                     document.querySelectorAll('.workout-exercise-checkbox').forEach(cb => {
@@ -326,6 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modalBuoiTapId) modalBuoiTapId.value = currentWorkout.buoiTapId || '';
 
         renderPlayer();
+        renderChecklist(currentWorkout.exercises);
     }
 
     // Bắt sự kiện click vào các Tab buổi tập
@@ -824,7 +977,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Nút "Lưu & Áp dụng bài tập"
     if (saveWorkoutBtn) {
-        saveWorkoutBtn.addEventListener('click', function () {
+        saveWorkoutBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (saveWorkoutBtn.disabled) return;
+
             const titleVal = modalWorkoutTitle ? modalWorkoutTitle.value.trim() : '';
             if (titleVal) {
                 editingWorkout.title = titleVal;
@@ -834,9 +990,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const dayVal = modalWorkoutDay ? modalWorkoutDay.value : '';
             const dayInt = dayVal ? parseInt(dayVal) : null;
 
+            // 1. Trạng thái Loading & Khóa nút chống double submit
             saveWorkoutBtn.disabled = true;
             saveWorkoutSpinner?.classList.remove('d-none');
             saveWorkoutIcon?.classList.add('d-none');
+            const saveBtnTextSpan = saveWorkoutBtn.querySelector('span:not(.spinner-border)');
+            const originalSaveText = saveBtnTextSpan ? saveBtnTextSpan.textContent : 'Lưu & Áp dụng bài tập';
+            if (saveBtnTextSpan) saveBtnTextSpan.textContent = 'Đang lưu...';
 
             const payload = {
                 buoi_tap_id: editingWorkout.buoiTapId,
@@ -857,19 +1017,23 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => {
-                        throw new Error(err.message || 'Lỗi lưu buổi tập (' + response.status + ')');
+                        throw new Error(err.message || ('Lỗi lưu buổi tập (' + response.status + ')'));
+                    }).catch(parseErr => {
+                        throw new Error(parseErr.message || ('Không thể kết nối máy chủ (' + response.status + ')'));
                     });
                 }
                 return response.json();
             })
             .then(res => {
                 if (res.success && res.data) {
+                    // Cập nhật trạng thái buổi tập hiện tại
                     currentWorkout.buoiTapId = res.data.buoi_tap_id;
                     currentWorkout.title = res.data.ten_buoi_tap;
                     currentWorkout.type = res.data.ten_buoi_tap;
                     currentWorkout.ngayTrongTuan = res.data.ngay_trong_tuan;
                     currentWorkout.exercises = res.data.exercises || [];
 
+                    // Đồng bộ buoiTapList trong config
                     if (config.buoiTapList) {
                         const existing = config.buoiTapList.find(b => b.id === currentWorkout.buoiTapId);
                         if (existing) {
@@ -877,43 +1041,64 @@ document.addEventListener('DOMContentLoaded', function () {
                             existing.exercises = currentWorkout.exercises;
                             existing.ngay_trong_tuan = currentWorkout.ngayTrongTuan;
                             existing.ten_thu = res.data.ten_thu;
+                        } else {
+                            config.buoiTapList.push({
+                                id: currentWorkout.buoiTapId,
+                                title: currentWorkout.title,
+                                exercises: currentWorkout.exercises,
+                                ngay_trong_tuan: currentWorkout.ngayTrongTuan,
+                                ten_thu: res.data.ten_thu
+                            });
                         }
                     }
 
+                    // CẬP NHẬT GIAO DIỆN NGAY LẬP TỨC KHÔNG CẦN RELOAD
                     currentExerciseIndex = 0;
                     renderPlayer();
+                    renderChecklist(currentWorkout.exercises);
 
-                    const bsModal = bootstrap.Modal.getInstance(editWorkoutModal);
+                    // Đóng modal tùy chỉnh
+                    const bsModal = bootstrap.Modal.getInstance(editWorkoutModal) || bootstrap.Modal.getOrCreateInstance(editWorkoutModal);
                     if (bsModal) bsModal.hide();
 
-                    showWorkoutSavedToast(res.message);
+                    // Hiển thị Toast thông báo thành công chuẩn theo yêu cầu
+                    showWorkoutToast('success', 'Lưu và áp dụng bài tập thành công!', `Đã cập nhật ${currentWorkout.exercises.length} bài tập cho buổi "${currentWorkout.title}".`);
+                } else {
+                    throw new Error(res.message || 'Không thể lưu bài tập. Vui lòng thử lại.');
                 }
             })
             .catch(err => {
                 console.error('Lỗi khi lưu cấu hình buổi tập:', err);
-                alert('Không thể lưu buổi tập: ' + err.message);
+                showWorkoutToast('error', 'Không thể lưu bài tập', err.message || 'Có lỗi kết nối máy chủ. Vui lòng thử lại.');
             })
             .finally(() => {
+                // Khôi phục trạng thái nút bấm
                 saveWorkoutBtn.disabled = false;
                 saveWorkoutSpinner?.classList.add('d-none');
                 saveWorkoutIcon?.classList.remove('d-none');
+                if (saveBtnTextSpan) saveBtnTextSpan.textContent = originalSaveText;
             });
         });
     }
 
-    function showWorkoutSavedToast(msg) {
+    function showWorkoutToast(type, title, msg) {
+        const isSuccess = (type === 'success');
         const alertBox = document.createElement('div');
-        alertBox.className = 'alert alert-primary alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3';
+        const alertClass = isSuccess ? 'alert-success' : 'alert-danger';
+        const iconClass = isSuccess ? 'bi-check-circle-fill text-success' : 'bi-exclamation-triangle-fill text-danger';
+
+        alertBox.className = `alert ${alertClass} alert-dismissible fade show position-fixed bottom-0 end-0 m-3 shadow-lg rounded-4 z-3`;
         alertBox.style.maxWidth = '380px';
+        alertBox.style.zIndex = '9999';
         alertBox.innerHTML = `
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill text-primary fs-4"></i>
-                <div>
-                    <strong class="d-block">Đã cập nhật bài tập!</strong>
-                    <small>${msg}</small>
+            <div class="d-flex align-items-center gap-2.5">
+                <i class="bi ${iconClass} fs-4 flex-shrink-0"></i>
+                <div class="min-w-0 flex-grow-1">
+                    <strong class="d-block fw-bold fs-8">${escapeHtml(title)}</strong>
+                    <small class="d-block opacity-75 fs-9 mt-0.5">${escapeHtml(msg)}</small>
                 </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         document.body.appendChild(alertBox);
         setTimeout(() => {
@@ -1307,7 +1492,29 @@ document.addEventListener('DOMContentLoaded', function () {
             messagesArea.scrollTop = messagesArea.scrollHeight;
         }
 
+        function isFloatingMenuOpenHelper() {
+            if (typeof window.isFloatingMenuOpen === 'function') {
+                return window.isFloatingMenuOpen();
+            }
+            const menuContainer = document.getElementById('floatingMenuContainer');
+            return menuContainer ? menuContainer.classList.contains('active') : false;
+        }
+
+        function closeFloatingMenuHelper() {
+            if (typeof window.closeFloatingMenu === 'function') {
+                return window.closeFloatingMenu();
+            }
+            const menuContainer = document.getElementById('floatingMenuContainer');
+            if (menuContainer && menuContainer.classList.contains('active')) {
+                menuContainer.classList.remove('active');
+                return true;
+            }
+            return false;
+        }
+
         function openPopup() {
+            // Đảm bảo đóng Menu điều hướng khi mở Chat
+            closeFloatingMenuHelper();
             popup.classList.add('active');
             isCommunityOpen = true;
             toggleBtn.classList.add('active');
@@ -1327,8 +1534,32 @@ document.addEventListener('DOMContentLoaded', function () {
             if (iconActive) iconActive.classList.add('d-none');
         }
 
+        // Cung cấp các helper toàn cục để đồng bộ trạng thái giữa Menu và Chat
+        window.isCommunityChatOpen = function() {
+            return isCommunityOpen;
+        };
+
+        window.closeCommunityChat = function() {
+            if (isCommunityOpen) {
+                closePopup();
+                return true;
+            }
+            return false;
+        };
+
         toggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
+
+            // QUY TẮC QUAN TRỌNG NHẤT (Rule 9 & 10):
+            // Khi Menu đang mở:
+            // - Bấm icon Chat -> Chỉ đóng Menu!
+            // - Chat vẫn CLOSED (KHÔNG tự động mở).
+            // - Muốn mở Chat, người dùng phải bấm icon Chat LẦN NỮA.
+            if (isFloatingMenuOpenHelper()) {
+                closeFloatingMenuHelper();
+                return;
+            }
+
             if (isCommunityOpen) {
                 closePopup();
             } else {

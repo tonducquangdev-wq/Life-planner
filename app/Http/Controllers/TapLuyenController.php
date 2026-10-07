@@ -643,7 +643,7 @@ class TapLuyenController extends Controller
         });
 
         // 4. Lấy danh sách kết quả đã được sắp xếp chuẩn để trả về client
-        $buoiTap->load(['chiTietBuoiTaps.baiTapTheChat']);
+        $buoiTap->unsetRelation('chiTietBuoiTaps')->load(['chiTietBuoiTaps.baiTapTheChat']);
         $resultList = [];
 
         foreach ($buoiTap->chiTietBuoiTaps->sortBy('thu_tu') as $ct) {

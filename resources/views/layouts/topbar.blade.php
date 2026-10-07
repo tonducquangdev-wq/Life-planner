@@ -100,7 +100,7 @@
                     <small class="text-muted fs-8 text-truncate d-block">{{ Auth::user()->email ?? '' }}</small>
                 </li>
                 <li>
-                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 rounded-2 mx-1" href="{{ route('profile.edit') }}">
+                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 rounded-2 mx-1 btn-open-profile-modal cursor-pointer" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
                         <i class="bi bi-person text-primary"></i><span>Hồ sơ cá nhân</span>
                     </a>
                 </li>

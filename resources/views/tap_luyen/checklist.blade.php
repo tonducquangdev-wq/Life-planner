@@ -40,26 +40,21 @@
 
     <style>
         .checklist-item {
-            transition: all 0.2s ease;
-            border-left: 4px solid #6366f1;
+            transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+            border-left: 3.5px solid #CBD5E1 !important;
         }
         .checklist-item.completed {
-            border-left-color: #10b981;
-            background-color: #f0fdf4 !important;
-            opacity: 0.85;
+            border-left-color: #10B981 !important;
+            background-color: rgba(16, 185, 129, 0.05) !important;
         }
         [data-bs-theme="dark"] .checklist-item.completed {
-            background-color: rgba(16, 185, 129, 0.1) !important;
+            background-color: rgba(16, 185, 129, 0.08) !important;
+            border-left-color: #10B981 !important;
         }
         .checklist-item.completed .exercise-title {
             text-decoration: line-through;
-            color: #64748b !important;
-        }
-        .custom-checkbox {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: #10b981;
+            color: var(--lp-text-muted, #64748B) !important;
+            opacity: 0.78;
         }
     </style>
 </head>
@@ -69,43 +64,8 @@
     <!-- MAIN WRAPPER FULL-WIDTH (HOME IS CALENDAR) -->
     <div class="main-wrapper main-wrapper-full">
 
-        <!-- HEADER TRÊN CÙNG KÈM NÚT QUAY LẠI LỊCH -->
-        <header class="top-header">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Quay lại Lịch</span>
-                </a>
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-check2-square text-success"></i> Checklist Bài Tập Rèn Luyện
-                </h5>
-            </div>
-
-            <div class="header-actions d-flex align-items-center gap-3">
-                <div class="user-profile dropdown">
-                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-                        @if(Auth::check() && !empty(Auth::user()->avatar_url))
-                            <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="user-avatar rounded-circle object-fit-cover" style="width: 38px; height: 38px;">
-                        @else
-                            <div class="user-avatar">
-                                {{ Auth::check() ? Auth::user()->initials : 'U' }}
-                            </div>
-                        @endif
-                        <span class="d-none d-md-inline fw-semibold text-dark">{{ Auth::user()->ho_ten ?? 'Người dùng' }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2 text-primary"></i>Hồ sơ cá nhân</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </header>
+        <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
+        @include('layouts.topbar', ['title' => 'Checklist Bài Tập'])
 
         <!-- CONTENT BODY -->
         <main class="content-body py-4 px-3 px-md-4">
@@ -165,46 +125,58 @@
                     </div>
                 @endif
 
-                <!-- TIẾN ĐỘ HOÀN THÀNH CHECKLIST -->
-                <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+                <!-- TIẾN ĐỘ HOÀN THÀNH CHECKLIST (SECTION 12 & 13) -->
+                <div class="card border-0 shadow-2xs rounded-3 p-3 mb-3 bg-white">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="fs-7 fw-bold text-dark d-flex align-items-center gap-1.5">
                             <i class="bi bi-trophy-fill text-warning"></i> Tiến độ buổi tập
                         </span>
-                        <span class="fs-7 fw-bold text-primary" id="progressText">0 / 0 hoàn thành (0%)</span>
+                        <span class="fs-8 fw-bold text-primary font-numeric" id="progressText">0 / 0 hoàn thành (0%)</span>
                     </div>
-                    <div class="progress rounded-pill" style="height: 10px;">
+                    <div class="progress workout-slim-progress" style="height: 6px;">
                         <div class="progress-bar bg-success rounded-pill transition-all" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
-                <!-- DANH SÁCH BÀI TẬP CHECKLIST -->
-                <div class="row g-3" id="checklistContainer">
+                <!-- DANH SÁCH BÀI TẬP CHECKLIST (4-ZONE STRUCTURED ALIGNMENT) -->
+                <div class="workout-checklist-container d-flex flex-column gap-2" id="checklistContainer">
                     @if($currentBuoiTap && $currentBuoiTap->chiTietBuoiTaps->isNotEmpty())
                         @foreach($currentBuoiTap->chiTietBuoiTaps->sortBy('thu_tu') as $index => $item)
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white checklist-item" id="item-{{ $item->id }}" data-id="{{ $item->id }}">
-                                    <div class="d-flex align-items-center justify-content-between gap-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <!-- Checkbox tương tác -->
-                                            <input type="checkbox" class="custom-checkbox exercise-checkbox" data-id="{{ $item->id }}">
-                                            <div>
-                                                <h6 class="fw-bold text-dark mb-1 exercise-title fs-6">
-                                                    {{ $item->baiTapTheChat ? $item->baiTapTheChat->ten_bai_tap : 'Bài tập' }}
-                                                </h6>
-                                                <div class="d-flex flex-wrap align-items-center gap-2 text-muted fs-8">
-                                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-0.5">
-                                                        {{ $item->baiTapTheChat ? $item->baiTapTheChat->nhom_co : 'Toàn thân' }}
-                                                    </span>
-                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 fw-semibold">
-                                                        {{ $item->dinh_dang_thong_so }}
-                                                    </span>
-                                                </div>
-                                            </div>
+                            <div class="checklist-exercise-item checklist-item" id="item-{{ $item->id }}" data-id="{{ $item->id }}">
+                                <!-- CỘT 1: CHECKBOX (CÙNG KÍCH THƯỚC 18x18px, CÙNG VỊ TRÍ, KHÔNG BỊ CO LỆCH) -->
+                                <div class="checklist-item-checkbox-col">
+                                    <input type="checkbox" 
+                                           class="custom-check-box exercise-checkbox" 
+                                           data-id="{{ $item->id }}"
+                                           aria-label="{{ $item->baiTapTheChat ? $item->baiTapTheChat->ten_bai_tap : 'Bài tập' }}">
+                                </div>
+
+                                <!-- THÂN ITEM (4-ZONE STRUCTURE) -->
+                                <div class="checklist-item-content">
+                                    <!-- CỘT 2: TÊN BÀI TẬP (BẮT ĐẦU CÙNG MỘT VỊ TRÍ, TỐI ĐA 2 DÒNG, KHÔNG ĐẨY CỘT KHÁC) -->
+                                    <div class="checklist-item-title-col">
+                                        <h6 class="exercise-title" title="{{ $item->baiTapTheChat ? $item->baiTapTheChat->ten_bai_tap : 'Bài tập' }}">
+                                            {{ $item->baiTapTheChat ? $item->baiTapTheChat->ten_bai_tap : 'Bài tập' }}
+                                        </h6>
+                                    </div>
+
+                                    <!-- CONTAINER PHỤ CHO RESPONSIVE MOBILE -->
+                                    <div class="checklist-item-bottom-row d-flex align-items-center">
+                                        <!-- CỘT 3: SETS / REPS / THÔNG TIN PHỤ (TABULAR DEDICATED ZONE) -->
+                                        <div class="checklist-item-meta-col">
+                                            <span class="checklist-item-metric-val">
+                                                {{ $item->dinh_dang_thong_so }}
+                                            </span>
+                                            @if($item->baiTapTheChat && $item->baiTapTheChat->nhom_co)
+                                                <span class="checklist-item-group-tag d-none d-md-inline-block">
+                                                    {{ $item->baiTapTheChat->nhom_co }}
+                                                </span>
+                                            @endif
                                         </div>
 
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-8 status-badge d-none">
+                                        <!-- CỘT 4: ACTION & TRẠNG THÁI -->
+                                        <div class="checklist-item-action-area">
+                                            <span class="badge bg-success-subtle text-success rounded-pill completed-tag status-badge d-none">
                                                 <i class="bi bi-check-circle-fill me-1"></i>Đã xong
                                             </span>
                                         </div>

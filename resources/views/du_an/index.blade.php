@@ -325,6 +325,9 @@
             }
         }
     </script>
+
+    <!-- Floating Action Menu & Shared Profile Modal -->
+    <x-floating-menu />
 </body>
 
 </html>

@@ -58,9 +58,8 @@
                     <div class="brand-icon-wrapper">
                         <i class="bi bi-calendar2-check-fill"></i>
                     </div>
-                    <div class="brand-text-group d-flex align-items-center gap-1.5">
+                    <div class="brand-text-group d-flex align-items-center">
                         <span class="brand-name fw-bold fs-5 text-dark">Life Planner</span>
-                        <span class="badge bg-primary text-white rounded-pill px-2 py-0.5 fs-8 fw-semibold">PRO</span>
                     </div>
                 </a>
 
@@ -172,7 +171,7 @@
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2 text-primary"></i>Hồ sơ cá nhân</a></li>
+                        <li><a class="dropdown-item btn-open-profile-modal cursor-pointer" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="bi bi-person me-2 text-primary"></i>Hồ sơ cá nhân</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -256,7 +255,7 @@
                 </div>
 
                 <!-- CỘT PHẢI (25% DESKTOP | 100% TABLET/MOBILE CHUYỂN XUỐNG DƯỚI): LỊCH TRÌNH & DEADLINE -->
-                <div class="col-12 col-lg-4 col-xl-3">
+                <div class="col-12 col-lg-4 col-xl-3 pb-5 pb-lg-0">
 
                     <!-- CARD 1: LỊCH TRÌNH HÔM NAY -->
                     <div class="side-card rounded-4 border-0 shadow-sm mb-3">
@@ -272,29 +271,66 @@
                         </div>
                     </div>
 
-                    <!-- CARD 2: DEADLINE SẮP ĐẾN HẠN -->
-                    <div class="side-card rounded-4 border-0 shadow-sm">
-                        <div class="side-card-header">
-                            <h6 class="side-card-title">
+                    <!-- CARD 2: DEADLINE SẮP ĐẾN HẠN (COMPACT TASK/DEADLINE LIST) -->
+                    <div class="side-card rounded-4 border-0 shadow-sm mb-4 mb-lg-0">
+                        <div class="side-card-header d-flex align-items-center justify-content-between py-2.5 px-3">
+                            <h6 class="side-card-title fs-7 mb-0">
                                 <i class="bi bi-hourglass-split text-warning"></i>
                                 <span>Deadline sắp tới</span>
                             </h6>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">2</span>
                         </div>
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-center justify-content-between p-2.5 mb-2 rounded-3 bg-light border-start border-warning border-3">
-                                <div>
-                                    <div class="fw-bold text-dark fs-7">Nộp đồ án PHP & Laravel</div>
-                                    <small class="text-muted fs-8">Hạn: 23:59 • Ngày 14/09</small>
+                        <div class="card-body p-2.5">
+                            <div class="deadline-compact-list d-flex flex-column gap-2" id="upcomingDeadlineList">
+                                <!-- Deadline 1: Nộp đồ án PHP & Laravel -->
+                                <div class="deadline-compact-item urgent p-2.5 rounded-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="deadline-dot urgent mt-1 flex-shrink-0" aria-hidden="true"></span>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                                                <span class="deadline-title fw-semibold text-truncate" title="Nộp đồ án PHP & Laravel">
+                                                    Nộp đồ án PHP & Laravel
+                                                </span>
+                                                <span class="deadline-tag badge bg-danger-subtle text-danger rounded-pill flex-shrink-0">
+                                                    Hôm nay
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between gap-2 text-secondary deadline-meta">
+                                                <span class="text-truncate" title="Lập trình Web">
+                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>Lập trình Web
+                                                </span>
+                                                <span class="flex-shrink-0 deadline-date">
+                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59 • 14/09
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 fs-8 fw-bold">Hôm nay</span>
-                            </div>
 
-                            <div class="d-flex align-items-center justify-content-between p-2.5 mb-2 rounded-3 bg-light border-start border-warning border-3">
-                                <div>
-                                    <div class="fw-bold text-dark fs-7">Nộp bài CSDL MySQL</div>
-                                    <small class="text-muted fs-8">Hạn: 23:59 • Ngày 16/09</small>
+                                <!-- Deadline 2: Nộp bài CSDL MySQL -->
+                                <div class="deadline-compact-item upcoming p-2.5 rounded-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="deadline-dot upcoming mt-1 flex-shrink-0" aria-hidden="true"></span>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                                                <span class="deadline-title fw-semibold text-truncate" title="Nộp bài CSDL MySQL">
+                                                    Nộp bài CSDL MySQL
+                                                </span>
+                                                <span class="deadline-tag badge bg-warning-subtle text-warning rounded-pill flex-shrink-0">
+                                                    Còn 2 ngày
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between gap-2 text-secondary deadline-meta">
+                                                <span class="text-truncate" title="Cơ sở dữ liệu">
+                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>Cơ sở dữ liệu
+                                                </span>
+                                                <span class="flex-shrink-0 deadline-date">
+                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59 • 16/09
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1 fs-8 fw-bold">Còn 2 ngày</span>
                             </div>
                         </div>
                     </div>

@@ -1,737 +1,1100 @@
 /* ==========================================================================
-   MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS) - MODERN COMPACT DASHBOARD
-   Chuẩn Bootstrap 5 & Dark UI - Tối ưu hoàn hảo cho màn hình 1366x768
+   MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS)
+   LIFE PLANNER - MODERN PRODUCTIVITY & FITNESS DASHBOARD
+   Thiết kế cân đối, tinh gọn, chuẩn Bootstrap 5 & Dark Mode Tokens
    ========================================================================== */
 
-/* 1. KHUNG HIỂN THỊ ĐỒNG HỒ TẬP LUYỆN TRUNG TÂM (COMPACT) */
-.workout-timer-box {
-    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    position: relative;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
-    padding: 0.85rem 1rem !important;
-    transition: all 0.25s ease;
+/* --------------------------------------------------------------------------
+   1. DESIGN TOKENS & TYPOGRAPHY UTILITIES
+   -------------------------------------------------------------------------- */
+:root {
+    --lp-primary: #6C8CFF;
+    --lp-primary-hover: #5574EE;
+    --lp-primary-subtle: rgba(108, 140, 255, 0.12);
+    --lp-primary-border: rgba(108, 140, 255, 0.3);
+    --lp-success: #10B981;
+    --lp-success-subtle: rgba(16, 185, 129, 0.12);
+    --lp-warning: #F59E0B;
+    --lp-danger: #EF4444;
+    --lp-card-radius: 12px;
+    --lp-item-radius: 8px;
+    --lp-card-border: #E2E8F0;
+    --lp-bg-card: #FFFFFF;
+    --lp-bg-surface: #F8FAFC;
+    --lp-text-main: #0F172A;
+    --lp-text-muted: #64748B;
 }
 
-/* Con số đồng hồ bấm giờ to rõ ràng, cố định khoảng cách chữ số (tabular-nums) */
-.timer-display {
-    font-size: clamp(2rem, 3.2vw, 2.7rem);
-    font-weight: 800;
-    color: #0f172a;
+[data-bs-theme="dark"] {
+    --lp-primary: #6C8CFF;
+    --lp-primary-hover: #829DFF;
+    --lp-primary-subtle: rgba(108, 140, 255, 0.15);
+    --lp-primary-border: rgba(108, 140, 255, 0.35);
+    --lp-card-border: #2E2E34;
+    --lp-bg-card: #1E1E22;
+    --lp-bg-surface: #161619;
+    --lp-text-main: #E8E8EA;
+    --lp-text-muted: #A0A0A8;
+}
+
+.font-numeric {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -1px;
-    line-height: 1.05;
-    margin: 0.15rem 0 !important;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* Tiêu đề bài tập trong trình phát */
-.exercise-title-text {
-    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
-    letter-spacing: -0.3px;
-    margin-bottom: 2px !important;
-}
-
-/* 2. TRẠNG THÁI BUỔI TẬP (STATUS BADGES) */
-.workout-status-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 2px 10px !important;
-    border-radius: 20px;
-    transition: all 0.25s ease;
-}
-
-.badge-not-started {
-    background-color: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0 !important;
-}
-
-.badge-running {
-    background-color: rgba(99, 102, 241, 0.15);
-    color: #6366f1;
-    border: 1px solid rgba(99, 102, 241, 0.35) !important;
-    animation: statusPulse 2s infinite ease-in-out;
-}
-
-.badge-paused {
-    background-color: rgba(245, 158, 11, 0.15);
-    color: #d97706;
-    border: 1px solid rgba(245, 158, 11, 0.35) !important;
-}
-
-.badge-completed {
-    background-color: rgba(16, 185, 129, 0.15);
-    color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.35) !important;
-}
-
-@keyframes statusPulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 5px rgba(99, 102, 241, 0);
-    }
-}
-
-/* 3. ĐỊNH HƯỚNG KẾ HOẠCH TUẦN (COMPACT SINGLE ROW) */
-.schedule-orientation-card {
-    border-left: 3px solid #6366f1 !important;
-    background: #ffffff;
-    padding: 0.4rem 0.75rem !important;
-    border-radius: 12px;
-}
-
-#weekly-schedule-pills {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 5px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-#weekly-schedule-pills::-webkit-scrollbar {
-    display: none;
-}
-
-.schedule-day-pill {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2px 6px;
-    border-radius: 7px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    font-size: 0.7rem;
-    position: relative;
-    min-width: 52px;
-    flex: 1 1 0;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.schedule-day-pill .day-label {
-    color: #64748b;
-    font-weight: 600;
-    font-size: 0.62rem;
-}
-
-.schedule-day-pill .split-name {
-    color: #1e293b;
-    font-weight: 700;
-    font-size: 0.72rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 75px;
-}
-
-.schedule-day-pill.active-today {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    border-color: #4f46e5;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
-}
-
-.schedule-day-pill.active-today .day-label,
-.schedule-day-pill.active-today .split-name {
-    color: #ffffff;
-}
-
-.schedule-day-pill.rest-day-pill {
-    background-color: #f8fafc;
-    border-style: dashed;
-}
-
-.schedule-day-pill.workout-day-pill {
-    background-color: #ffffff;
-    border-color: #cbd5e1;
-}
-
-.schedule-day-pill.workout-day-pill:hover:not(.active-today) {
-    background-color: #f1f5f9;
-    border-color: #94a3b8;
-    transform: translateY(-1px);
-}
-
-.schedule-day-pill .today-marker {
-    position: absolute;
-    top: -5px;
-    right: -3px;
-    background-color: #ef4444;
-    color: #ffffff;
-    font-size: 0.52rem;
-    font-weight: 700;
-    padding: 1px 3px;
-    border-radius: 5px;
-    line-height: 1;
-}
-
-/* 4. TABS PHÂN LOẠI BUỔI TẬP */
-.workout-type-tab {
-    cursor: pointer;
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-weight: 600;
-    font-size: 0.76rem;
-    transition: all 0.2s ease;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
-    color: #64748b;
-}
-
-.workout-type-tab:hover {
-    background: #e2e8f0;
-    color: #1e293b;
-}
-
-.workout-type-tab.active {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    color: #ffffff;
-    border-color: #4f46e5;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
-}
-
-/* 5. MICRO KPI STAT CARDS */
-.kpi-micro-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    padding: 0.45rem 0.7rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 100%;
-    transition: all 0.2s ease;
-}
-
-.kpi-micro-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
-}
-
-.kpi-micro-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-.kpi-micro-val {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.1;
-}
-
-.kpi-micro-title {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: #64748b;
-    margin-bottom: 0px;
-}
-
-/* 6. LƯỚI LỊCH TẬP HEATMAP 7 CỘT */
-.calendar-heatmap-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-}
-
-.calendar-heatmap-cell {
-    aspect-ratio: 1;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #f1f5f9;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    position: relative;
-}
-
-.calendar-heatmap-cell.cell-empty {
-    visibility: hidden;
-    cursor: default;
-}
-
-.calendar-heatmap-cell:hover:not(.cell-empty) {
-    transform: scale(1.15);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
-    z-index: 2;
-}
-
-.calendar-heatmap-cell.today-cell {
-    box-shadow: 0 0 0 2px #6366f1;
-}
-
-.legend-box {
-    width: 9px;
-    height: 9px;
-    border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* 7. HOẠT ĐỘNG GẦN ĐÂY */
-.empty-activity-box {
-    background-color: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 10px;
-    padding: 1rem 0.5rem !important;
-}
-
-.empty-icon-wrapper {
-    width: 38px;
-    height: 38px;
-    background-color: #f1f5f9;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-}
-
-.activity-record-item {
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-    padding: 5px 6px !important;
-    border-radius: 7px;
-}
-
-.activity-record-item:hover {
-    background-color: #f8fafc;
-}
-
-#history-items-list {
-    max-height: 160px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-}
-
-#history-items-list::-webkit-scrollbar {
-    width: 4px;
-}
-
-#history-items-list::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 4px;
-}
-
-/* 8. HỘP ICON CHỈ SỐ */
-.metric-icon-box {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-.text-indigo {
-    color: #4f46e5 !important;
-}
-
-.bg-indigo-subtle {
-    background-color: #e0e7ff !important;
+.letter-spacing-1 {
+    letter-spacing: 0.04em;
 }
 
 .fs-7 {
-    font-size: 0.8rem;
+    font-size: 0.84rem !important;
 }
 
 .fs-8 {
-    font-size: 0.72rem;
+    font-size: 0.76rem !important;
 }
 
 .fs-9 {
-    font-size: 0.65rem;
+    font-size: 0.69rem !important;
 }
 
-.shadow-xs {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.fs-10 {
+    font-size: 0.625rem !important;
+}
+
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .shadow-2xs {
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-/* 9. BADGES PHÂN LOẠI BÀI TẬP */
-.badge-type-strength {
-    background-color: #e0e7ff !important;
-    color: #4338ca !important;
-    border: 1px solid #c7d2fe !important;
+.shadow-xs {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-.badge-type-core {
-    background-color: #ccfbf1 !important;
-    color: #0f766e !important;
-    border: 1px solid #99f6e4 !important;
-}
-
-.badge-type-cardio {
-    background-color: #ffe4e6 !important;
-    color: #be123c !important;
-    border: 1px solid #fecdd3 !important;
-}
-
-.badge-type-other {
-    background-color: #f1f5f9 !important;
-    color: #475569 !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-.exercise-item-row {
-    transition: all 0.2s ease;
-}
-
-.exercise-item-row:hover {
-    border-color: #cbd5e1 !important;
-    background-color: #f8fafc !important;
-}
-
-.cursor-pointer {
-    cursor: pointer;
-}
-
-/* ==========================================================================
-   10. DARK MODE OVERRIDES CHO MODULE THỂ CHẤT (DATA-BS-THEME="DARK")
-   ========================================================================== */
-[data-bs-theme="dark"] .schedule-orientation-card {
-    background-color: #131d31 !important;
-    border-color: #1e293b !important;
-    border-left: 3px solid #6366f1 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill {
-    background-color: #0b1120 !important;
-    border-color: #1e293b !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill .day-label {
-    color: #94a3b8 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill .split-name {
-    color: #f1f5f9 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.active-today {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-    border-color: #4f46e5 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.active-today .split-name,
-[data-bs-theme="dark"] .schedule-day-pill.active-today .day-label {
-    color: #ffffff !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.workout-day-pill:hover:not(.active-today) {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-/* WORKOUT TIMER BOX TRONG DARK MODE: GIAO DIỆN TỐI SANG TRỌNG, KHÔNG BỊ TRẮNG */
-[data-bs-theme="dark"] .workout-timer-box {
-    background: linear-gradient(180deg, #0b1120 0%, #080d19 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-bs-theme="dark"] .timer-display {
-    color: #ffffff !important;
-    text-shadow: 0 0 18px rgba(99, 102, 241, 0.4) !important;
-}
-
-[data-bs-theme="dark"] .exercise-title-text {
-    color: #f8fafc !important;
-}
-
-[data-bs-theme="dark"] .kpi-micro-card {
-    background-color: #131d31 !important;
-    border-color: #1e293b !important;
-}
-
-[data-bs-theme="dark"] .kpi-micro-val {
-    color: #ffffff !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab {
-    background-color: #0b1120 !important;
-    border-color: #1e293b !important;
-    color: #94a3b8 !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab:hover {
-    background-color: #1e293b !important;
-    color: #ffffff !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab.active {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-    color: #ffffff !important;
-    border-color: #4f46e5 !important;
-}
-
-[data-bs-theme="dark"] .calendar-heatmap-cell {
-    background-color: #0b1120 !important;
-    border-color: #1e293b !important;
-}
-
-[data-bs-theme="dark"] .calendar-heatmap-cell.cell-empty {
-    visibility: hidden;
-}
-
-[data-bs-theme="dark"] .empty-activity-box {
-    background-color: #0b1120 !important;
-    border-color: #1e293b !important;
-}
-
-[data-bs-theme="dark"] .empty-icon-wrapper {
-    background-color: #131d31 !important;
-    color: #94a3b8 !important;
-}
-
-[data-bs-theme="dark"] .exercise-item-row:hover,
-[data-bs-theme="dark"] .activity-record-item:hover {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-[data-bs-theme="dark"] .badge-type-other {
-    background-color: #1e293b !important;
-    color: #cbd5e1 !important;
-    border-color: #334155 !important;
-}
-
-[data-bs-theme="dark"] .badge-type-strength {
-    background-color: rgba(99, 102, 241, 0.2) !important;
-    color: #a5b4fc !important;
-    border-color: rgba(165, 180, 252, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-type-core {
-    background-color: rgba(20, 184, 166, 0.2) !important;
-    color: #99f6e4 !important;
-    border-color: rgba(153, 246, 228, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-type-cardio {
-    background-color: rgba(244, 63, 94, 0.2) !important;
-    color: #fecdd3 !important;
-    border-color: rgba(254, 205, 211, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-not-started {
-    background-color: #131d31 !important;
-    color: #94a3b8 !important;
-    border-color: #1e293b !important;
-}
-
-/* RESPONSIVE */
-@media (max-width: 991.98px) {
-    .schedule-orientation-card {
-        padding: 0.4rem !important;
-    }
-    .workout-timer-box {
-        padding: 0.75rem !important;
-    }
-}
-
-/* ==========================================================================
-   CHECKLIST & FIXED TIMER REFACTOR - LIFE PLANNER WORKOUT
-   ========================================================================== */
-
-/* 1. TIẾN ĐỘ BUỔI TẬP */
-.workout-progress-card {
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    transition: all 0.25s ease;
-}
-[data-bs-theme="dark"] .workout-progress-card {
-    background: #131d31;
-    border-color: #1e293b;
-}
-
-/* 2. CHECKLIST BÀI TẬP (BÊN TRÁI - SCROLL ĐỘC LẬP) */
-.workout-checklist-container {
-    max-height: 520px;
-    overflow-y: auto;
-    padding-right: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
-}
-.workout-checklist-container::-webkit-scrollbar {
-    width: 6px;
-}
-.workout-checklist-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-.workout-checklist-container::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
-    border-radius: 10px;
-}
-[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
-    background-color: #334155;
-}
-
-.checklist-exercise-item {
+.transition-all {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 4px solid #6366f1;
-    background: #ffffff;
-    cursor: pointer;
 }
-.checklist-exercise-item:hover {
-    transform: translateX(3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+/* --------------------------------------------------------------------------
+   2. HEADER & TOOLBAR
+   -------------------------------------------------------------------------- */
+.workout-header-wrapper {
+    margin-bottom: 0.85rem;
 }
-.checklist-exercise-item.active-exercise {
-    border-left-color: #3b82f6;
-    background-color: rgba(59, 130, 246, 0.04);
+
+.workout-page-title {
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--lp-text-main);
 }
-.checklist-exercise-item.completed {
-    border-left-color: #10b981;
-    background-color: #f0fdf4 !important;
+
+.workout-page-subtitle {
+    font-size: 0.82rem;
+    color: var(--lp-text-muted);
 }
-[data-bs-theme="dark"] .checklist-exercise-item {
-    background: #131d31;
-    border-color: #1e293b;
-}
-[data-bs-theme="dark"] .checklist-exercise-item.completed {
-    background-color: rgba(16, 185, 129, 0.1) !important;
-}
-.checklist-exercise-item.completed .exercise-title {
-    text-decoration: line-through;
-    color: #64748b !important;
-}
-.custom-check-box {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    accent-color: #10b981;
+
+.workout-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    font-size: 1rem;
     flex-shrink: 0;
 }
 
-/* 3. TIMER TẬP LUYỆN (BÊN PHẢI - STICKY) */
+.nav-segment-control {
+    background-color: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    gap: 2px;
+}
+
+.nav-segment-control .nav-link,
+.nav-segment-control .btn {
+    border: none;
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    color: #64748B;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.nav-segment-control .nav-link:hover,
+.nav-segment-control .btn:hover {
+    color: #1E293B;
+}
+
+.nav-segment-control .nav-link.active,
+.nav-segment-control .btn.btn-primary {
+    background-color: var(--lp-primary);
+    color: #FFFFFF !important;
+    box-shadow: 0 1px 4px rgba(108, 140, 255, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   3. QUICK STATS STRIP (KPI SUMMARY)
+   -------------------------------------------------------------------------- */
+.workout-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 0.85rem;
+}
+
+@media (max-width: 991.98px) {
+    .workout-kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .workout-kpi-strip {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.workout-kpi-card {
+    background-color: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-card-radius);
+    padding: 0.65rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.workout-kpi-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.workout-kpi-label {
+    font-size: 0.72rem;
+    color: var(--lp-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+}
+
+.workout-kpi-val {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--lp-text-main);
+    line-height: 1.25;
+}
+
+/* --------------------------------------------------------------------------
+   4. WEEKLY SCHEDULE STRIP (7-DAY GRID)
+   -------------------------------------------------------------------------- */
+.schedule-strip-card {
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-card-radius);
+    transition: all 0.2s ease;
+    margin-bottom: 0.85rem;
+}
+
+.weekly-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+}
+
+@media (max-width: 991.98px) {
+    .weekly-schedule-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+    }
+    .weekly-schedule-grid::-webkit-scrollbar {
+        height: 4px;
+    }
+    .weekly-schedule-grid::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.4);
+        border-radius: 4px;
+    }
+}
+
+.schedule-day-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 9px;
+    background-color: var(--lp-bg-surface);
+    border: 1px solid var(--lp-card-border);
+    min-height: 52px;
+    transition: all 0.16s ease;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 991.98px) {
+    .schedule-day-box {
+        min-width: 90px;
+        flex: 0 0 auto;
+    }
+}
+
+.schedule-day-box:hover:not(.is-today) {
+    background-color: #F1F5F9;
+    border-color: #CBD5E1;
+    transform: translateY(-1px);
+}
+
+.schedule-day-box .day-code {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--lp-text-muted);
+    text-transform: uppercase;
+}
+
+.schedule-day-box .session-name {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--lp-text-main);
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+
+.schedule-day-box .today-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #EF4444;
+    display: inline-block;
+}
+
+/* Today highlight */
+.schedule-day-box.is-today {
+    background: linear-gradient(135deg, rgba(108, 140, 255, 0.14) 0%, rgba(108, 140, 255, 0.06) 100%);
+    border-color: var(--lp-primary);
+    box-shadow: 0 1px 4px rgba(108, 140, 255, 0.2);
+}
+
+.schedule-day-box.is-today .day-code {
+    color: #4F46E5;
+    font-weight: 800;
+}
+
+.schedule-day-box.is-today .session-name {
+    color: #1E1B4B;
+    font-weight: 700;
+}
+
+/* Rest day highlight */
+.schedule-day-box.is-rest {
+    border-style: dashed;
+    background-color: var(--lp-bg-surface);
+}
+
+.schedule-day-box.is-rest .session-name {
+    color: var(--lp-text-muted);
+    font-style: italic;
+}
+
+/* Selected highlight */
+.schedule-day-box.is-selected {
+    border-color: var(--lp-primary);
+    box-shadow: 0 0 0 1.5px var(--lp-primary);
+}
+
+/* --------------------------------------------------------------------------
+   5. WORKOUT PROGRESS CARD (SLIM HERO)
+   -------------------------------------------------------------------------- */
+.workout-progress-card {
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-card-radius);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.workout-progress-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background-color: rgba(245, 158, 11, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.workout-slim-progress {
+    height: 6px !important;
+    background-color: #F1F5F9;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.workout-slim-progress .progress-bar {
+    background-color: var(--lp-success);
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+}
+
+/* --------------------------------------------------------------------------
+   6. MAIN WORKOUT CARDS: CHECKLIST (LEFT) + TIMER (RIGHT)
+   -------------------------------------------------------------------------- */
+.workout-main-card {
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-card-radius);
+    padding: 1rem 1.15rem;
+    transition: all 0.2s ease;
+}
+
+/* --------------------------------------------------------------------------
+   6.1 CHECKLIST HEADER COMPONENT
+   -------------------------------------------------------------------------- */
+.checklist-header-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--lp-card-border);
+    padding-bottom: 0.65rem;
+}
+
+.checklist-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.checklist-header-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.checklist-header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background-color: var(--lp-primary-subtle);
+    color: var(--lp-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.checklist-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--lp-text-main);
+    margin: 0;
+    line-height: 1.25;
+}
+
+.checklist-header-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--lp-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.checklist-header-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checklist-header-progress-bar {
+    flex-grow: 1;
+    height: 6px !important;
+    background-color: var(--lp-bg-surface);
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.checklist-header-progress-bar .progress-bar {
+    background-color: var(--lp-success);
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+}
+
+.checklist-header-percent {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--lp-primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 34px;
+    text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   6.2 CHECKLIST ITEMS CONTAINER & ROWS (UNIFIED 4-ZONE LAYOUT)
+   -------------------------------------------------------------------------- */
+.workout-checklist-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Spacing between items: 4px - 8px */
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+}
+
+.workout-checklist-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.workout-checklist-container::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 6px;
+}
+
+.checklist-exercise-item {
+    display: flex;
+    align-items: center;
+    min-height: 48px; /* Uniform height: 44px – 52px */
+    padding: 8px 12px; /* Uniform padding: 8px – 12px */
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-left: 3.5px solid #CBD5E1 !important;
+    border-radius: var(--lp-item-radius);
+    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.checklist-exercise-item:hover {
+    background-color: #F8FAFC;
+    border-color: #CBD5E1;
+}
+
+.checklist-exercise-item.active-exercise {
+    border-left-color: var(--lp-primary) !important;
+    background-color: rgba(108, 140, 255, 0.05);
+}
+
+.checklist-exercise-item.completed {
+    border-left-color: var(--lp-success) !important;
+    background-color: rgba(16, 185, 129, 0.04);
+}
+
+.checklist-exercise-item.completed .exercise-title {
+    text-decoration: line-through;
+    color: var(--lp-text-muted) !important;
+    opacity: 0.78;
+}
+
+.checklist-exercise-item.completed .checklist-item-metric-val {
+    opacity: 0.75;
+}
+
+/* ZONE 1: Checkbox (Fixed 18x18px, perfectly aligned horizontally) */
+.checklist-item-checkbox-col {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 12px; /* Spacing Checkbox -> Tên: 10px – 12px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.custom-check-box {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    accent-color: var(--lp-success);
+    flex-shrink: 0;
+    display: block;
+}
+
+/* ZONE 2-4: Item Content Wrapper */
+.checklist-item-content {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 12px; /* Spacing Tên -> Thông tin: 8px – 16px */
+}
+
+/* ZONE 2: Exercise Name (Uniform starting point, line-clamp-2 max) */
+.checklist-item-title-col {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.exercise-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--lp-text-main);
+    line-height: 1.35;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin: 0;
+}
+
+/* ZONE 3: Sets / Reps / Metric Info (Tabular, aligned, dedicated column) */
+.checklist-item-meta-col {
+    flex: 0 0 auto;
+    min-width: 82px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.checklist-item-metric-val {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4338CA;
+    background-color: rgba(108, 140, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+    display: inline-block;
+}
+
+.checklist-item-group-tag {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--lp-text-muted);
+    background-color: var(--lp-bg-surface);
+    border: 1px solid var(--lp-card-border);
+    padding: 2px 7px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* ZONE 4: Action / Status Area (Right aligned, fixed min-width to avoid layout shifts) */
+.checklist-item-action-area {
+    flex: 0 0 auto;
+    min-width: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: 4px; /* Spacing Thông tin -> Action: ~16px total */
+    flex-shrink: 0;
+}
+
+.completed-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    white-space: nowrap;
+}
+
+/* Mobile Responsive (< 576px) */
+@media (max-width: 575.98px) {
+    .checklist-exercise-item {
+        align-items: flex-start;
+        padding: 9px 10px;
+        min-height: auto;
+    }
+    .checklist-item-checkbox-col {
+        margin-top: 2px;
+        margin-right: 10px;
+    }
+    .checklist-item-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        width: 100%;
+    }
+    .checklist-item-title-col {
+        width: 100%;
+    }
+    .checklist-item-bottom-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 8px;
+    }
+    .checklist-item-meta-col {
+        min-width: 0;
+        text-align: left;
+        justify-content: flex-start;
+    }
+    .checklist-item-action-area {
+        min-width: 0;
+        margin-left: auto;
+    }
+}
+
+/* Dark Mode Checklist Theme */
+[data-bs-theme="dark"] .checklist-exercise-item {
+    background: #1E1E22;
+    border-color: #2E2E34;
+    border-left-color: #3F3F46 !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item:hover {
+    background-color: #26262B;
+    border-color: #3F3F46;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item.active-exercise {
+    background-color: rgba(108, 140, 255, 0.1);
+    border-left-color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item.completed {
+    background-color: rgba(16, 185, 129, 0.08);
+    border-left-color: #10B981 !important;
+}
+
+[data-bs-theme="dark"] .checklist-header-box {
+    border-bottom-color: #2E2E34;
+}
+
+[data-bs-theme="dark"] .checklist-header-progress-bar {
+    background-color: #161619;
+    border-color: #2E2E34;
+}
+
+[data-bs-theme="dark"] .checklist-item-metric-val {
+    background-color: rgba(108, 140, 255, 0.15);
+    color: #829DFF;
+}
+
+[data-bs-theme="dark"] .checklist-item-group-tag {
+    background-color: #161619;
+    border-color: #2E2E34;
+    color: #A0A0A8;
+}
+
+[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
+    background-color: #3F3F46;
+}
+
+/* --------------------------------------------------------------------------
+   7. TIMER & PLAYER CARD
+   -------------------------------------------------------------------------- */
 .workout-timer-sticky {
     position: sticky;
-    top: 24px;
-    z-index: 10;
+    top: 10px;
+    z-index: 5;
 }
+
 @media (max-width: 991.98px) {
     .workout-timer-sticky {
         position: static;
     }
 }
 
-/* 4. REST DAY CARD */
+.workout-timer-box {
+    background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+    border: 1px solid var(--lp-card-border);
+    border-radius: 12px;
+    padding: 0.65rem 0.85rem;
+}
+
+.timer-display {
+    font-size: clamp(1.85rem, 2.5vw, 2.25rem);
+    font-weight: 800;
+    color: var(--lp-text-main);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin: 0.15rem 0;
+}
+
+.active-exercise-card {
+    background: var(--lp-bg-surface);
+    border: 1px solid var(--lp-card-border);
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+}
+
+.exercise-title-text {
+    font-size: 0.88rem;
+    letter-spacing: -0.1px;
+}
+
+/* Status badge */
+.workout-status-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 9999px;
+}
+
+.badge-not-started {
+    background-color: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.badge-running {
+    background-color: rgba(108, 140, 255, 0.14);
+    color: #4F46E5;
+    border: 1px solid rgba(108, 140, 255, 0.35);
+    animation: statusPulse 2s infinite ease-in-out;
+}
+
+.badge-paused {
+    background-color: rgba(245, 158, 11, 0.14);
+    color: #D97706;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-completed {
+    background-color: rgba(16, 185, 129, 0.14);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+@keyframes statusPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(108, 140, 255, 0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(108, 140, 255, 0); }
+}
+
+.exercise-type-badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.badge-type-strength {
+    background-color: rgba(108, 140, 255, 0.14);
+    color: #4338CA;
+    border: 1px solid rgba(108, 140, 255, 0.28);
+}
+
+.badge-type-core {
+    background-color: rgba(20, 184, 166, 0.14);
+    color: #0F766E;
+    border: 1px solid rgba(20, 184, 166, 0.28);
+}
+
+.badge-type-cardio {
+    background-color: rgba(244, 63, 94, 0.14);
+    color: #BE123C;
+    border: 1px solid rgba(244, 63, 94, 0.28);
+}
+
+.badge-type-other {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. CARD KẾ HOẠCH TẬP LUYỆN (WORKOUT PLAN CARDS - SECTION 7)
+   -------------------------------------------------------------------------- */
+.plan-card-item {
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-card-radius);
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.plan-card-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    border-color: #CBD5E1;
+}
+
+.plan-card-item.is-active-plan {
+    border-color: var(--lp-primary);
+    box-shadow: 0 0 0 1.5px var(--lp-primary), 0 4px 12px rgba(108, 140, 255, 0.12);
+}
+
+.plan-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--lp-text-main);
+    line-height: 1.3;
+}
+
+.plan-card-desc {
+    font-size: 0.78rem;
+    color: var(--lp-text-muted);
+    min-height: 38px;
+    line-height: 1.4;
+}
+
+.plan-card-progress-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--lp-text-muted);
+}
+
+.plan-card-progress-val {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--lp-primary);
+}
+
+.plan-card-meta {
+    font-size: 0.75rem;
+    color: var(--lp-text-muted);
+    font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   9. WORKOUT SESSIONS LIST (SECTION 10)
+   -------------------------------------------------------------------------- */
+.workout-session-item {
+    background: var(--lp-bg-card);
+    border: 1px solid var(--lp-card-border);
+    border-radius: var(--lp-item-radius);
+    padding: 0.65rem 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    transition: all 0.18s ease;
+}
+
+.workout-session-item:hover {
+    background-color: var(--lp-bg-surface);
+    border-color: #CBD5E1;
+}
+
+.session-main-info {
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.session-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--lp-text-main);
+    line-height: 1.3;
+}
+
+.session-meta {
+    font-size: 0.74rem;
+    color: var(--lp-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. REST DAY CARD
+   -------------------------------------------------------------------------- */
 .rest-day-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px dashed #cbd5e1;
-    border-radius: 20px;
+    background: var(--lp-bg-card);
+    border: 1px dashed #CBD5E1;
+    border-radius: var(--lp-card-radius);
+    padding: 2.5rem 1.5rem;
 }
-[data-bs-theme="dark"] .rest-day-card {
-    background: linear-gradient(145deg, #131d31 0%, #0b1120 100%);
-    border-color: #334155;
-}
+
 .rest-day-icon-bounce {
     animation: gentleBounce 2.5s infinite ease-in-out;
 }
+
 @keyframes gentleBounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-5px); }
 }
 
-/* 5. FLOATING COMMUNITY BUTTON (NẰM TRÊN FLOATING MENU) */
+/* --------------------------------------------------------------------------
+   11. BUTTONS & CONTROLS POLISH
+   -------------------------------------------------------------------------- */
+.btn-sm {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    line-height: 1.35;
+}
+
+.btn-primary {
+    background-color: var(--lp-primary);
+    border-color: var(--lp-primary);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--lp-primary-hover);
+    border-color: var(--lp-primary-hover);
+    color: #FFFFFF;
+}
+
+.btn-outline-secondary {
+    border-color: var(--lp-card-border);
+    color: #475569;
+    background-color: var(--lp-bg-card);
+}
+
+.btn-outline-secondary:hover {
+    background-color: #F1F5F9;
+    border-color: #CBD5E1;
+    color: #1E293B;
+}
+
+/* --------------------------------------------------------------------------
+   12. FLOATING COMMUNITY BUTTON & POPUP
+   -------------------------------------------------------------------------- */
 .floating-community-btn {
     position: fixed;
-    bottom: 94px;
-    right: 28px;
-    z-index: 1059;
-    width: 54px;
-    height: 54px;
+    bottom: 82px;
+    right: 24px;
+    z-index: 1050;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+    color: #FFFFFF;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     cursor: pointer;
-    box-shadow: 0 8px 24px -4px rgba(14, 165, 233, 0.45), 0 4px 12px 0 rgba(0, 0, 0, 0.1);
-    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 20px -4px rgba(14, 165, 233, 0.45), 0 3px 8px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+    padding: 0;
+    margin: 0;
     text-decoration: none;
 }
+
 .floating-community-btn:hover {
     transform: scale(1.08) translateY(-2px);
-    box-shadow: 0 12px 30px -4px rgba(14, 165, 233, 0.6), 0 6px 16px 0 rgba(0, 0, 0, 0.12);
-    color: #ffffff;
+    box-shadow: 0 10px 24px -4px rgba(14, 165, 233, 0.6), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    color: #FFFFFF;
 }
+
 .floating-community-btn:active {
     transform: scale(0.96);
 }
+
+.floating-community-btn.active {
+    background: #EF4444;
+    box-shadow: 0 6px 20px -4px rgba(239, 68, 68, 0.45);
+}
+
+.floating-community-btn .icon-community-open {
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.floating-community-btn .icon-community-close {
+    display: none;
+    font-size: 1.2rem;
+}
+
+.floating-community-btn.active .icon-community-open {
+    display: none !important;
+}
+
+.floating-community-btn.active .icon-community-close {
+    display: inline-block !important;
+    animation: rotateIn 0.25s ease-out;
+}
+
 .floating-community-btn .community-tooltip {
     position: absolute;
-    right: 66px;
-    background: #0f172a;
-    color: #ffffff;
-    font-size: 0.78rem;
+    right: 58px;
+    background: #1E1E22;
+    color: #FFFFFF;
+    font-size: 0.72rem;
     font-weight: 600;
     white-space: nowrap;
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 4px 10px;
+    border-radius: 6px;
     pointer-events: none;
     opacity: 0;
-    transform: translateX(8px);
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(4px);
+    transition: all 0.18s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
 .floating-community-btn:hover .community-tooltip {
     opacity: 1;
     transform: translateX(0);
 }
-@media (max-width: 767.98px) {
-    .floating-community-btn {
-        bottom: 84px;
-        right: 18px;
-        width: 48px;
-        height: 48px;
-        font-size: 1.2rem;
-    }
-}
 
-/* ==========================================================================
-   6. MESSENGER-LIKE FLOATING COMMUNITY CHAT POPUP
-   ========================================================================== */
 .community-messenger-popup {
     position: fixed;
-    bottom: 142px;
+    bottom: 140px;
     right: 24px;
-    width: 375px;
+    width: 360px;
     max-width: calc(100vw - 32px);
-    height: 440px;
-    max-height: calc(100vh - 165px);
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06);
-    z-index: 1065;
+    height: 420px;
+    max-height: calc(100vh - 160px);
+    background: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    z-index: 1045;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(16px) scale(0.95);
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(10px) scale(0.97);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .community-messenger-popup.active {
@@ -740,232 +1103,384 @@
     transform: translateY(0) scale(1);
 }
 
-[data-bs-theme="dark"] .community-messenger-popup {
-    background: #131d31;
-    border-color: #1e293b;
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-/* Header */
 .community-popup-header {
-    background: #ffffff;
-    border-bottom: 1px solid #f1f5f9;
-}
-[data-bs-theme="dark"] .community-popup-header {
-    background: #1A1A1D;
-    border-bottom-color: #2E2E34;
+    background: #FFFFFF;
+    border-bottom: 1px solid #F1F5F9;
 }
 
 .header-icon-circle {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
 }
 
-/* Online Indicator Dot */
 .online-indicator-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #4ADE80;
+    width: 6px;
+    height: 6px;
+    background-color: #22C55E;
     border-radius: 50%;
     display: inline-block;
 }
 
-/* World Chat Body & Messages */
 .world-chat-body {
-    background: #f8fafc;
+    background: #F8FAFC;
     flex: 1 1 0%;
     min-height: 0;
     overflow: hidden;
-}
-[data-bs-theme="dark"] .world-chat-body {
-    background: #121212;
 }
 
 .world-chat-messages {
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
     padding-right: 4px;
-    scroll-behavior: smooth;
-}
-.world-chat-messages::-webkit-scrollbar {
-    width: 5px;
-}
-.world-chat-messages::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-[data-bs-theme="dark"] .world-chat-messages::-webkit-scrollbar-thumb {
-    background: #2E2E34;
 }
 
-/* World Chat Message Row */
 .world-msg-row {
     display: flex;
-    gap: 8px;
+    gap: 7px;
     align-items: flex-start;
     max-width: 88%;
 }
+
 .world-msg-row.sent-by-me {
     align-self: flex-end;
     flex-direction: row-reverse;
 }
 
 .world-msg-avatar {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.72rem;
+    font-size: 0.65rem;
     font-weight: 700;
-    color: #0B1020;
-    background: #6C8CFF;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    color: #FFFFFF;
+    background: var(--lp-primary);
 }
 
 .world-msg-bubble {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 7px 11px;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 5px 9px;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    border: 1px solid #F1F5F9;
     word-break: break-word;
 }
+
+.world-msg-row.sent-by-me .world-msg-bubble {
+    background: var(--lp-primary);
+    color: #FFFFFF;
+    border-color: transparent;
+    border-bottom-right-radius: 2px;
+}
+
+.world-msg-author {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #2563EB;
+    margin-bottom: 2px;
+}
+
+.world-msg-time {
+    font-size: 0.6rem;
+    color: #94A3B8;
+    margin-top: 2px;
+    display: block;
+}
+
+.world-msg-row.sent-by-me .world-msg-time {
+    color: rgba(255, 255, 255, 0.85);
+    text-align: right;
+}
+
+.world-chat-footer {
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   13. STRICT DARK MODE TOKENS (LIFE PLANNER SPEC)
+   Background: #121212 | Navbar: #1A1A1D | Card: #1E1E22 | Modal: #26262B
+   Border: #2E2E34 | Text: #E8E8EA | Secondary: #A0A0A8 | Primary: #6C8CFF
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] .workout-page-title,
+[data-bs-theme="dark"] .plan-card-title,
+[data-bs-theme="dark"] .session-title,
+[data-bs-theme="dark"] .timer-display,
+[data-bs-theme="dark"] .exercise-title-text,
+[data-bs-theme="dark"] .modal-title,
+[data-bs-theme="dark"] .table-light th,
+[data-bs-theme="dark"] .workout-header-wrapper .text-dark,
+[data-bs-theme="dark"] .schedule-day-box .session-name,
+[data-bs-theme="dark"] .checklist-exercise-item .text-dark,
+[data-bs-theme="dark"] .workout-kpi-val {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .workout-page-subtitle,
+[data-bs-theme="dark"] .session-meta,
+[data-bs-theme="dark"] .plan-card-desc,
+[data-bs-theme="dark"] .plan-card-meta {
+    color: #A0A0A8 !important;
+}
+
+[data-bs-theme="dark"] .nav-segment-control {
+    background-color: #1E1E22 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .nav-segment-control .nav-link,
+[data-bs-theme="dark"] .nav-segment-control .btn {
+    color: #A0A0A8 !important;
+}
+
+[data-bs-theme="dark"] .nav-segment-control .nav-link.active,
+[data-bs-theme="dark"] .nav-segment-control .btn.btn-primary {
+    background-color: #6C8CFF !important;
+    color: #FFFFFF !important;
+}
+
+[data-bs-theme="dark"] .schedule-strip-card,
+[data-bs-theme="dark"] .workout-progress-card,
+[data-bs-theme="dark"] .workout-main-card,
+[data-bs-theme="dark"] .plan-card-item,
+[data-bs-theme="dark"] .workout-session-item,
+[data-bs-theme="dark"] .rest-day-card,
+[data-bs-theme="dark"] .workout-kpi-card {
+    background-color: #1E1E22 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box {
+    background-color: #161619 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box .day-code {
+    color: #A0A0A8 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box.is-today {
+    background: rgba(108, 140, 255, 0.12) !important;
+    border-color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box.is-today .day-code,
+[data-bs-theme="dark"] .schedule-day-box.is-today .session-name {
+    color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box.is-rest {
+    border-color: #2E2E34 !important;
+    background-color: #161619 !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box.is-rest .session-name {
+    color: #71717A !important;
+}
+
+[data-bs-theme="dark"] .schedule-day-box:hover:not(.is-today) {
+    background-color: #26262B !important;
+    border-color: #3A3A42 !important;
+}
+
+[data-bs-theme="dark"] .workout-slim-progress {
+    background-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item {
+    background-color: #161619 !important;
+    border-color: #2E2E34 !important;
+    border-left-color: #3A3A42 !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item:hover {
+    background-color: #1E1E22 !important;
+    border-color: #3A3A42 !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item.active-exercise {
+    background-color: rgba(108, 140, 255, 0.08) !important;
+    border-left-color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .checklist-exercise-item.completed {
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    border-left-color: #10B981 !important;
+}
+
+[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
+    background-color: #2E2E34;
+}
+
+[data-bs-theme="dark"] .badge-group-tag {
+    background-color: #1E1E22 !important;
+    color: #A0A0A8 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .badge-metric-tag {
+    background-color: rgba(108, 140, 255, 0.15) !important;
+    color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .workout-timer-box,
+[data-bs-theme="dark"] .active-exercise-card {
+    background: #161619 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .badge-not-started {
+    background-color: #1E1E22 !important;
+    color: #A0A0A8 !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .badge-type-strength {
+    background-color: rgba(108, 140, 255, 0.15) !important;
+    color: #6C8CFF !important;
+    border-color: rgba(108, 140, 255, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .badge-type-core {
+    background-color: rgba(20, 184, 166, 0.15) !important;
+    color: #5EEAD4 !important;
+    border-color: rgba(20, 184, 166, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .badge-type-cardio {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #FDA4AF !important;
+    border-color: rgba(244, 63, 94, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .badge-type-other {
+    background-color: #1E1E22 !important;
+    color: #A0A0A8 !important;
+    border-color: #2E2E34 !important;
+}
+
+/* Dark Mode for Modals */
+[data-bs-theme="dark"] .modal-content {
+    background-color: #26262B !important;
+    border: 1px solid #2E2E34 !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .modal-body .bg-light {
+    background-color: #1E1E22 !important;
+    border: 1px solid #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .table-light {
+    background-color: #1A1A1D !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: #E8E8EA;
+    --bs-table-border-color: #2E2E34;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #1E1E22 !important;
+    border-color: #2E2E34 !important;
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    border-color: #6C8CFF !important;
+    background-color: #1E1E22 !important;
+    color: #E8E8EA !important;
+    box-shadow: 0 0 0 2px rgba(108, 140, 255, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    border-color: #2E2E34 !important;
+    color: #E8E8EA !important;
+    background-color: #1E1E22 !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #26262B !important;
+    border-color: #3A3A42 !important;
+    color: #FFFFFF !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #26262B !important;
+    border-color: #2E2E34 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: #E8E8EA !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus {
+    background-color: #1E1E22 !important;
+    color: #6C8CFF !important;
+}
+
+[data-bs-theme="dark"] .community-messenger-popup {
+    background: #1E1E22;
+    border: 1px solid #2E2E34;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.65);
+}
+
+[data-bs-theme="dark"] .community-popup-header {
+    background: #1A1A1D;
+    border-bottom-color: #2E2E34;
+}
+
+[data-bs-theme="dark"] .world-chat-body {
+    background: #121212;
+}
+
 [data-bs-theme="dark"] .world-msg-bubble {
     background: #26262B;
     border-color: #2E2E34;
     color: #E8E8EA;
 }
 
-.world-msg-row.sent-by-me .world-msg-bubble {
-    background: #6C8CFF;
-    color: #0B1020;
-    font-weight: 600;
-    border-color: transparent;
-    border-bottom-right-radius: 3px;
-    box-shadow: 0 2px 6px rgba(108, 140, 255, 0.35);
-}
-
-.world-msg-author {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #2563eb;
-    margin-bottom: 2px;
-}
-[data-bs-theme="dark"] .world-msg-author {
-    color: #6C8CFF;
-}
-.world-msg-row.sent-by-me .world-msg-author {
-    display: none;
-}
-
-.world-msg-time {
-    font-size: 0.65rem;
-    color: #94a3b8;
-    margin-top: 3px;
-    display: block;
-}
-.world-msg-row.sent-by-me .world-msg-time {
-    color: rgba(11, 16, 32, 0.8);
-    text-align: right;
-}
-
-.world-chat-footer {
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-}
 [data-bs-theme="dark"] .world-chat-footer {
     background: #1A1A1D;
     border-top-color: #2E2E34;
 }
 
-/* ADDITIONAL WORKOUT DARK MODE OVERRIDES */
-[data-bs-theme="dark"] .workout-timer-box {
-    background: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-[data-bs-theme="dark"] .timer-display {
-    color: #E8E8EA !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-[data-bs-theme="dark"] .schedule-orientation-card {
-    background: #1E1E22 !important;
-    border-left-color: #6C8CFF !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill {
-    background-color: #1A1A1E !important;
-    border-color: #33333A !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill .day-label {
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill .split-name {
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.workout-day-pill {
-    background-color: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.workout-day-pill:hover:not(.active-today) {
-    background-color: #26262B !important;
-    border-color: #3A3A42 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.active-today {
-    background-color: #6C8CFF !important;
-    border-color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-pill.active-today .day-label,
-[data-bs-theme="dark"] .schedule-day-pill.active-today .split-name {
-    color: #0B1020 !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab {
-    background: #1A1A1E !important;
-    border-color: #33333A !important;
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab:hover {
-    background: #26262B !important;
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .workout-type-tab.active {
-    background-color: #6C8CFF !important;
-    color: #0B1020 !important;
-    border-color: #6C8CFF !important;
-    font-weight: 700;
-}
-
-/* Responsive for mobile */
-@media (max-width: 480px) {
+/* --------------------------------------------------------------------------
+   14. RESPONSIVE BREAKPOINT TWEAKS
+   -------------------------------------------------------------------------- */
+@media (max-width: 576px) {
+    .floating-community-btn {
+        bottom: 70px;
+        right: 18px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.15rem;
+    }
     .community-messenger-popup {
-        right: 12px;
-        width: calc(100vw - 24px);
-        bottom: 140px;
-        height: 420px;
+        right: 14px;
+        width: calc(100vw - 28px);
+        bottom: 122px;
+        height: 390px;
     }
 }
-
-

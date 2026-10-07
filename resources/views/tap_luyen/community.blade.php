@@ -45,43 +45,8 @@
     <!-- MAIN WRAPPER FULL-WIDTH (HOME IS CALENDAR) -->
     <div class="main-wrapper main-wrapper-full">
 
-        <!-- HEADER TRÊN CÙNG KÈM NÚT QUAY LẠI LỊCH -->
-        <header class="top-header">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Quay lại Lịch</span>
-                </a>
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-globe-americas text-primary"></i> Cộng Đồng Gymer & Chia Sẻ Lịch Tập
-                </h5>
-            </div>
-
-            <div class="header-actions d-flex align-items-center gap-3">
-                <div class="user-profile dropdown">
-                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-                        @if(Auth::check() && !empty(Auth::user()->avatar_url))
-                            <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="user-avatar rounded-circle object-fit-cover" style="width: 38px; height: 38px;">
-                        @else
-                            <div class="user-avatar">
-                                {{ Auth::check() ? Auth::user()->initials : 'U' }}
-                            </div>
-                        @endif
-                        <span class="d-none d-md-inline fw-semibold text-dark">{{ Auth::user()->ho_ten ?? 'Người dùng' }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2 text-primary"></i>Hồ sơ cá nhân</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </header>
+        <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
+        @include('layouts.topbar', ['title' => 'Cộng Đồng Gymer'])
 
         <!-- CONTENT BODY -->
         <main class="content-body py-4 px-3 px-md-4">

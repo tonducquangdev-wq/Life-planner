@@ -12,7 +12,6 @@
             </div>
             <div class="brand-text-group">
                 <span class="brand-name">Life Planner</span>
-                <span class="brand-badge">PRO</span>
             </div>
         </a>
     </div>
@@ -57,10 +56,13 @@
                 </a>
             </li>
 
-            <!-- 4. Hồ sơ cá nhân -->
+            <!-- 4. Hồ sơ cá nhân (Mở Modal) -->
             <li class="nav-item">
-                <a href="{{ route('profile.edit') }}" 
-                   class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <a href="#" 
+                   class="nav-link btn-open-profile-modal cursor-pointer"
+                   data-bs-toggle="modal"
+                   data-bs-target="#profileModal"
+                   title="Hồ sơ cá nhân">
                     <span class="nav-icon-box"><i class="bi bi-person-fill-gear"></i></span>
                     <span class="nav-text">Hồ sơ</span>
                 </a>
@@ -70,7 +72,7 @@
 
     <!-- User Profile ở đáy Sidebar -->
     <div class="sidebar-user-footer">
-        <a href="{{ route('profile.edit') }}" class="sidebar-user-card text-decoration-none">
+        <a href="#" class="sidebar-user-card text-decoration-none btn-open-profile-modal cursor-pointer" data-bs-toggle="modal" data-bs-target="#profileModal" title="Xem hồ sơ cá nhân">
             <div class="sidebar-user-avatar">
                 @if(Auth::check() && !empty(Auth::user()->avatar_url))
                     <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="avatar-img">
@@ -99,7 +101,6 @@
             </div>
             <div class="brand-text-group">
                 <span class="brand-name">Life Planner</span>
-                <span class="brand-badge">PRO</span>
             </div>
         </a>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -140,9 +141,9 @@
                     </a>
                 </li>
 
-                <!-- 4. Hồ sơ -->
+                <!-- 4. Hồ sơ (Mở Modal) -->
                 <li class="nav-item">
-                    <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }} d-flex align-items-center gap-3 py-2 px-3 rounded-3">
+                    <a href="#" class="nav-link btn-open-profile-modal cursor-pointer d-flex align-items-center gap-3 py-2 px-3 rounded-3" data-bs-toggle="modal" data-bs-target="#profileModal" data-bs-dismiss="offcanvas">
                         <i class="bi bi-person-fill-gear fs-5"></i>
                         <span>Hồ sơ</span>
                     </a>
@@ -153,7 +154,7 @@
         <!-- Mobile User Profile -->
         <div class="pt-3 border-top mt-auto">
             <div class="d-flex align-items-center justify-content-between">
-                <a href="{{ route('profile.edit') }}" class="d-flex align-items-center gap-2 text-decoration-none min-w-0">
+                <a href="#" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 btn-open-profile-modal cursor-pointer" data-bs-toggle="modal" data-bs-target="#profileModal" data-bs-dismiss="offcanvas">
                     <div class="sidebar-user-avatar">
                         @if(Auth::check() && !empty(Auth::user()->avatar_url))
                             <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="avatar-img" style="width: 36px; height: 36px;">
