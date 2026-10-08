@@ -39,131 +39,251 @@ $date = $event->thoi_gian_bat_dau ?? $event->date ?? null;
 }
 return $date ? Carbon::parse($date)->format('Y-m-d') : '';
 });
-@endphp
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <!-- HEADER NÚT CHUYỂN THÁNG -->
-    <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
-        <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-calendar-month text-primary fs-4"></i>
-            <span>Tháng {{ $currentMonth }}, {{ $currentYear }}</span>
-        </h5>
+// Tính toán 7 ngày trong tuần hiện tại (Mobile View)
+$startOfWeek = $today->copy()->startOfWeek(Carbon::MONDAY);
+$weekDays = [];
+for ($w = 0; $w < 7; $w++) {
+    $wDate=$startOfWeek->copy()->addDays($w);
+    $wDateStr = $wDate->format('Y-m-d');
+    $wEvents = $groupedEvents->get($wDateStr) ?? collect();
+    $weekDays[] = [
+    'date' => $wDate,
+    'dayNum' => $wDate->day,
+    'dayName' => match($wDate->isoWeekday()) {
+    1 => 'T2', 2 => 'T3', 3 => 'T4', 4 => 'T5', 5 => 'T6', 6 => 'T7', 7 => 'CN'
+    },
+    'isToday' => $today->isSameDay($wDate),
+    'events' => $wEvents,
+    ];
+    }
 
-        <div class="d-flex align-items-center gap-2">
-            <!-- Nút về tháng hiện tại -->
-            <a href="?month={{ date('n') }}&year={{ date('Y') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-medium">
-                Hôm nay
-            </a>
+    // Danh sách sự kiện hôm nay & Deadline sắp tới (Mobile View)
+    $todayEvents = $groupedEvents->get($today->format('Y-m-d')) ?? collect();
+    $upcomingDeadlines = collect($events)->filter(function($evt) use ($today) {
+    if (is_array($evt)) {
+    $type = $evt['loai_su_kien'] ?? $evt['type'] ?? '';
+    $dateStr = $evt['thoi_gian_bat_dau'] ?? $evt['date'] ?? null;
+    } else {
+    $type = $evt->loai_su_kien ?? $evt->type ?? '';
+    $dateStr = $evt->thoi_gian_bat_dau ?? $evt->date ?? null;
+    }
+    if ($type !== 'deadline' && $type !== 'han_chot') return false;
+    if (!$dateStr) return false;
+    return Carbon::parse($dateStr)->gte($today);
+    })->take(3);
+    @endphp
 
-            <!-- Nút Tháng trước -->
-            <a href="?month={{ $prevMonth }}&year={{ $prevYear }}" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Tháng trước">
-                <i class="bi bi-chevron-left"></i>
-            </a>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <!-- HEADER NÚT CHUYỂN THÁNG -->
+        <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
+            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-calendar-month text-primary fs-4"></i>
+                <span>Tháng {{ $currentMonth }}, {{ $currentYear }}</span>
+            </h5>
 
-            <!-- Nút Tháng sau -->
-            <a href="?month={{ $nextMonth }}&year={{ $nextYear }}" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Tháng sau">
-                <i class="bi bi-chevron-right"></i>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <!-- Nút về tháng hiện tại -->
+                <a href="?month={{ date('n') }}&year={{ date('Y') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-medium">
+                    Hôm nay
+                </a>
+
+                <!-- Nút Tháng trước -->
+                <a href="?month={{ $prevMonth }}&year={{ $prevYear }}" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Tháng trước">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+
+                <!-- Nút Tháng sau -->
+                <a href="?month={{ $nextMonth }}&year={{ $nextYear }}" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Tháng sau">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 1. BẢNG LỊCH THÁNG (HIỂN THỊ TRÊN DESKTOP/TABLET: >= 768px) -->
+        <div class="card-body p-3 d-none d-md-block">
+            <table class="table table-borderless text-center align-middle mb-0" style="table-layout: fixed;">
+                <thead>
+                    <tr class="text-secondary fw-semibold fs-7 border-bottom">
+                        <th class="py-2">T2</th>
+                        <th class="py-2">T3</th>
+                        <th class="py-2">T4</th>
+                        <th class="py-2">T5</th>
+                        <th class="py-2">T6</th>
+                        <th class="py-2 text-primary">T7</th>
+                        <th class="py-2 text-danger">CN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $currentCell = 1;
+                    $dayCounter = 1;
+                    $nextMonthDayCounter = 1;
+                    @endphp
+
+                    @while ($dayCounter <= $daysInMonth)
+                        <tr>
+                        @for ($i = 1; $i <= 7; $i++)
+                            @php
+                            $cellDateString=null;
+                            $isCurrentMonth=false;
+                            $isToday=false;
+                            $displayDay='' ;
+
+                            if ($currentCell <=$paddingOffset) {
+                            // Ô hiển thị ngày tháng trước
+                            $displayDay=$daysInPrevMonth - $paddingOffset + $currentCell;
+                            } elseif ($dayCounter <=$daysInMonth) {
+                            // Ô hiển thị ngày tháng hiện tại
+                            $isCurrentMonth=true;
+                            $displayDay=$dayCounter;
+                            $cellDateString=sprintf('%04d-%02d-%02d', $currentYear, $currentMonth, $dayCounter);
+                            $cellDate=Carbon::parse($cellDateString);
+                            $isToday=$today->isSameDay($cellDate);
+                            $dayCounter++;
+                            } else {
+                            // Ô hiển thị ngày tháng sau
+                            $displayDay = $nextMonthDayCounter++;
+                            }
+
+                            $currentCell++;
+                            $dayEvents = ($isCurrentMonth && $cellDateString) ? ($groupedEvents->get($cellDateString) ?? collect()) : collect();
+                            @endphp
+
+                            <td class="p-1">
+                                <div class="p-2 rounded-3 text-start position-relative border"
+                                    style="min-height: 85px; background-color: {{ $isToday ? '#eef2ff' : ($isCurrentMonth ? '#ffffff' : '#f8fafc') }}; border-color: {{ $isToday ? '#818cf8 !important' : '#f1f5f9' }};">
+
+                                    <!-- Hiển thị số ngày -->
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold fs-7 {{ $isToday ? 'badge bg-primary rounded-circle p-1 px-2' : ($isCurrentMonth ? ($i >= 6 ? 'text-danger' : 'text-dark') : 'text-black-50') }}">
+                                            {{ $displayDay }}
+                                        </span>
+                                        @if($dayEvents->count() > 0)
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill fs-8">
+                                            {{ $dayEvents->count() }}
+                                        </span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Hiển thị danh sách sự kiện trong ngày -->
+                                    <div class="events-wrapper overflow-hidden" style="max-height: 52px;">
+                                        @foreach($dayEvents->take(2) as $event)
+                                        @php
+                                        $tieuDe = is_array($event) ? ($event['tieu_de'] ?? $event['title'] ?? '') : ($event->tieu_de ?? $event->title ?? '');
+                                        $loai = is_array($event) ? ($event['loai_su_kien'] ?? 'hoc_tap') : ($event->loai_su_kien ?? 'hoc_tap');
+
+                                        $badgeStyle = match($loai) {
+                                        'hoc_tap' => 'background-color: #e0e7ff; color: #4338ca; border-left: 3px solid #6366f1;',
+                                        'the_chat' => 'background-color: #d1fae5; color: #065f46; border-left: 3px solid #10b981;',
+                                        'ca_nhan' => 'background-color: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b;',
+                                        default => 'background-color: #e0f2fe; color: #0369a1; border-left: 3px solid #0284c7;'
+                                        };
+                                        @endphp
+                                        <div class="text-truncate fs-8 p-1 mb-1 rounded" style="{{ $badgeStyle }}" title="{{ $tieuDe }}">
+                                            {{ $tieuDe }}
+                                        </div>
+                                        @endforeach
+
+                                        @if($dayEvents->count() > 2)
+                                        <div class="text-muted fs-8 text-center fw-semibold">
+                                            +{{ $dayEvents->count() - 2 }} sự kiện khác
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            @endfor
+                            </tr>
+                            @endwhile
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. GIAO DIỆN LỊCH TUẦN & LỊCH TRÌNH HÔM NAY / DEADLINE (CHỈ HIỂN THỊ TRÊN MOBILE: < 768px) -->
+        <div class="card-body p-3 d-block d-md-none bg-light-subtle">
+            <!-- A. Thanh Lịch Tuần 7 ngày -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold fs-7 text-dark">
+                        <i class="bi bi-calendar-week text-primary me-1"></i>Lịch tuần này
+                    </span>
+                    <span class="fs-8 text-muted">Tuần {{ $today->weekOfYear }}</span>
+                </div>
+                <div class="d-flex justify-content-between gap-1">
+                    @foreach($weekDays as $wDay)
+                    <div class="text-center flex-fill p-2 rounded-3 border {{ $wDay['isToday'] ? 'bg-primary text-white border-primary shadow-sm' : 'bg-white text-dark border-light-subtle' }}">
+                        <div class="fs-8 fw-semibold opacity-75">{{ $wDay['dayName'] }}</div>
+                        <div class="fw-bold fs-6">{{ $wDay['dayNum'] }}</div>
+                        @if($wDay['events']->count() > 0)
+                        <div class="mt-1 d-flex justify-content-center gap-1">
+                            <span class="badge rounded-circle p-1 {{ $wDay['isToday'] ? 'bg-white text-primary' : 'bg-primary' }}" style="width: 6px; height: 6px;"></span>
+                        </div>
+                        @else
+                        <div style="height: 6px;" class="mt-1"></div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- B. Lịch trình Hôm nay -->
+            <div class="card border-0 shadow-2xs rounded-3 mb-3">
+                <div class="card-header bg-white border-0 py-2.5 px-3 d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold fs-7 mb-0 text-dark d-flex align-items-center gap-1.5">
+                        <i class="bi bi-clock-history text-primary"></i> Lịch trình hôm nay
+                    </h6>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 fs-8">
+                        {{ $todayEvents->count() }}
+                    </span>
+                </div>
+                <div class="card-body p-2.5">
+                    @forelse($todayEvents as $evt)
+                    @php
+                    $tieuDe = is_array($evt) ? ($evt['tieu_de'] ?? $evt['title'] ?? '') : ($evt->tieu_de ?? $evt->title ?? '');
+                    $gio = is_array($evt) ? ($evt['gio'] ?? $evt['time'] ?? 'Cả ngày') : ($evt->gio ?? $evt->time ?? 'Cả ngày');
+                    @endphp
+                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light mb-1.5">
+                        <div class="d-flex align-items-center gap-2 min-w-0">
+                            <span class="badge bg-primary rounded-circle p-1"></span>
+                            <span class="fw-semibold fs-7 text-truncate">{{ $tieuDe }}</span>
+                        </div>
+                        <small class="text-muted fs-8 flex-shrink-0 ms-2"><i class="bi bi-clock me-1"></i>{{ $gio }}</small>
+                    </div>
+                    @empty
+                    <div class="text-center py-2 text-muted fs-8">Chưa có lịch trình hôm nay</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- C. Deadline sắp tới -->
+            <div class="card border-0 shadow-2xs rounded-3">
+                <div class="card-header bg-white border-0 py-2.5 px-3 d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold fs-7 mb-0 text-dark d-flex align-items-center gap-1.5">
+                        <i class="bi bi-hourglass-split text-warning"></i> Deadline sắp tới
+                    </h6>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-8">
+                        {{ $upcomingDeadlines->count() }}
+                    </span>
+                </div>
+                <div class="card-body p-2.5">
+                    @forelse($upcomingDeadlines as $dl)
+                    @php
+                    $tieuDe = is_array($dl) ? ($dl['tieu_de'] ?? $dl['title'] ?? '') : ($dl->tieu_de ?? $dl->title ?? '');
+                    $dateStr = is_array($dl) ? ($dl['thoi_gian_bat_dau'] ?? $dl['date'] ?? '') : ($dl->thoi_gian_bat_dau ?? $dl->date ?? '');
+                    $formattedDate = $dateStr ? Carbon::parse($dateStr)->format('d/m') : '';
+                    @endphp
+                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-warning-subtle text-warning-emphasis mb-1.5">
+                        <div class="d-flex align-items-center gap-2 min-w-0">
+                            <i class="bi bi-exclamation-circle-fill text-warning fs-7"></i>
+                            <span class="fw-semibold fs-7 text-truncate">{{ $tieuDe }}</span>
+                        </div>
+                        <small class="fw-bold fs-8 flex-shrink-0 ms-2"><i class="bi bi-calendar-event me-1"></i>{{ $formattedDate }}</small>
+                    </div>
+                    @empty
+                    <div class="text-center py-2 text-muted fs-8">Không có deadline sắp tới</div>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- BẢNG LỊCH THÁNG BOOTSTRAP 5 -->
-    <div class="card-body p-3">
-        <table class="table table-borderless text-center align-middle mb-0" style="table-layout: fixed;">
-            <thead>
-                <tr class="text-secondary fw-semibold fs-7 border-bottom">
-                    <th class="py-2">T2</th>
-                    <th class="py-2">T3</th>
-                    <th class="py-2">T4</th>
-                    <th class="py-2">T5</th>
-                    <th class="py-2">T6</th>
-                    <th class="py-2 text-primary">T7</th>
-                    <th class="py-2 text-danger">CN</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                $currentCell = 1;
-                $dayCounter = 1;
-                $nextMonthDayCounter = 1;
-                @endphp
-
-                @while ($dayCounter <= $daysInMonth)
-                    <tr>
-                    @for ($i = 1; $i <= 7; $i++)
-                        @php
-                        $cellDateString=null;
-                        $isCurrentMonth=false;
-                        $isToday=false;
-                        $displayDay='' ;
-
-                        if ($currentCell <=$paddingOffset) {
-                        // Ô hiển thị ngày tháng trước
-                        $displayDay=$daysInPrevMonth - $paddingOffset + $currentCell;
-                        } elseif ($dayCounter <=$daysInMonth) {
-                        // Ô hiển thị ngày tháng hiện tại
-                        $isCurrentMonth=true;
-                        $displayDay=$dayCounter;
-                        $cellDateString=sprintf('%04d-%02d-%02d', $currentYear, $currentMonth, $dayCounter);
-                        $cellDate=Carbon::parse($cellDateString);
-                        $isToday=$today->isSameDay($cellDate);
-                        $dayCounter++;
-                        } else {
-                        // Ô hiển thị ngày tháng sau
-                        $displayDay = $nextMonthDayCounter++;
-                        }
-
-                        $currentCell++;
-                        $dayEvents = ($isCurrentMonth && $cellDateString) ? ($groupedEvents->get($cellDateString) ?? collect()) : collect();
-                        @endphp
-
-                        <td class="p-1">
-                            <div class="p-2 rounded-3 text-start position-relative border"
-                                style="min-height: 85px; background-color: {{ $isToday ? '#eef2ff' : ($isCurrentMonth ? '#ffffff' : '#f8fafc') }}; border-color: {{ $isToday ? '#818cf8 !important' : '#f1f5f9' }};">
-
-                                <!-- Hiển thị số ngày -->
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-bold fs-7 {{ $isToday ? 'badge bg-primary rounded-circle p-1 px-2' : ($isCurrentMonth ? ($i >= 6 ? 'text-danger' : 'text-dark') : 'text-black-50') }}">
-                                        {{ $displayDay }}
-                                    </span>
-                                    @if($dayEvents->count() > 0)
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill fs-8">
-                                        {{ $dayEvents->count() }}
-                                    </span>
-                                    @endif
-                                </div>
-
-                                <!-- Hiển thị danh sách sự kiện trong ngày -->
-                                <div class="events-wrapper overflow-hidden" style="max-height: 52px;">
-                                    @foreach($dayEvents->take(2) as $event)
-                                    @php
-                                    $tieuDe = is_array($event) ? ($event['tieu_de'] ?? $event['title'] ?? '') : ($event->tieu_de ?? $event->title ?? '');
-                                    $loai = is_array($event) ? ($event['loai_su_kien'] ?? 'hoc_tap') : ($event->loai_su_kien ?? 'hoc_tap');
-
-                                    $badgeStyle = match($loai) {
-                                    'hoc_tap' => 'background-color: #e0e7ff; color: #4338ca; border-left: 3px solid #6366f1;',
-                                    'the_chat' => 'background-color: #d1fae5; color: #065f46; border-left: 3px solid #10b981;',
-                                    'ca_nhan' => 'background-color: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b;',
-                                    default => 'background-color: #e0f2fe; color: #0369a1; border-left: 3px solid #0284c7;'
-                                    };
-                                    @endphp
-                                    <div class="text-truncate fs-8 p-1 mb-1 rounded" style="{{ $badgeStyle }}" title="{{ $tieuDe }}">
-                                        {{ $tieuDe }}
-                                    </div>
-                                    @endforeach
-
-                                    @if($dayEvents->count() > 2)
-                                    <div class="text-muted fs-8 text-center fw-semibold">
-                                        +{{ $dayEvents->count() - 2 }} sự kiện khác
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </td>
-                        @endfor
-                        </tr>
-                        @endwhile
-            </tbody>
-        </table>
-    </div>
-</div>

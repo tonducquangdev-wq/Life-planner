@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
+<html lang="vi" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">

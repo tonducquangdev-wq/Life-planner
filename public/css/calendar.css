@@ -920,14 +920,38 @@
     gap: 12px;
 }
 
+.week-strip-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 6px;
+}
+
+.week-strip-wrapper::-webkit-scrollbar {
+    height: 4px;
+}
+.week-strip-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+.week-strip-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+[data-bs-theme="dark"] .week-strip-wrapper::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
 .week-strip-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
     background-color: #f8fafc;
-    padding: 8px;
-    border-radius: 20px;
+    padding: 12px;
+    border-radius: 24px;
     border: 1px solid #e2e8f0;
+    min-width: max-content;
 }
 
 [data-bs-theme="dark"] .week-strip-grid {
@@ -938,62 +962,183 @@
 .week-day-card {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: 175px;
+    width: 175px;
+    height: 290px;
+    padding: 12px 10px 14px 10px;
+    border-radius: 20px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1.5px solid #e2e8f0;
+    user-select: none;
+    scroll-snap-align: start;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle fade overlay at the bottom to indicate scrollability */
+.week-day-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95));
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    pointer-events: none;
+    transition: background 0.25s ease;
+    z-index: 2;
+}
+
+[data-bs-theme="dark"] .week-day-card::after {
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.95));
+}
+
+.week-day-card.active::after {
+    background: linear-gradient(to bottom, rgba(79, 70, 229, 0), rgba(79, 70, 229, 0.95));
+}
+
+[data-bs-theme="dark"] .week-day-card {
+    background: #0f172a;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.week-day-header {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px 3px;
-    border-radius: 16px;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border: 1.5px solid transparent;
-    user-select: none;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #e2e8f0;
+    flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .week-day-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 .week-day-card .day-name {
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #64748b;
     text-transform: uppercase;
     margin-bottom: 2px;
+    letter-spacing: 0.5px;
 }
 
 .week-day-card .day-number {
-    font-size: 1.15rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: #1e293b;
-    line-height: 1;
+    line-height: 1.1;
 }
 
 [data-bs-theme="dark"] .week-day-card .day-number {
     color: #f8fafc;
 }
 
-.week-day-card .event-dots-row {
+.week-events-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    height: 8px;
-    margin-top: 4px;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 2px;
+    padding-bottom: 16px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
 }
 
-.week-day-card .event-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background-color: #6366f1;
+/* Custom sleek scrollbar for week day card events container */
+.week-events-container::-webkit-scrollbar {
+    width: 3.5px;
 }
 
-.week-day-card .event-dot.hoc-tap { background-color: #3b82f6; }
-.week-day-card .event-dot.tap-luyen { background-color: #22c55e; }
-.week-day-card .event-dot.deadline { background-color: #f97316; }
-.week-day-card .event-dot.ca-nhan { background-color: #a855f7; }
-.week-day-card .event-dot.cong-viec { background-color: #6366f1; }
+.week-events-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.week-events-container::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.25);
+    border-radius: 10px;
+}
+
+.week-events-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.5);
+}
+
+.week-day-card.active .week-events-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.week-event-detail-item {
+    font-size: 0.75rem;
+    padding: 6px 8px;
+    border-radius: 10px;
+    text-align: left;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.week-event-detail-item.hoc-tap { background: #e0e7ff; color: #3730a3; border-left: 3px solid #6366f1; }
+.week-event-detail-item.tap-luyen { background: #d1fae5; color: #065f46; border-left: 3px solid #10b981; }
+.week-event-detail-item.deadline { background: #ffedd5; color: #9a3412; border-left: 3px solid #f97316; }
+.week-event-detail-item.ca-nhan { background: #f3e8ff; color: #6b21a8; border-left: 3px solid #a855f7; }
+.week-event-detail-item.cong-viec { background: #e0f2fe; color: #075985; border-left: 3px solid #0284c7; }
+
+.week-event-title {
+    font-weight: 700;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.week-event-meta {
+    font-size: 0.68rem;
+    font-weight: 500;
+    opacity: 0.85;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.week-event-time, .week-event-loc {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.week-event-more {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.week-event-empty {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-align: center;
+    font-style: italic;
+    margin-top: 10px;
+}
 
 .week-day-card.active {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-    box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45) !important;
-    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 20px -3px rgba(79, 70, 229, 0.45) !important;
+    transform: translateY(-4px) scale(1.03);
     border-color: transparent !important;
 }
 
@@ -1002,13 +1147,28 @@
     color: #ffffff !important;
 }
 
-.week-day-card.active .event-dot {
-    background-color: #ffffff !important;
+.week-day-card.active .week-day-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.week-day-card.active .week-event-detail-item {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #ffffff !important;
+    backdrop-filter: blur(4px);
+}
+
+.week-day-card.active .week-event-more {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.week-day-card.active .week-event-empty {
+    color: rgba(255, 255, 255, 0.65) !important;
 }
 
 .week-day-card.is-today:not(.active) {
     border-color: #6366f1;
-    background-color: rgba(99, 102, 241, 0.08);
+    background-color: rgba(99, 102, 241, 0.05);
 }
 
 .mobile-day-schedule-card {

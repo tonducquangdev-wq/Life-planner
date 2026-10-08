@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const currentMonthTitleEl = document.getElementById('currentMonthTitle');
     if (currentMonthTitleEl) {
-        currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
     }
 
 
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!calendarGrid) return;
 
         if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+            currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
         }
 
         const headerHtml = `
@@ -372,12 +372,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        const firstDay = weekDays[0];
-        const lastDay = weekDays[6];
-        if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Tháng ${firstDay.month}, ${firstDay.year} (${firstDay.day} - ${lastDay.day} Thg ${lastDay.month})`;
-        }
-
         let selectedInWeek = weekDays.find(w => w.day === activeSelectedDay && w.month === currentMonth);
         if (!selectedInWeek) {
             selectedInWeek = weekDays.find(w => w.isToday) || weekDays[0];
@@ -386,32 +380,62 @@ document.addEventListener('DOMContentLoaded', function () {
             currentYear = selectedInWeek.year;
         }
 
+        if (currentMonthTitleEl) {
+            currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
+        }
+
         let stripHtml = '';
         weekDays.forEach(w => {
             const dayEvents = getEventsForDay(w.day, true, w.month, w.year);
             const filtered = dayEvents.filter(e => activeFilters.size === 0 || activeFilters.has(e.type));
 
-            const types = Array.from(new Set(filtered.map(e => e.type))).slice(0, 3);
-            let dotsHtml = '';
-            types.forEach(t => {
-                dotsHtml += `<span class="event-dot ${t}"></span>`;
-            });
+            let eventsHtml = '';
+            if (filtered.length > 0) {
+                filtered.forEach(evt => {
+                    const evtTitle = evt.title || evt.tieu_de || 'Sự kiện';
+                    const evtType = evt.type || 'hoc-tap';
+                    const evtTime = evt.time || 'Cả ngày';
+                    const evtLoc = evt.location || '';
+                    const iconClass = typeIconMap[evtType] || 'bi-calendar-event';
+
+                    eventsHtml += `
+                        <div class="week-event-detail-item ${evtType}" title="${evtTitle}">
+                            <div class="week-event-title">
+                                <i class="bi ${iconClass} me-1"></i>${evtTitle}
+                            </div>
+                            <div class="week-event-meta">
+                                <span class="week-event-time"><i class="bi bi-clock me-1"></i>${evtTime}</span>
+                                ${evtLoc ? `<span class="week-event-loc"><i class="bi bi-geo-alt me-1"></i>${evtLoc}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                eventsHtml = `<div class="week-event-empty">Chưa có lịch trình</div>`;
+            }
 
             const isActive = (w.day === activeSelectedDay && w.month === currentMonth && w.year === currentYear) ? 'active' : '';
             const todayClass = w.isToday ? 'is-today' : '';
 
             stripHtml += `
                 <div class="week-day-card ${isActive} ${todayClass}" data-day="${w.day}" data-month="${w.month}" data-year="${w.year}">
-                    <span class="day-name">${w.dayName}</span>
-                    <span class="day-number">${w.day}</span>
-                    <div class="event-dots-row">
-                        ${dotsHtml}
+                    <div class="week-day-header">
+                        <span class="day-name">${w.dayName}</span>
+                        <span class="day-number">${w.day}</span>
+                    </div>
+                    <div class="week-events-container">
+                        ${eventsHtml}
                     </div>
                 </div>
             `;
         });
 
         weekStripGrid.innerHTML = stripHtml;
+
+        const activeWeekCard = weekStripGrid.querySelector('.week-day-card.active');
+        if (activeWeekCard) {
+            activeWeekCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
 
         weekStripGrid.querySelectorAll('.week-day-card').forEach(card => {
             card.addEventListener('click', function () {
@@ -680,10 +704,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function openCreateModalWithDay(day) {
-        document.getElementById('createHocTapDay').value = day;
-        document.getElementById('createTapLuyenDay').value = day;
-        document.getElementById('createDeadlineDay').value = day;
-        document.getElementById('createCaNhanDay').value = day;
+        const dateFormatted = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        ['createHocTapDay', 'createTapLuyenDay', 'createDeadlineDay', 'createCaNhanDay'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = dateFormatted;
+        });
 
         ['createHocTap', 'createTapLuyen', 'createDeadline', 'createCaNhan'].forEach(prefix => {
             const sw = document.getElementById(`${prefix}BatThongBao`);
@@ -807,8 +832,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tabId === 'hoc-tap-tab') {
             const title = document.getElementById('createHocTapTitle').value.trim();
             if (!title) { showToast('Vui lòng nhập tên môn học.', false); return; }
-            const day = parseInt(document.getElementById('createHocTapDay').value);
-            targetDay = day;
+            const dateStr = document.getElementById('createHocTapDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+            const parts = dateStr.split('-');
+            targetDay = parseInt(parts[2]) || activeSelectedDay;
             const startTime = document.getElementById('createHocTapTime').value || '08:00';
             const endTime = document.getElementById('createHocTapEndTime').value || '10:30';
             const location = document.getElementById('createHocTapLocation').value.trim();
@@ -823,8 +849,8 @@ document.addEventListener('DOMContentLoaded', function () {
             payload = {
                 tieu_de: title,
                 loai_su_kien: 'hoc_tap',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
-                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                thoi_gian_bat_dau: `${dateStr} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${dateStr} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
                 so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1),
@@ -834,8 +860,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (tabId === 'tap-luyen-tab') {
             const title = document.getElementById('createTapLuyenTitle').value.trim();
             if (!title) { showToast('Vui lòng nhập tên buổi tập.', false); return; }
-            const day = parseInt(document.getElementById('createTapLuyenDay').value);
-            targetDay = day;
+            const dateStr = document.getElementById('createTapLuyenDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+            const parts = dateStr.split('-');
+            targetDay = parseInt(parts[2]) || activeSelectedDay;
             const startTime = document.getElementById('createTapLuyenTime').value || '18:00';
             const endTime = document.getElementById('createTapLuyenEndTime').value || '19:30';
             const location = document.getElementById('createTapLuyenLocation').value.trim();
@@ -850,8 +877,8 @@ document.addEventListener('DOMContentLoaded', function () {
             payload = {
                 tieu_de: title,
                 loai_su_kien: 'tap_luyen',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
-                thoi_gian_ket_thuc: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`,
+                thoi_gian_bat_dau: `${dateStr} ${startTime}:00`,
+                thoi_gian_ket_thuc: `${dateStr} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
                 so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1),
@@ -861,8 +888,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (tabId === 'deadline-tab') {
             const title = document.getElementById('createDeadlineTitle').value.trim();
             if (!title) { showToast('Vui lòng nhập tiêu đề deadline.', false); return; }
-            const day = parseInt(document.getElementById('createDeadlineDay').value);
-            targetDay = day;
+            const dateStr = document.getElementById('createDeadlineDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+            const parts = dateStr.split('-');
+            targetDay = parseInt(parts[2]) || activeSelectedDay;
             const time = document.getElementById('createDeadlineTime').value || '23:59';
             const location = document.getElementById('createDeadlineLocation').value.trim();
             const repeat = document.getElementById('createDeadlineRepeat')?.value || 'once';
@@ -876,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function () {
             payload = {
                 tieu_de: title,
                 loai_su_kien: 'deadline',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                thoi_gian_bat_dau: `${dateStr} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
                 so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1),
@@ -886,8 +914,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             const title = document.getElementById('createCaNhanTitle').value.trim();
             if (!title) { showToast('Vui lòng nhập tên sự kiện.', false); return; }
-            const day = parseInt(document.getElementById('createCaNhanDay').value);
-            targetDay = day;
+            const dateStr = document.getElementById('createCaNhanDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+            const parts = dateStr.split('-');
+            targetDay = parseInt(parts[2]) || activeSelectedDay;
             const time = document.getElementById('createCaNhanTime').value || '14:00';
             const location = document.getElementById('createCaNhanLocation').value.trim();
             const repeat = document.getElementById('createCaNhanRepeat')?.value || 'once';
@@ -901,7 +930,7 @@ document.addEventListener('DOMContentLoaded', function () {
             payload = {
                 tieu_de: title,
                 loai_su_kien: 'ca_nhan',
-                thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${time}:00`,
+                thoi_gian_bat_dau: `${dateStr} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
                 so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1),
@@ -922,10 +951,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         dayDetailModal?.hide();
 
+        const evtDateStr = evt.start ? evt.start.substring(0, 10) : `${evt.year || currentYear}-${String(evt.month || currentMonth).padStart(2, '0')}-${String(evt.day || 1).padStart(2, '0')}`;
+
         document.getElementById('editEventId').value = evt.id;
         document.getElementById('editEventType').value = evt.type;
         document.getElementById('editEventTitle').value = evt.title;
-        document.getElementById('editEventDay').value = evt.day;
+        document.getElementById('editEventDay').value = evtDateStr;
         document.getElementById('editEventTime').value = evt.startTime || '08:00';
         document.getElementById('editEventEndTime').value = evt.endTime || '';
         document.getElementById('editEventLocation').value = evt.location || '';
@@ -957,7 +988,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const type = document.getElementById('editEventType').value;
         const title = document.getElementById('editEventTitle').value.trim();
-        const day = parseInt(document.getElementById('editEventDay').value);
+        const dateStr = document.getElementById('editEventDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+        const parts = dateStr.split('-');
+        const day = parseInt(parts[2]) || activeSelectedDay;
         const startTime = document.getElementById('editEventTime').value || '08:00';
         const endTime = document.getElementById('editEventEndTime').value;
         const location = document.getElementById('editEventLocation').value.trim();
@@ -977,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const payload = {
             tieu_de: title,
             loai_su_kien: type,
-            thoi_gian_bat_dau: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${startTime}:00`,
+            thoi_gian_bat_dau: `${dateStr} ${startTime}:00`,
             mo_ta: location,
             bat_thong_bao: document.getElementById('editEventBatThongBao')?.checked || false,
             so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1),
@@ -986,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         if (endTime) {
-            payload.thoi_gian_ket_thuc = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')} ${endTime}:00`;
+            payload.thoi_gian_ket_thuc = `${dateStr} ${endTime}:00`;
         }
 
         await sendEventRequestWithConflictCheck(`/calendar/events/${id}`, 'PUT', payload, editEventModal, day);
@@ -1196,5 +1229,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2. Nạp dữ liệu sự kiện thực từ Database
     loadEventsFromDatabase();
+
+    // 3. Kiểm tra tham số ?action=create trên URL để mở modal Thêm sự kiện
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'create') {
+        setTimeout(() => {
+            openCreateModalWithDay(activeSelectedDay || todayDate.getDate());
+        }, 200);
+    }
 });
 

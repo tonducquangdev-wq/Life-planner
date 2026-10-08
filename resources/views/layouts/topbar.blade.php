@@ -2,8 +2,13 @@
      TOP HEADER THANH CÔNG CỤ TRÊN CÙNG - LIFE PLANNER (COMPACT 58PX)
      ========================================================================== -->
 <header class="top-header">
-    <!-- BÊN TRÁI: NÚT QUAY LẠI LỊCH & TIÊU ĐỀ TRANG -->
-    <div class="topbar-left d-flex align-items-center gap-3">
+    <!-- BÊN TRÁI: NÚT TOGGLE MENU, QUAY LẠI LỊCH & TIÊU ĐỀ TRANG -->
+    <div class="topbar-left d-flex align-items-center gap-2 gap-sm-3">
+        <!-- Nút Toggle Mobile Offcanvas Menu (Màn hình < 1024px) -->
+        <button class="btn btn-light rounded-3 p-1.5 px-2.5 border-0 shadow-2xs topbar-sidebar-toggle" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" title="Mở Menu danh mục">
+            <i class="bi bi-list fs-5 text-dark"></i>
+        </button>
+
         <!-- Nút Quay lại Lịch (Luôn đưa người dùng trực tiếp về /calendar) -->
         <a href="{{ route('calendar.index') }}" class="btn-back-to-calendar" title="Quay lại giao diện Lịch chính">
             <i class="bi bi-arrow-left"></i>
@@ -23,61 +28,8 @@
         </div>
     </div>
 
-    <!-- BÊN PHẢI: DARK MODE, THÔNG BÁO & USER PROFILE DROPDOWN -->
+    <!-- BÊN PHẢI: USER PROFILE DROPDOWN -->
     <div class="topbar-right header-actions d-flex align-items-center gap-2 gap-sm-3">
-        <!-- Nút chuyển chế độ Sáng/Tối (Dark/Light Mode) nhanh -->
-        <button type="button" class="theme-toggle-btn btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 shadow-2xs" id="quickThemeBtn" title="Đổi giao diện Sáng/Tối">
-            <i class="bi {{ (Auth::user()->giao_dien ?? 'light') === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary' }} fs-6" id="quickThemeIcon"></i>
-        </button>
-
-        <!-- Dropdown Thông báo -->
-        <div class="notification-dropdown dropdown">
-            <a href="#" class="notification-btn position-relative text-decoration-none d-flex align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" id="notificationMenuBtn">
-                <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill' : 'bi-bell-slash-fill text-muted' }}" id="mainNotifBellIcon"></i>
-                <span class="badge-dot {{ (Auth::user()->thong_bao_enabled ?? true) ? '' : 'd-none' }}" id="notifBadgeDot"></span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2" style="width: 360px; max-width: 90vw;">
-                <!-- Header Dropdown -->
-                <div class="p-3 border-bottom d-flex align-items-center justify-content-between rounded-top-4 notif-header-bg">
-                    <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
-                        <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill text-primary' : 'bi-bell-slash-fill text-muted' }}" id="notifHeaderIcon"></i>Thông báo
-                        <span class="badge bg-danger rounded-pill fs-8" id="notifCountBadge">3 mới</span>
-                    </h6>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="form-check form-switch m-0 d-flex align-items-center gap-1" title="Bật/tắt nhanh thông báo">
-                            <input class="form-check-input mt-0 cursor-pointer" type="checkbox" role="switch" id="btnQuickToggleNotif" {{ (Auth::user()->thong_bao_enabled ?? true) ? 'checked' : '' }}>
-                        </div>
-                        <button type="button" class="btn btn-link text-decoration-none p-0 fs-8 text-primary fw-semibold" id="btnMarkAllRead">Đã đọc</button>
-                    </div>
-                </div>
-
-                <!-- Danh sách thông báo thực tế -->
-                <div class="notification-list p-2" style="max-height: 300px; overflow-y: auto;">
-                    <a href="#" class="notification-item unread d-flex align-items-start gap-2.5 p-2 rounded-3 text-decoration-none mb-1">
-                        <div class="notif-icon bg-danger-subtle text-danger rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                            <i class="bi bi-exclamation-triangle-fill fs-7"></i>
-                        </div>
-                        <div class="flex-grow-1 min-w-0">
-                            <div class="fw-semibold fs-7 text-truncate">Deadline Nộp đồ án PHP & Laravel</div>
-                            <div class="text-muted fs-8">Hạn nộp: 23:59 hôm nay (Còn 2 giờ)</div>
-                            <small class="text-primary fs-8 fw-semibold">10 phút trước</small>
-                        </div>
-                        <span class="notif-dot bg-primary rounded-circle mt-1" style="width: 6px; height: 6px;"></span>
-                    </a>
-                    <a href="#" class="notification-item unread d-flex align-items-start gap-2.5 p-2 rounded-3 text-decoration-none mb-1">
-                        <div class="notif-icon bg-primary-subtle text-primary rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                            <i class="bi bi-book-fill fs-7"></i>
-                        </div>
-                        <div class="flex-grow-1 min-w-0">
-                            <div class="fw-semibold fs-7 text-truncate">Lịch học: Lập trình Web PHP</div>
-                            <div class="text-muted fs-8">Phòng C.102 &bull; 07:30 - 11:30</div>
-                            <small class="text-primary fs-8 fw-semibold">30 phút trước</small>
-                        </div>
-                        <span class="notif-dot bg-primary rounded-circle mt-1" style="width: 6px; height: 6px;"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
 
         <!-- Avatar người dùng, Tên & Email & Dropdown -->
         <div class="user-profile dropdown">

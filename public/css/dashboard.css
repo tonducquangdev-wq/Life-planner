@@ -6,7 +6,7 @@
     --primary-hover: #4f46e5;
     --primary-light: #e0e7ff;
     --secondary-bg: #f8fafc;
-    --sidebar-width: 250px;
+    --sidebar-width: 260px;
     --sidebar-bg: #0b1120;
     --header-height: 58px;
     --card-radius: 16px;
@@ -15,6 +15,25 @@
     --modal-radius: 20px;
     --card-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
     --card-shadow-hover: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Breakpoints for Sidebar Width Layout Tokens */
+@media (min-width: 1201px) {
+    :root {
+        --sidebar-width: 260px;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+    :root {
+        --sidebar-width: 72px;
+    }
+}
+
+@media (max-width: 1023.98px) {
+    :root {
+        --sidebar-width: 0px;
+    }
 }
 
 html, body {
@@ -288,28 +307,73 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* ==========================================================================
+   MINI SIDEBAR STYLES (DESKTOP 1024PX - 1200PX)
+   ========================================================================== */
+@media (min-width: 1024px) and (max-width: 1200px) {
+    aside.sidebar {
+        width: 72px !important;
+        overflow: hidden;
+    }
+    aside.sidebar .brand-name,
+    aside.sidebar .sidebar-label,
+    aside.sidebar .nav-text,
+    aside.sidebar .sidebar-user-info,
+    aside.sidebar .sidebar-user-action {
+        display: none !important;
+    }
+    aside.sidebar .brand-logo {
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    aside.sidebar .brand-link {
+        justify-content: center !important;
+    }
+    aside.sidebar .sidebar-menu .nav-link {
+        justify-content: center !important;
+        padding: 0.75rem 0 !important;
+        border-radius: 12px !important;
+    }
+    aside.sidebar .sidebar-menu .nav-link .nav-icon-box {
+        margin: 0 !important;
+        font-size: 1.25rem !important;
+    }
+    aside.sidebar .sidebar-user-footer {
+        padding: 0.75rem 0.5rem !important;
+    }
+    aside.sidebar .sidebar-user-card {
+        justify-content: center !important;
+        padding: 0.5rem !important;
+    }
+}
+
+/* ==========================================================================
    2. MAIN WRAPPER (KHUNG NỘI DUNG CHÍNH 100VH)
    ========================================================================== */
 .main-wrapper {
     margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    transition: all 0.3s ease;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* HEADER CỐ ĐỊNH PHÍA TRÊN (COMPACT 58PX) */
+/* HEADER CỐ ĐỊNH PHÍA TRÊN (COMPACT 58PX STICKY TOPBAR) */
 .top-header {
     height: var(--header-height);
-    background-color: #ffffff;
-    padding: 0 1.5rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 0 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
     border-bottom: 1px solid #e2e8f0;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
     z-index: 1030;
 }
 
@@ -318,9 +382,15 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     letter-spacing: -0.2px;
 }
 
+.topbar-sidebar-toggle {
+    display: none;
+}
+
 .search-box {
     position: relative;
-    width: 280px;
+    width: 260px;
+    max-width: 100%;
+    flex-shrink: 1;
 }
 
 .search-box input {
@@ -667,14 +737,17 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* ==========================================================================
-   4. RESPONSIVE (MOBILE & TABLET < 992px)
+   4. RESPONSIVE (TABLET & MOBILE < 1024px)
    ========================================================================== */
-@media (max-width: 991.98px) {
+@media (max-width: 1023.98px) {
     html, body {
-        overflow: auto; /* Cho phép cuộn trang trên mobile */
+        overflow: auto; /* Allow page scroll on mobile/tablet */
     }
     aside.sidebar {
-        display: none !important; /* Cuộn ẩn sidebar cố định thành nút menu */
+        display: none !important;
+    }
+    .topbar-sidebar-toggle {
+        display: inline-flex !important;
     }
     .main-wrapper {
         margin-left: 0 !important;
@@ -685,7 +758,16 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     .content-body {
         height: auto;
         overflow-y: visible;
-        padding: 1.25rem 1rem;
+        padding: 1.25rem 1rem 5rem 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .content-body {
+        padding: 0.85rem 0.65rem 5.5rem 0.65rem !important;
+    }
+    .search-box {
+        width: 160px;
     }
 }
 
@@ -765,6 +847,72 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.5);
 
     --sidebar-bg: #1A1A1D;
+}
+
+/* ==========================================================================
+   GLOBAL RESPONSIVE FORM & COMPONENT ENHANCEMENTS (TASKS UI-03 TO UI-08)
+   ========================================================================== */
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+    .modal-body {
+        padding: 1rem !important;
+    }
+    .modal-header, .modal-footer {
+        padding: 0.75rem 1rem !important;
+    }
+}
+
+.form-control, .form-select, textarea {
+    border: 1px solid #cbd5e1;
+    font-size: 0.875rem;
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus, textarea:focus {
+    border-color: var(--primary-color, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+}
+
+/* Responsive Table & Overflow Prevention */
+.table-responsive {
+    border-radius: 14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    .table-responsive .table th, 
+    .table-responsive .table td {
+        padding: 0.65rem 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Touch Targets for Workout & Checklist Items */
+.checklist-exercise-item, .timer-btn, .workout-action-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+/* Kanban Board & Project Cards Grid Overflow Fix */
+.kanban-board-container, .project-board-wrapper {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.kanban-column {
+    min-width: 280px;
+    scroll-snap-align: start;
 }
 
 [data-bs-theme="dark"] body {
@@ -1637,6 +1785,16 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         right: 0 !important;
         width: 250px;
     }
+
+    /* Native Touch Feel */
+    .card, .custom-card, .stat-card, .btn, .list-group-item {
+        border-radius: 16px !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+
+    .btn:active, .card:active, .custom-card:active {
+        transform: scale(0.97) !important;
+    }
 }
 
 /* ==========================================================================
@@ -1838,23 +1996,4 @@ body.modal-open .floating-menu-container {
     pointer-events: none !important;
     transition: opacity 0.2s ease;
 }
-
-=======
-        bottom: 10px !important;
-        right: 0 !important;
-        width: 260px;
-    }
-
-    /* 5. Cảm giác chạm Rung Chạm (Native Touch Feel) kiểu Flutter */
-    .card, .custom-card, .stat-card, .btn, .list-group-item {
-        border-radius: 16px !important;
-        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-    }
-
-    .btn:active, .card:active, .custom-card:active {
-        transform: scale(0.97) !important;
-    }
-}
-
->>>>>>> aa2de67 (Lưu thay đổi tạm thời)
 

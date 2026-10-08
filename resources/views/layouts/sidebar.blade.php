@@ -2,8 +2,8 @@
      SIDEBAR MENU BÊN TRÁI - LIFE PLANNER (PREMIUM MODERN DASHBOARD)
      ========================================================================== -->
 
-<!-- 1. DESKTOP SIDEBAR (CỐ ĐỊNH BÊN TRÁI TRÊN MÀN HÌNH MÁY TÍNH >= 992px) -->
-<aside class="sidebar d-none d-lg-flex" id="sidebar">
+<!-- 1. DESKTOP SIDEBAR (CỐ ĐỊNH BÊN TRÁI TRÊN MÀN HÌNH >= 1024PX) -->
+<aside class="sidebar" id="sidebar">
     <!-- Logo thương hiệu Hiện đại & Tinh tế -->
     <div class="brand-logo">
         <a href="{{ route('calendar.index') }}" class="brand-link text-decoration-none d-flex align-items-center gap-3">
@@ -23,7 +23,8 @@
             <!-- 1. Lịch -->
             <li class="nav-item">
                 <a href="{{ route('calendar.index') }}" 
-                   class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}">
+                   class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}"
+                   title="Lịch">
                     <span class="nav-icon-box"><i class="bi bi-calendar3"></i></span>
                     <span class="nav-text">Lịch</span>
                 </a>
@@ -32,31 +33,34 @@
             <!-- 2. Công việc & Dự án -->
             <li class="nav-item">
                 <a href="{{ route('cong-viec.index') }}" 
-                   class="nav-link {{ request()->routeIs(['cong-viec.*', 'du-an.*']) ? 'active' : '' }}">
+                   class="nav-link {{ request()->routeIs(['cong-viec.*', 'du-an.*']) ? 'active' : '' }}"
+                   title="Công việc & Dự án">
                     <span class="nav-icon-box"><i class="bi bi-briefcase-fill"></i></span>
                     <span class="nav-text">Công việc & Dự án</span>
                 </a>
             </li>
 
-            <!-- 2. Báo cáo học tập -->
+            <!-- 3. Báo cáo học tập -->
             <li class="nav-item">
                 <a href="{{ Route::has('bao-cao-hoc-tap.index') ? route('bao-cao-hoc-tap.index') : '#' }}" 
-                   class="nav-link {{ request()->routeIs(['bao-cao-hoc-tap.*', 'mon-hoc.*']) ? 'active' : '' }}">
+                   class="nav-link {{ request()->routeIs(['bao-cao-hoc-tap.*', 'mon-hoc.*']) ? 'active' : '' }}"
+                   title="Báo cáo học tập">
                     <span class="nav-icon-box"><i class="bi bi-mortarboard-fill"></i></span>
                     <span class="nav-text">Báo cáo học tập</span>
                 </a>
             </li>
 
-            <!-- 3. Báo cáo tập luyện (Active trên cả tap-luyen và bao-cao-tap-luyen) -->
+            <!-- 4. Báo cáo tập luyện -->
             <li class="nav-item">
                 <a href="{{ route('tap-luyen.index') }}" 
-                   class="nav-link {{ request()->routeIs(['tap-luyen.*', 'bao-cao-tap-luyen.*']) ? 'active' : '' }}">
+                   class="nav-link {{ request()->routeIs(['tap-luyen.*', 'bao-cao-tap-luyen.*']) ? 'active' : '' }}"
+                   title="Báo cáo tập luyện">
                     <span class="nav-icon-box"><i class="bi bi-heart-pulse-fill"></i></span>
                     <span class="nav-text">Báo cáo tập luyện</span>
                 </a>
             </li>
 
-            <!-- 4. Hồ sơ cá nhân (Mở Modal) -->
+            <!-- 5. Hồ sơ cá nhân -->
             <li class="nav-item">
                 <a href="#" 
                    class="nav-link btn-open-profile-modal cursor-pointer"
@@ -92,8 +96,8 @@
     </div>
 </aside>
 
-<!-- 2. MOBILE & TABLET OFFCANVAS SIDEBAR (MỞ BẰNG NÚT TOGGLE TRÊN MÀN HÌNH < 992px) -->
-<div class="offcanvas offcanvas-start border-0 shadow-lg d-lg-none modern-offcanvas" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+<!-- 2. MOBILE & TABLET OFFCANVAS SIDEBAR (MỞ BẰNG NÚT TOGGLE TRÊN MÀN HÌNH < 1024PX) -->
+<div class="offcanvas offcanvas-start border-0 shadow-lg modern-offcanvas" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
     <div class="offcanvas-header p-3 px-4 border-bottom">
         <a href="{{ route('calendar.index') }}" class="text-decoration-none d-flex align-items-center gap-3">
             <div class="brand-icon-wrapper">

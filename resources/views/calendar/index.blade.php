@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
+<html lang="vi" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -7,25 +7,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Life Planner - Lịch Cá Nhân (Calendar First)</title>
 
-    <!-- Kịch bản Khởi tạo Giao diện Sáng/Tối chống giật trang (Anti-Flicker) -->
+    <!-- Khởi tạo Giao diện Sáng (Light Theme Only) -->
     <script>
         (function() {
-            var userTheme = "{{ Auth::check() ? (Auth::user()->giao_dien ?? 'system') : 'system' }}";
-            var savedTheme = localStorage.getItem('theme');
-            var themeToApply = 'light';
-            if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
-                themeToApply = savedTheme;
-            } else if (userTheme && (userTheme === 'dark' || userTheme === 'light')) {
-                themeToApply = userTheme;
-            } else {
-                themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.setAttribute('data-bs-theme', themeToApply);
-            if (themeToApply === 'dark') {
-                document.documentElement.classList.add('dark-theme');
-            } else {
-                document.documentElement.classList.remove('dark-theme');
-            }
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            document.documentElement.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
         })();
     </script>
 
@@ -71,90 +58,8 @@
                 </div>
             </div>
 
-            <!-- Khu vực người dùng & nút Thông báo -->
+            <!-- Khu vực người dùng -->
             <div class="header-actions d-flex align-items-center gap-3">
-
-                <!-- Nút chuyển chế độ Dark/Light Mode nhanh -->
-                <button type="button" class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 shadow-xs text-dark" id="quickThemeBtn" title="Đổi chế độ Sáng/Tối">
-                    <i class="bi {{ (Auth::user()->giao_dien ?? 'light') === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary' }} fs-5" id="quickThemeIcon"></i>
-                </button>
-
-                <!-- Nút Thông báo & Dropdown Menu -->
-                <div class="notification-dropdown dropdown">
-                    <a href="#" class="notification-btn position-relative text-dark text-decoration-none d-flex align-items-center justify-content-center" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" id="notificationMenuBtn">
-                        <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill text-dark' : 'bi-bell-slash-fill text-muted' }} fs-5" id="mainNotifBellIcon"></i>
-                        <span class="badge-dot {{ (Auth::user()->thong_bao_enabled ?? true) ? '' : 'd-none' }}" id="notifBadgeDot"></span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-0 mt-2" style="width: 380px; max-width: 90vw;">
-                        <!-- Header Dropdown -->
-                        <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light rounded-top-4">
-                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                                <i class="bi {{ (Auth::user()->thong_bao_enabled ?? true) ? 'bi-bell-fill text-primary' : 'bi-bell-slash-fill text-muted' }}" id="notifHeaderIcon"></i>Thông báo
-                                <span class="badge bg-danger rounded-pill fs-8" id="notifCountBadge">3 mới</span>
-                            </h6>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="form-check form-switch m-0 d-flex align-items-center gap-1" title="Bật/tắt nhanh thông báo">
-                                    <input class="form-check-input mt-0 cursor-pointer" type="checkbox" role="switch" id="btnQuickToggleNotif" {{ (Auth::user()->thong_bao_enabled ?? true) ? 'checked' : '' }}>
-                                </div>
-                                <button type="button" class="btn btn-link text-decoration-none p-0 fs-8 text-primary fw-semibold" id="btnMarkAllRead">Đã đọc</button>
-                            </div>
-                        </div>
-
-
-                        <!-- Danh sách thông báo thực tế của Life Planner -->
-                        <div class="notification-list p-2" style="max-height: 340px; overflow-y: auto;">
-                            <!-- 1. Deadline gấp -->
-                            <a href="#" class="notification-item unread d-flex align-items-start gap-3 p-2.5 rounded-3 text-decoration-none text-dark mb-1">
-                                <div class="notif-icon bg-danger-subtle text-danger rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-exclamation-triangle-fill fs-6"></i>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="fw-semibold fs-7 text-dark text-truncate">Deadline Nộp đồ án PHP & Laravel</div>
-                                    <div class="text-muted fs-8">Hạn nộp: 23:59 hôm nay (Còn 2 giờ nữa)</div>
-                                    <small class="text-primary fs-8 fw-semibold">10 phút trước</small>
-                                </div>
-                                <span class="notif-dot bg-primary rounded-circle mt-1" style="width: 7px; height: 7px;"></span>
-                            </a>
-
-                            <!-- 2. Lịch học sắp tới -->
-                            <a href="#" class="notification-item unread d-flex align-items-start gap-3 p-2.5 rounded-3 text-decoration-none text-dark mb-1">
-                                <div class="notif-icon bg-primary-subtle text-primary rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-book-fill fs-6"></i>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="fw-semibold fs-7 text-dark text-truncate">Sắp diễn ra: Lập trình Web</div>
-                                    <div class="text-muted fs-8">08:00 - 10:30 • Phòng B2.04</div>
-                                    <small class="text-primary fs-8 fw-semibold">30 phút trước</small>
-                                </div>
-                                <span class="notif-dot bg-primary rounded-circle mt-1" style="width: 7px; height: 7px;"></span>
-                            </a>
-
-                            <!-- 3. Lịch tập sắp tới -->
-                            <a href="#" class="notification-item unread d-flex align-items-start gap-3 p-2.5 rounded-3 text-decoration-none text-dark mb-1">
-                                <div class="notif-icon bg-success-subtle text-success rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-activity fs-6"></i>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="fw-semibold fs-7 text-dark text-truncate">Sắp diễn ra: Ngực - Vai - Tay sau</div>
-                                    <div class="text-muted fs-8">18:00 - 19:30 • Fitness Center</div>
-                                    <small class="text-muted fs-8">1 giờ trước</small>
-                                </div>
-                            </a>
-
-                            <!-- 4. Sự kiện cá nhân -->
-                            <a href="#" class="notification-item read d-flex align-items-start gap-3 p-2.5 rounded-3 text-decoration-none text-dark opacity-75">
-                                <div class="notif-icon bg-purple-subtle text-purple rounded-circle p-2 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: #faf5ff; color: #7e22ce;">
-                                    <i class="bi bi-person-fill fs-6"></i>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="fw-semibold fs-7 text-dark text-truncate">Họp nhóm Đồ án Life Planner</div>
-                                    <div class="text-muted fs-8">14:00 - 15:30 • Google Meet</div>
-                                    <small class="text-muted fs-8">Hôm qua</small>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Avatar người dùng & dropdown -->
                 <div class="user-profile dropdown">
@@ -203,7 +108,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <h5 class="fw-bold text-dark mb-0 fs-5 d-flex align-items-center gap-2">
                                         <i class="bi bi-calendar3 text-primary"></i>
-                                        <span id="currentMonthTitle">Tháng 9, 2026</span>
+                                        <span id="currentMonthTitle">{{ $currentMonthYear ?? ('Ngày ' . date('j') . ', Tháng ' . date('n') . ', ' . date('Y')) }}</span>
                                     </h5>
                                     <div class="btn-group border rounded-pill p-1 bg-light ms-1">
                                         <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnPrevMonth" title="Xem trước (Tuần/Tháng)">
@@ -215,8 +120,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Nút chuyển đổi Chế độ xem: Tuần / Tháng -->
-                                <div class="btn-group border rounded-pill p-1 bg-light ms-auto" id="calendarViewModeGroup">
+                                <!-- Nút chuyển đổi Chế độ xem: Tuần / Tháng (Tự động ẩn trên Mobile) -->
+                                <div class="btn-group border rounded-pill p-1 bg-light ms-auto d-none d-md-flex" id="calendarViewModeGroup">
                                     <button type="button" class="btn btn-sm btn-white rounded-pill px-2.5 py-1 shadow-none active fw-semibold" id="btnViewModeWeek" title="Chế độ Lịch Tuần">
                                         <i class="bi bi-calendar-week me-1"></i>Tuần
                                     </button>
@@ -226,8 +131,8 @@
                                 </div>
                             </div>
 
-                            <!-- NÚT LỌC MÀU SỰ KIỆN ĐA LỰA CHỌN -->
-                            <div class="d-flex flex-wrap align-items-center gap-2" id="calendarFilterGroup">
+                            <!-- NÚT LỌC MÀU SỰ KIỆN ĐA LỰA CHỌN (TỰ ĐỘNG ẨN TRÊN MOBILE) -->
+                            <div class="d-none d-md-flex flex-wrap align-items-center gap-2" id="calendarFilterGroup">
                                 <button type="button" class="legend-btn active" data-filter="all">
                                     <i class="bi bi-grid-fill me-1 fs-8"></i>Tất cả
                                 </button>
@@ -273,25 +178,6 @@
                                         <!-- Dynamic render via calendar.js -->
                                     </div>
                                 </div>
-
-                                <!-- Thẻ danh sách Lịch trình chi tiết trong ngày được chọn -->
-                                <div class="mobile-day-schedule-card p-3 rounded-4 border bg-white shadow-xs">
-                                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-                                        <div>
-                                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" id="mobileSelectedDayTitle">
-                                                <i class="bi bi-calendar-event text-primary fs-5"></i>
-                                                <span>Lịch trình ngày 14/09/2026</span>
-                                            </h6>
-                                            <small class="text-muted fs-8" id="mobileSelectedDaySubtitle">Bấm vào các ngày ở trên để chuyển lịch trình</small>
-                                        </div>
-                                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-2xs fw-semibold" id="btnMobileAddEvent">
-                                            <i class="bi bi-plus-lg me-1"></i>Thêm
-                                        </button>
-                                    </div>
-                                    <div class="mobile-day-events-list" id="mobileDayEventsList">
-                                        <!-- Dynamic render via calendar.js -->
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -301,8 +187,8 @@
                 <!-- CỘT PHẢI (25% DESKTOP | 100% TABLET/MOBILE CHUYỂN XUỐNG DƯỚI): LỊCH TRÌNH & DEADLINE -->
                 <div class="col-12 col-lg-4 col-xl-3 pb-5 pb-lg-0">
 
-                    <!-- CARD 1: LỊCH TRÌNH HÔM NAY -->
-                    <div class="side-card rounded-4 border-0 shadow-sm mb-3">
+                    <!-- CARD 1: LỊCH TRÌNH HÔM NAY (HIỂN THỊ TRÊN DESKTOP, ẨN TRÊN MOBILE VÌ ĐÃ CÓ TRONG LỊCH TUẦN) -->
+                    <div class="side-card rounded-4 border-0 shadow-sm mb-3 d-none d-lg-block">
                         <div class="side-card-header">
                             <h6 class="side-card-title">
                                 <i class="bi bi-clock-history text-primary"></i>
@@ -474,11 +360,7 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-3">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Ngày diễn ra</label>
-                                        <select class="form-select rounded-3" id="createHocTapDay">
-                                            @for($i=1; $i<=30; $i++)
-                                                <option value="{{ $i }}" {{ $i == 14 ? 'selected' : '' }}>Ngày {{ $i }}/09/2026</option>
-                                                @endfor
-                                        </select>
+                                        <input type="date" class="form-control rounded-3" id="createHocTapDay" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Giờ bắt đầu</label>
@@ -543,11 +425,7 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-3">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Ngày bắt đầu tập</label>
-                                        <select class="form-select rounded-3" id="createTapLuyenDay">
-                                            @for($i=1; $i<=30; $i++)
-                                                <option value="{{ $i }}" {{ $i == 14 ? 'selected' : '' }}>Ngày {{ $i }}/09/2026</option>
-                                                @endfor
-                                        </select>
+                                        <input type="date" class="form-control rounded-3" id="createTapLuyenDay" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Giờ bắt đầu</label>
@@ -612,11 +490,7 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Ngày hạn nộp</label>
-                                        <select class="form-select rounded-3" id="createDeadlineDay">
-                                            @for($i=1; $i<=30; $i++)
-                                                <option value="{{ $i }}" {{ $i == 14 ? 'selected' : '' }}>Ngày {{ $i }}/09/2026</option>
-                                                @endfor
-                                        </select>
+                                        <input type="date" class="form-control rounded-3" id="createDeadlineDay" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Giờ nộp</label>
@@ -677,11 +551,7 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Ngày diễn ra</label>
-                                        <select class="form-select rounded-3" id="createCaNhanDay">
-                                            @for($i=1; $i<=30; $i++)
-                                                <option value="{{ $i }}" {{ $i == 14 ? 'selected' : '' }}>Ngày {{ $i }}/09/2026</option>
-                                                @endfor
-                                        </select>
+                                        <input type="date" class="form-control rounded-3" id="createCaNhanDay" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold fs-7 text-secondary">Thời gian</label>
@@ -774,12 +644,8 @@
                         </div>
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-semibold fs-7 text-secondary">Ngày</label>
-                                <select class="form-select rounded-3" id="editEventDay">
-                                    @for($i=1; $i<=30; $i++)
-                                        <option value="{{ $i }}">Ngày {{ $i }}/09/2026</option>
-                                        @endfor
-                                </select>
+                                <label class="form-label fw-semibold fs-7 text-secondary">Ngày diễn ra</label>
+                                <input type="date" class="form-control rounded-3" id="editEventDay" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold fs-7 text-secondary">Giờ bắt đầu</label>
@@ -914,49 +780,6 @@
                     .catch(err => {
                         console.error('Lỗi cập nhật thông báo:', err);
                     });
-            });
-
-            // Quick Theme Toggle Script (Dark Mode / Light Mode)
-            const quickThemeBtn = document.getElementById('quickThemeBtn');
-            const quickThemeIcon = document.getElementById('quickThemeIcon');
-
-            const currentTheme = localStorage.getItem('theme') || "{{ Auth::user()->giao_dien ?? 'light' }}";
-            if (currentTheme === 'dark') {
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                document.body.classList.add('dark-theme');
-                if (quickThemeIcon) quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-5';
-            } else if (currentTheme === 'light') {
-                document.documentElement.setAttribute('data-bs-theme', 'light');
-                document.body.classList.remove('dark-theme');
-                if (quickThemeIcon) quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-5';
-            }
-
-            quickThemeBtn?.addEventListener('click', function() {
-                const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-                const newTheme = isDark ? 'light' : 'dark';
-
-                document.documentElement.setAttribute('data-bs-theme', newTheme);
-                if (newTheme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    if (quickThemeIcon) quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-5';
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    if (quickThemeIcon) quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-5';
-                }
-                localStorage.setItem('theme', newTheme);
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                fetch("{{ route('profile.theme.quick-toggle') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken || '',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        giao_dien: newTheme
-                    })
-                });
             });
         });
     </script>

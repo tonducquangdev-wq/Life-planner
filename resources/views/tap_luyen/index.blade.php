@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
+<html lang="vi" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -1073,54 +1073,8 @@
     <!-- Script Chức năng Thể Chất / Tập Luyện -->
     <script src="{{ asset('js/tap-luyen.js') }}"></script>
 
-    <!-- Đồng bộ Theme Icon khi đổi theme -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const quickThemeBtn = document.getElementById('quickThemeBtn');
-            const quickThemeIcon = document.getElementById('quickThemeIcon');
-
-            function syncThemeIcon(theme) {
-                if (!quickThemeIcon) return;
-                if (theme === 'dark') {
-                    quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-6';
-                } else {
-                    quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-6';
-                }
-            }
-
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-            syncThemeIcon(currentTheme);
-
-            if (quickThemeBtn) {
-                quickThemeBtn.addEventListener('click', function () {
-                    const activeTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-                    const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
-
-                    document.documentElement.setAttribute('data-bs-theme', newTheme);
-                    if (newTheme === 'dark') {
-                        document.documentElement.classList.add('dark-theme');
-                    } else {
-                        document.documentElement.classList.remove('dark-theme');
-                    }
-                    localStorage.setItem('theme', newTheme);
-                    syncThemeIcon(newTheme);
-
-                    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
-
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                    if (csrfToken) {
-                        fetch("{{ route('profile.theme.quick-toggle') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": csrfToken,
-                                "Accept": "application/json"
-                            },
-                            body: JSON.stringify({ theme: newTheme })
-                        }).catch(err => console.log('Lỗi lưu giao diện:', err));
-                    }
-                });
-            }
 
             const btnQuickToggleNotif = document.getElementById('btnQuickToggleNotif');
             if (btnQuickToggleNotif) {

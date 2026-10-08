@@ -117,29 +117,17 @@
                             @method('PATCH')
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark fs-8 mb-2">Chế độ giao diện (Theme)</label>
-                                <div class="row g-2">
-                                    <div class="col-4">
-                                        <label class="theme-card-option border rounded-3 p-2.5 d-block cursor-pointer text-center position-relative h-100">
-                                            <input class="form-check-input position-absolute top-0 end-0 m-2 theme-radio-input" type="radio" name="giao_dien" value="light" {{ old('giao_dien', $user->giao_dien ?? 'light') === 'light' ? 'checked' : '' }}>
-                                            <i class="bi bi-sun-fill text-warning fs-4 d-block mb-1"></i>
-                                            <span class="fw-semibold text-dark fs-8 d-block">Sáng</span>
-                                        </label>
+                                <div class="border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-sun-fill text-warning fs-4"></i>
+                                        <div>
+                                            <div class="fw-bold text-dark fs-7">Giao diện Sáng (Light Mode)</div>
+                                            <small class="text-muted fs-8">Hệ thống đã chuẩn hóa duy nhất Giao diện Sáng hiện đại & tối ưu di động.</small>
+                                        </div>
                                     </div>
-                                    <div class="col-4">
-                                        <label class="theme-card-option border rounded-3 p-2.5 d-block cursor-pointer text-center position-relative h-100">
-                                            <input class="form-check-input position-absolute top-0 end-0 m-2 theme-radio-input" type="radio" name="giao_dien" value="dark" {{ old('giao_dien', $user->giao_dien ?? 'light') === 'dark' ? 'checked' : '' }}>
-                                            <i class="bi bi-moon-stars-fill text-primary fs-4 d-block mb-1"></i>
-                                            <span class="fw-semibold text-dark fs-8 d-block">Tối</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="theme-card-option border rounded-3 p-2.5 d-block cursor-pointer text-center position-relative h-100">
-                                            <input class="form-check-input position-absolute top-0 end-0 m-2 theme-radio-input" type="radio" name="giao_dien" value="system" {{ old('giao_dien', $user->giao_dien ?? 'light') === 'system' ? 'checked' : '' }}>
-                                            <i class="bi bi-display text-secondary fs-4 d-block mb-1"></i>
-                                            <span class="fw-semibold text-dark fs-8 d-block">Hệ thống</span>
-                                        </label>
-                                    </div>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-8">Đang áp dụng</span>
                                 </div>
+                                <input type="hidden" name="giao_dien" value="light">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark fs-8 mb-2">Ngôn ngữ hiển thị</label>
@@ -358,21 +346,12 @@
                 if (btn) btn.disabled = true;
 
                 const formData = new FormData(this);
-                const selectedTheme = formData.get('giao_dien') || 'light';
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-                // Apply theme immediately client-side
-                let themeToApply = selectedTheme;
-                if (selectedTheme === 'system') {
-                    themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                document.documentElement.setAttribute('data-bs-theme', themeToApply);
-                if (themeToApply === 'dark') {
-                    document.body.classList.add('dark-theme');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                }
-                localStorage.setItem('theme', selectedTheme);
+                // Always enforce light theme
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
 
                 fetch(this.action, {
                     method: 'POST',
