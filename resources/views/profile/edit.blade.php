@@ -37,7 +37,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Tùy chỉnh Dashboard -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+
     <style>
         .profile-cover-banner {
             background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #3b82f6 100%);
@@ -446,5 +447,9 @@
             });
         });
     </script>
+
+    <!-- Floating Action Menu & Mobile Bottom Navigation Bar -->
+    <x-floating-menu />
 </body>
 </html>
+

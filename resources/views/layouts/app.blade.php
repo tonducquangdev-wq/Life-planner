@@ -153,7 +153,11 @@
     @stack('scripts')
     <!-- Floating Action Menu (Góc phải bên dưới) -->
     <x-floating-menu />
+
+    <!-- Mobile Bottom Navigation Bar (Flutter Style) -->
+    @include('layouts.bottom-nav')
 </body>
 
 </html>
+
 

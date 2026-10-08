@@ -37,8 +37,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Tùy chỉnh Dashboard & Calendar -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ time() }}">
+
 </head>
 
 <body>
@@ -198,17 +199,29 @@
                     <div class="custom-card mb-0 h-100 border-0 shadow-sm rounded-4">
                         <!-- HEADER CARD LỊCH: THÁNG & NÚT LỌC MÀU SỰ KIỆN -->
                         <div class="card-header-custom flex-wrap gap-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <h5 class="fw-bold text-dark mb-0 fs-5 d-flex align-items-center gap-2">
-                                    <i class="bi bi-calendar3 text-primary"></i>
-                                    <span id="currentMonthTitle">Tháng 9, 2026</span>
-                                </h5>
-                                <div class="btn-group border rounded-pill p-1 bg-light">
-                                    <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnPrevMonth" title="Tháng trước">
-                                        <i class="bi bi-chevron-left"></i>
+                            <div class="d-flex align-items-center justify-content-between w-100 w-sm-auto gap-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h5 class="fw-bold text-dark mb-0 fs-5 d-flex align-items-center gap-2">
+                                        <i class="bi bi-calendar3 text-primary"></i>
+                                        <span id="currentMonthTitle">Tháng 9, 2026</span>
+                                    </h5>
+                                    <div class="btn-group border rounded-pill p-1 bg-light ms-1">
+                                        <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnPrevMonth" title="Xem trước (Tuần/Tháng)">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnNextMonth" title="Xem sau (Tuần/Tháng)">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Nút chuyển đổi Chế độ xem: Tuần / Tháng -->
+                                <div class="btn-group border rounded-pill p-1 bg-light ms-auto" id="calendarViewModeGroup">
+                                    <button type="button" class="btn btn-sm btn-white rounded-pill px-2.5 py-1 shadow-none active fw-semibold" id="btnViewModeWeek" title="Chế độ Lịch Tuần">
+                                        <i class="bi bi-calendar-week me-1"></i>Tuần
                                     </button>
-                                    <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnNextMonth" title="Tháng sau">
-                                        <i class="bi bi-chevron-right"></i>
+                                    <button type="button" class="btn btn-sm btn-white rounded-pill px-2.5 py-1 shadow-none fw-semibold" id="btnViewModeMonth" title="Chế độ Lịch Tháng">
+                                        <i class="bi bi-calendar-month me-1"></i>Tháng
                                     </button>
                                 </div>
                             </div>
@@ -236,8 +249,9 @@
                             </div>
                         </div>
 
-                        <!-- LƯỚI LỊCH THÁNG LỚN (7 CỘT) -->
+                        <!-- KHO NỘI DUNG LỊCH (LỊCH THÁNG HOẶC LỊCH TUẦN MOBILE) -->
                         <div class="card-body p-2 p-md-3">
+                            <!-- 1. LƯỚI LỊCH THÁNG LỚN (7 CỘT) -->
                             <div class="calendar-grid-container" id="calendarGrid">
                                 <!-- Hàng 0: Header thứ (CN -> T7) -->
                                 <div class="calendar-header-day weekend">CN</div>
@@ -250,7 +264,37 @@
 
                                 <!-- Dynamic render via calendar.js -->
                             </div>
+
+                            <!-- 2. KHUNG LỊCH TUẦN MOBILE (FLUTTER STYLE) -->
+                            <div class="mobile-week-calendar-container d-none" id="mobileWeekCalendar">
+                                <!-- Thanh trượt 7 ngày trong tuần -->
+                                <div class="week-strip-wrapper mb-3">
+                                    <div class="week-strip-grid" id="weekStripGrid">
+                                        <!-- Dynamic render via calendar.js -->
+                                    </div>
+                                </div>
+
+                                <!-- Thẻ danh sách Lịch trình chi tiết trong ngày được chọn -->
+                                <div class="mobile-day-schedule-card p-3 rounded-4 border bg-white shadow-xs">
+                                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" id="mobileSelectedDayTitle">
+                                                <i class="bi bi-calendar-event text-primary fs-5"></i>
+                                                <span>Lịch trình ngày 14/09/2026</span>
+                                            </h6>
+                                            <small class="text-muted fs-8" id="mobileSelectedDaySubtitle">Bấm vào các ngày ở trên để chuyển lịch trình</small>
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-2xs fw-semibold" id="btnMobileAddEvent">
+                                            <i class="bi bi-plus-lg me-1"></i>Thêm
+                                        </button>
+                                    </div>
+                                    <div class="mobile-day-events-list" id="mobileDayEventsList">
+                                        <!-- Dynamic render via calendar.js -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -959,7 +1003,8 @@
     <x-floating-menu />
 
     <!-- Custom Calendar JS Engine -->
-    <script src="{{ asset('js/calendar.js') }}"></script>
+    <script src="{{ asset('js/calendar.js') }}?v={{ time() }}"></script>
 </body>
+
 
 </html>

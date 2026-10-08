@@ -13,10 +13,23 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentMonth = todayDate.getMonth() + 1;
     let activeSelectedDay = todayDate.getDate();
 
+    // Chế độ xem Lịch: 'week' (Lịch Tuần Mobile - Mặc định trên màn hình < 768px) hoặc 'month' (Lịch Tháng)
+    let calendarViewMode = (window.innerWidth < 768) ? 'week' : 'month';
+
+    function getStartOfWeek(d) {
+        const date = new Date(d);
+        const day = date.getDay(); // 0: CN -> 6: T7
+        const diff = date.getDate() - day;
+        return new Date(date.setDate(diff));
+    }
+
+    let currentWeekStartDate = getStartOfWeek(todayDate);
+
     const currentMonthTitleEl = document.getElementById('currentMonthTitle');
     if (currentMonthTitleEl) {
         currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
     }
+
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -221,12 +234,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ==========================================================================
-    // 4. RENDER CALENDAR GRID
+    // 4. RENDER CALENDAR GRID (ĐA CHẾ ĐỘ: TUẦN / THÁNG)
     // ==========================================================================
     function renderCalendarGrid() {
         disposeTooltips();
         const calendarGrid = document.getElementById('calendarGrid');
+        const mobileWeekCalendar = document.getElementById('mobileWeekCalendar');
+
+        if (calendarViewMode === 'week') {
+            if (calendarGrid) calendarGrid.classList.add('d-none');
+            if (mobileWeekCalendar) mobileWeekCalendar.classList.remove('d-none');
+            renderWeekCalendarView();
+        } else {
+            if (calendarGrid) calendarGrid.classList.remove('d-none');
+            if (mobileWeekCalendar) mobileWeekCalendar.classList.add('d-none');
+            renderMonthCalendarGrid();
+        }
+        renderTodaySchedule();
+    }
+
+    /**
+     * Render Chế độ Lịch Tháng (Desktop / Laptop View)
+     */
+    function renderMonthCalendarGrid() {
+        const calendarGrid = document.getElementById('calendarGrid');
         if (!calendarGrid) return;
+
+        if (currentMonthTitleEl) {
+            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+        }
 
         const headerHtml = `
             <div class="calendar-header-day weekend">CN</div>
@@ -303,8 +339,176 @@ document.addEventListener('DOMContentLoaded', function () {
         tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el, { container: 'body' }));
 
         attachCellClickHandlers();
-        renderTodaySchedule();
     }
+
+    /**
+     * Render Chế độ Lịch Tuần Mobile (7 ngày dạng strip + danh sách lịch trình)
+     */
+    function renderWeekCalendarView() {
+        const weekStripGrid = document.getElementById('weekStripGrid');
+        const mobileDayEventsList = document.getElementById('mobileDayEventsList');
+        const mobileSelectedDayTitle = document.getElementById('mobileSelectedDayTitle');
+        if (!weekStripGrid) return;
+
+        const weekDays = [];
+        const today = new Date();
+        const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(currentWeekStartDate);
+            d.setDate(currentWeekStartDate.getDate() + i);
+
+            const isToday = (d.getFullYear() === today.getFullYear() &&
+                             d.getMonth() === today.getMonth() &&
+                             d.getDate() === today.getDate());
+
+            weekDays.push({
+                dateObj: d,
+                day: d.getDate(),
+                month: d.getMonth() + 1,
+                year: d.getFullYear(),
+                dayName: dayNames[d.getDay()],
+                isToday: isToday
+            });
+        }
+
+        const firstDay = weekDays[0];
+        const lastDay = weekDays[6];
+        if (currentMonthTitleEl) {
+            currentMonthTitleEl.textContent = `Tháng ${firstDay.month}, ${firstDay.year} (${firstDay.day} - ${lastDay.day} Thg ${lastDay.month})`;
+        }
+
+        let selectedInWeek = weekDays.find(w => w.day === activeSelectedDay && w.month === currentMonth);
+        if (!selectedInWeek) {
+            selectedInWeek = weekDays.find(w => w.isToday) || weekDays[0];
+            activeSelectedDay = selectedInWeek.day;
+            currentMonth = selectedInWeek.month;
+            currentYear = selectedInWeek.year;
+        }
+
+        let stripHtml = '';
+        weekDays.forEach(w => {
+            const dayEvents = getEventsForDay(w.day, true, w.month, w.year);
+            const filtered = dayEvents.filter(e => activeFilters.size === 0 || activeFilters.has(e.type));
+
+            const types = Array.from(new Set(filtered.map(e => e.type))).slice(0, 3);
+            let dotsHtml = '';
+            types.forEach(t => {
+                dotsHtml += `<span class="event-dot ${t}"></span>`;
+            });
+
+            const isActive = (w.day === activeSelectedDay && w.month === currentMonth && w.year === currentYear) ? 'active' : '';
+            const todayClass = w.isToday ? 'is-today' : '';
+
+            stripHtml += `
+                <div class="week-day-card ${isActive} ${todayClass}" data-day="${w.day}" data-month="${w.month}" data-year="${w.year}">
+                    <span class="day-name">${w.dayName}</span>
+                    <span class="day-number">${w.day}</span>
+                    <div class="event-dots-row">
+                        ${dotsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        weekStripGrid.innerHTML = stripHtml;
+
+        weekStripGrid.querySelectorAll('.week-day-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const day = parseInt(this.getAttribute('data-day'));
+                const month = parseInt(this.getAttribute('data-month'));
+                const year = parseInt(this.getAttribute('data-year'));
+
+                activeSelectedDay = day;
+                currentMonth = month;
+                currentYear = year;
+
+                renderWeekCalendarView();
+            });
+        });
+
+        if (mobileSelectedDayTitle) {
+            const selectedDateObj = new Date(currentYear, currentMonth - 1, activeSelectedDay);
+            const dayOfWeekStr = dayNames[selectedDateObj.getDay()];
+            mobileSelectedDayTitle.innerHTML = `<i class="bi bi-calendar-event text-primary fs-5"></i> Lịch trình ${dayOfWeekStr}, ${String(activeSelectedDay).padStart(2, '0')}/${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+        }
+
+        if (mobileDayEventsList) {
+            const selectedEvents = getEventsForDay(activeSelectedDay, true, currentMonth, currentYear);
+            const filteredEvents = selectedEvents.filter(e => activeFilters.size === 0 || activeFilters.has(e.type));
+            filteredEvents.sort((a, b) => a.time.localeCompare(b.time));
+
+            if (filteredEvents.length === 0) {
+                mobileDayEventsList.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x text-muted fs-1 d-block mb-2"></i>
+                        <div class="fw-bold text-dark fs-7 mb-1">Chưa có lịch trình cho ngày này</div>
+                        <p class="text-muted fs-8 mb-3">Bạn chưa có bài tập, môn học hay deadline nào được lên lịch.</p>
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btnMobileEmptyAdd">
+                            <i class="bi bi-plus-lg me-1"></i>Thêm sự kiện mới
+                        </button>
+                    </div>
+                `;
+                document.getElementById('btnMobileEmptyAdd')?.addEventListener('click', function () {
+                    openCreateModalWithDay(activeSelectedDay);
+                });
+            } else {
+                let agendaHtml = '';
+                filteredEvents.forEach(evt => {
+                    const iconClass = typeIconMap[evt.type] || 'bi-calendar';
+                    const notifTag = evt.batThongBao ? `<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8">🔔 Nhắc trước ${evt.soNgayNhac || 1}d</span>` : '';
+                    const repeatTag = (evt.quyTacLap && evt.quyTacLap !== 'once') ? `<span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0.5 fs-8">🔄 Lặp</span>` : '';
+
+                    agendaHtml += `
+                        <div class="mobile-agenda-item ${evt.type}">
+                            <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+                                <div class="event-icon-badge flex-shrink-0">
+                                    <i class="bi ${iconClass}"></i>
+                                </div>
+                                <div class="min-w-0 flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                        <span class="fw-bold text-dark fs-6 text-truncate">${evt.title}</span>
+                                        ${repeatTag}
+                                        ${notifTag}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 text-muted fs-7">
+                                        <span><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
+                                        <span class="text-truncate"><i class="bi bi-geo-alt me-1 text-secondary"></i>${evt.location || 'Chưa có vị trí'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-1.5 flex-shrink-0 ms-2">
+                                <button type="button" class="btn-action btn-edit" data-edit-id="${evt.id}" title="Sửa">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button type="button" class="btn-action btn-delete" data-delete-id="${evt.id}" title="Xóa">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                mobileDayEventsList.innerHTML = agendaHtml;
+
+                mobileDayEventsList.querySelectorAll('[data-edit-id]').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        const id = parseInt(this.getAttribute('data-edit-id'));
+                        openEditModal(id);
+                    });
+                });
+
+                mobileDayEventsList.querySelectorAll('[data-delete-id]').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        const id = parseInt(this.getAttribute('data-delete-id'));
+                        deleteEvent(id, activeSelectedDay);
+                    });
+                });
+            }
+        }
+    }
+
 
     function attachCellClickHandlers() {
         document.querySelectorAll('.calendar-day-cell').forEach(cell => {
@@ -914,31 +1118,77 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Nút Prev/Next Month
-    document.getElementById('btnPrevMonth')?.addEventListener('click', function () {
-        if (currentMonth === 1) {
-            currentMonth = 12;
-            currentYear--;
+    // Nút chuyển đổi Chế độ xem: Tuần / Tháng
+    const btnViewModeWeek = document.getElementById('btnViewModeWeek');
+    const btnViewModeMonth = document.getElementById('btnViewModeMonth');
+
+    function syncViewModeUI() {
+        if (calendarViewMode === 'week') {
+            btnViewModeWeek?.classList.add('active');
+            btnViewModeMonth?.classList.remove('active');
         } else {
-            currentMonth--;
+            btnViewModeMonth?.classList.add('active');
+            btnViewModeWeek?.classList.remove('active');
         }
-        if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+    }
+
+    btnViewModeWeek?.addEventListener('click', function () {
+        calendarViewMode = 'week';
+        syncViewModeUI();
+        renderCalendarGrid();
+    });
+
+    btnViewModeMonth?.addEventListener('click', function () {
+        calendarViewMode = 'month';
+        syncViewModeUI();
+        renderCalendarGrid();
+    });
+
+    syncViewModeUI();
+
+    // Nút Prev/Next (Hỗ trợ chuyển theo Tuần ở Mobile hoặc theo Tháng ở Desktop)
+    document.getElementById('btnPrevMonth')?.addEventListener('click', function () {
+        if (calendarViewMode === 'week') {
+            currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+            activeSelectedDay = currentWeekStartDate.getDate();
+            currentMonth = currentWeekStartDate.getMonth() + 1;
+            currentYear = currentWeekStartDate.getFullYear();
+        } else {
+            if (currentMonth === 1) {
+                currentMonth = 12;
+                currentYear--;
+            } else {
+                currentMonth--;
+            }
         }
         renderCalendarGrid();
     });
 
     document.getElementById('btnNextMonth')?.addEventListener('click', function () {
-        if (currentMonth === 12) {
-            currentMonth = 1;
-            currentYear++;
+        if (calendarViewMode === 'week') {
+            currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+            activeSelectedDay = currentWeekStartDate.getDate();
+            currentMonth = currentWeekStartDate.getMonth() + 1;
+            currentYear = currentWeekStartDate.getFullYear();
         } else {
-            currentMonth++;
-        }
-        if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Tháng ${currentMonth}, ${currentYear}`;
+            if (currentMonth === 12) {
+                currentMonth = 1;
+                currentYear++;
+            } else {
+                currentMonth++;
+            }
         }
         renderCalendarGrid();
+    });
+
+    // Lắng nghe sự kiện thay đổi kích thước màn hình để tự động chuyển Lịch Tuần trên Mobile
+    window.addEventListener('resize', function () {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && calendarViewMode !== 'week') {
+            calendarViewMode = 'week';
+            syncViewModeUI();
+            renderCalendarGrid();
+        }
     });
 
     // 1. Vẽ lưới lịch ban đầu lập tức khi vừa mở trang
@@ -947,3 +1197,4 @@ document.addEventListener('DOMContentLoaded', function () {
     // 2. Nạp dữ liệu sự kiện thực từ Database
     loadEventsFromDatabase();
 });
+

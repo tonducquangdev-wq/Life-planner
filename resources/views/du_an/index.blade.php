@@ -35,8 +35,9 @@
     <!-- Google Font: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard CSS -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ time() }}">
+
 </head>
 
 <body>
@@ -331,3 +332,4 @@
 </body>
 
 </html>
+

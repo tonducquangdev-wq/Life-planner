@@ -911,3 +911,136 @@
     pointer-events: auto;
 }
 
+/* ==========================================================================
+   8. MOBILE WEEK CALENDAR VIEW (FLUTTER / NOTION STYLE)
+   ========================================================================== */
+.mobile-week-calendar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.week-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    background-color: #f8fafc;
+    padding: 8px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+[data-bs-theme="dark"] .week-strip-grid {
+    background-color: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.week-day-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 3px;
+    border-radius: 16px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1.5px solid transparent;
+    user-select: none;
+}
+
+.week-day-card .day-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.week-day-card .day-number {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+[data-bs-theme="dark"] .week-day-card .day-number {
+    color: #f8fafc;
+}
+
+.week-day-card .event-dots-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 8px;
+    margin-top: 4px;
+}
+
+.week-day-card .event-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #6366f1;
+}
+
+.week-day-card .event-dot.hoc-tap { background-color: #3b82f6; }
+.week-day-card .event-dot.tap-luyen { background-color: #22c55e; }
+.week-day-card .event-dot.deadline { background-color: #f97316; }
+.week-day-card .event-dot.ca-nhan { background-color: #a855f7; }
+.week-day-card .event-dot.cong-viec { background-color: #6366f1; }
+
+.week-day-card.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.45) !important;
+    transform: translateY(-2px) scale(1.03);
+    border-color: transparent !important;
+}
+
+.week-day-card.active .day-name,
+.week-day-card.active .day-number {
+    color: #ffffff !important;
+}
+
+.week-day-card.active .event-dot {
+    background-color: #ffffff !important;
+}
+
+.week-day-card.is-today:not(.active) {
+    border-color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.08);
+}
+
+.mobile-day-schedule-card {
+    transition: all 0.25s ease;
+}
+
+.mobile-agenda-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    border-left: 4.5px solid #6366f1;
+    background-color: #f8fafc;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s ease;
+}
+
+[data-bs-theme="dark"] .mobile-agenda-item {
+    background-color: #0f172a;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-agenda-item.hoc-tap { border-left-color: #3b82f6; }
+.mobile-agenda-item.tap-luyen { border-left-color: #22c55e; }
+.mobile-agenda-item.deadline { border-left-color: #f97316; }
+.mobile-agenda-item.ca-nhan { border-left-color: #a855f7; }
+.mobile-agenda-item.cong-viec { border-left-color: #6366f1; }
+
+.mobile-agenda-item:active {
+    transform: scale(0.98);
+}
+
+

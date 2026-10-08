@@ -138,3 +138,7 @@
         });
     })();
 </script>
+
+<!-- MOBILE BOTTOM NAVIGATION BAR (FLUTTER APP STYLE) -->
+@include('layouts.bottom-nav')
+
