@@ -4,8 +4,8 @@
 <header class="top-header">
     <!-- BÊN TRÁI: NÚT TOGGLE MENU, QUAY LẠI LỊCH & TIÊU ĐỀ TRANG -->
     <div class="topbar-left d-flex align-items-center gap-2 gap-sm-3">
-        <!-- Nút Toggle Mobile Offcanvas Menu (Màn hình < 1024px) -->
-        <button class="btn btn-light rounded-3 p-1.5 px-2.5 border-0 shadow-2xs topbar-sidebar-toggle" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" title="Mở Menu danh mục">
+        <!-- Nút Toggle Mobile Offcanvas Menu (Đã ẩn khi responsive mobile) -->
+        <button class="btn btn-light rounded-3 p-1.5 px-2.5 border-0 shadow-2xs topbar-sidebar-toggle d-none" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" title="Mở Menu danh mục">
             <i class="bi bi-list fs-5 text-dark"></i>
         </button>
 

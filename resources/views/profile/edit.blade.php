@@ -138,7 +138,7 @@
         <!-- HEADER THANH CÔNG CỤ TRÊN CÙNG -->
         <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                <button class="btn btn-light d-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                     <i class="bi bi-list fs-4 text-primary"></i>
                 </button>
                 <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">

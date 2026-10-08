@@ -382,8 +382,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     letter-spacing: -0.2px;
 }
 
-.topbar-sidebar-toggle {
-    display: none;
+.topbar-sidebar-toggle,
+#sidebarToggle {
+    display: none !important;
 }
 
 .search-box {
@@ -746,8 +747,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     aside.sidebar {
         display: none !important;
     }
-    .topbar-sidebar-toggle {
-        display: inline-flex !important;
+    .topbar-sidebar-toggle,
+    #sidebarToggle,
+    .floating-menu-container {
+        display: none !important;
     }
     .main-wrapper {
         margin-left: 0 !important;
@@ -1766,24 +1769,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         transform: scale(0.9);
     }
 
-    /* 4. Điều chỉnh Floating Menu Popup không bị đè bởi Bottom Nav */
+    /* 4. Ẩn Floating Menu trên Mobile vì đã có Bottom Nav */
     .floating-menu-container {
-        bottom: 78px !important;
-        right: 16px !important;
-        z-index: 1042;
-    }
-
-    .floating-menu-btn {
-        display: flex !important;
-        width: 46px !important;
-        height: 46px !important;
-        font-size: 1.15rem !important;
-    }
-
-    .floating-menu-popup {
-        bottom: 58px !important;
-        right: 0 !important;
-        width: 250px;
+        display: none !important;
     }
 
     /* Native Touch Feel */

@@ -1,7 +1,7 @@
 <!-- ==========================================================================
      FLOATING ACTION MENU - LIFE PLANNER (GÓC PHẢI BÊN DƯỚI)
      ========================================================================== -->
-<div class="floating-menu-container" id="floatingMenuContainer">
+<div class="floating-menu-container d-none d-lg-block" id="floatingMenuContainer">
     <!-- POPUP MENU -->
     <div class="floating-menu-popup" id="floatingMenuPopup" role="menu" aria-orientation="vertical">
         <div class="px-2 py-1 mb-1 d-flex align-items-center justify-content-between">

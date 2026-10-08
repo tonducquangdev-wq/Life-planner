@@ -14,7 +14,7 @@ class CalendarController extends Controller
     public function index()
     {
         // 1. Thông tin ngày tháng hiện tại
-        $currentMonthYear = 'Ngày ' . date('j') . ', Tháng ' . date('n') . ', ' . date('Y');
+        $currentMonthYear = date('d/m/Y');
 
         // 2. Dữ liệu mẫu các sự kiện hiển thị trên Lưới Lịch (Calendar Grid 35 ô đại diện Tháng 9/2026)
         // Tháng 9/2026 bắt đầu từ Thứ 3 (ngày 1/9). Ô 0 (Chủ nhật) là ngày 31/08.

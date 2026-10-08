@@ -108,7 +108,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <h5 class="fw-bold text-dark mb-0 fs-5 d-flex align-items-center gap-2">
                                         <i class="bi bi-calendar3 text-primary"></i>
-                                        <span id="currentMonthTitle">{{ $currentMonthYear ?? ('Ngày ' . date('j') . ', Tháng ' . date('n') . ', ' . date('Y')) }}</span>
+                                        <span id="currentMonthTitle">{{ $currentMonthYear ?? date('d/m/Y') }}</span>
                                     </h5>
                                     <div class="btn-group border rounded-pill p-1 bg-light ms-1">
                                         <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnPrevMonth" title="Xem trước (Tuần/Tháng)">
@@ -403,10 +403,30 @@
                                         <label class="form-label fw-semibold fs-7 text-secondary mb-1">
                                             <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
                                         </label>
-                                        <select class="form-select rounded-3" id="createHocTapSoNgayNhac">
-                                            <option value="1" selected>Trước 1 ngày</option>
-                                            <option value="2">Trước 2 ngày</option>
+                                        <select class="form-select rounded-3 notif-select-time" id="createHocTapSoNgayNhac">
+                                            <option value="0">Đúng giờ diễn ra</option>
+                                            <option value="5">Trước 5 phút</option>
+                                            <option value="10">Trước 10 phút</option>
+                                            <option value="15" selected>Trước 15 phút</option>
+                                            <option value="30">Trước 30 phút</option>
+                                            <option value="60">Trước 1 giờ</option>
+                                            <option value="120">Trước 2 giờ</option>
+                                            <option value="1440">Trước 1 ngày</option>
+                                            <option value="2880">Trước 2 ngày</option>
+                                            <option value="10080">Trước 1 tuần</option>
+                                            <option value="custom">⚙️ Tự thiết lập thời gian...</option>
                                         </select>
+                                        <div class="custom-time-inputs mt-2 d-none">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                                <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                                <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                                    <option value="1">phút</option>
+                                                    <option value="60">giờ</option>
+                                                    <option value="1440">ngày</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <small class="text-muted fs-8 d-block mt-1">
                                             <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
                                         </small>
@@ -468,10 +488,30 @@
                                         <label class="form-label fw-semibold fs-7 text-secondary mb-1">
                                             <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
                                         </label>
-                                        <select class="form-select rounded-3" id="createTapLuyenSoNgayNhac">
-                                            <option value="1" selected>Trước 1 ngày</option>
-                                            <option value="2">Trước 2 ngày</option>
+                                        <select class="form-select rounded-3 notif-select-time" id="createTapLuyenSoNgayNhac">
+                                            <option value="0">Đúng giờ diễn ra</option>
+                                            <option value="5">Trước 5 phút</option>
+                                            <option value="10">Trước 10 phút</option>
+                                            <option value="15" selected>Trước 15 phút</option>
+                                            <option value="30">Trước 30 phút</option>
+                                            <option value="60">Trước 1 giờ</option>
+                                            <option value="120">Trước 2 giờ</option>
+                                            <option value="1440">Trước 1 ngày</option>
+                                            <option value="2880">Trước 2 ngày</option>
+                                            <option value="10080">Trước 1 tuần</option>
+                                            <option value="custom">⚙️ Tự thiết lập thời gian...</option>
                                         </select>
+                                        <div class="custom-time-inputs mt-2 d-none">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                                <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                                <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                                    <option value="1">phút</option>
+                                                    <option value="60">giờ</option>
+                                                    <option value="1440">ngày</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <small class="text-muted fs-8 d-block mt-1">
                                             <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
                                         </small>
@@ -529,10 +569,30 @@
                                         <label class="form-label fw-semibold fs-7 text-secondary mb-1">
                                             <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
                                         </label>
-                                        <select class="form-select rounded-3" id="createDeadlineSoNgayNhac">
-                                            <option value="1" selected>Trước 1 ngày</option>
-                                            <option value="2">Trước 2 ngày</option>
+                                        <select class="form-select rounded-3 notif-select-time" id="createDeadlineSoNgayNhac">
+                                            <option value="0">Đúng giờ diễn ra</option>
+                                            <option value="5">Trước 5 phút</option>
+                                            <option value="10">Trước 10 phút</option>
+                                            <option value="15" selected>Trước 15 phút</option>
+                                            <option value="30">Trước 30 phút</option>
+                                            <option value="60">Trước 1 giờ</option>
+                                            <option value="120">Trước 2 giờ</option>
+                                            <option value="1440">Trước 1 ngày</option>
+                                            <option value="2880">Trước 2 ngày</option>
+                                            <option value="10080">Trước 1 tuần</option>
+                                            <option value="custom">⚙️ Tự thiết lập thời gian...</option>
                                         </select>
+                                        <div class="custom-time-inputs mt-2 d-none">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                                <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                                <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                                    <option value="1">phút</option>
+                                                    <option value="60">giờ</option>
+                                                    <option value="1440">ngày</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <small class="text-muted fs-8 d-block mt-1">
                                             <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
                                         </small>
@@ -590,10 +650,30 @@
                                         <label class="form-label fw-semibold fs-7 text-secondary mb-1">
                                             <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
                                         </label>
-                                        <select class="form-select rounded-3" id="createCaNhanSoNgayNhac">
-                                            <option value="1" selected>Trước 1 ngày</option>
-                                            <option value="2">Trước 2 ngày</option>
+                                        <select class="form-select rounded-3 notif-select-time" id="createCaNhanSoNgayNhac">
+                                            <option value="0">Đúng giờ diễn ra</option>
+                                            <option value="5">Trước 5 phút</option>
+                                            <option value="10">Trước 10 phút</option>
+                                            <option value="15" selected>Trước 15 phút</option>
+                                            <option value="30">Trước 30 phút</option>
+                                            <option value="60">Trước 1 giờ</option>
+                                            <option value="120">Trước 2 giờ</option>
+                                            <option value="1440">Trước 1 ngày</option>
+                                            <option value="2880">Trước 2 ngày</option>
+                                            <option value="10080">Trước 1 tuần</option>
+                                            <option value="custom">⚙️ Tự thiết lập thời gian...</option>
                                         </select>
+                                        <div class="custom-time-inputs mt-2 d-none">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                                <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                                <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                                    <option value="1">phút</option>
+                                                    <option value="60">giờ</option>
+                                                    <option value="1440">ngày</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <small class="text-muted fs-8 d-block mt-1">
                                             <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
                                         </small>
@@ -688,10 +768,30 @@
                                 <label class="form-label fw-semibold fs-7 text-secondary mb-1">
                                     <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
                                 </label>
-                                <select class="form-select rounded-3" id="editEventSoNgayNhac">
-                                    <option value="1" selected>Trước 1 ngày</option>
-                                    <option value="2">Trước 2 ngày</option>
+                                <select class="form-select rounded-3 notif-select-time" id="editEventSoNgayNhac">
+                                    <option value="0">Đúng giờ diễn ra</option>
+                                    <option value="5">Trước 5 phút</option>
+                                    <option value="10">Trước 10 phút</option>
+                                    <option value="15" selected>Trước 15 phút</option>
+                                    <option value="30">Trước 30 phút</option>
+                                    <option value="60">Trước 1 giờ</option>
+                                    <option value="120">Trước 2 giờ</option>
+                                    <option value="1440">Trước 1 ngày</option>
+                                    <option value="2880">Trước 2 ngày</option>
+                                    <option value="10080">Trước 1 tuần</option>
+                                    <option value="custom">⚙️ Tự thiết lập thời gian...</option>
                                 </select>
+                                <div class="custom-time-inputs mt-2 d-none">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                        <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                        <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                            <option value="1">phút</option>
+                                            <option value="60">giờ</option>
+                                            <option value="1440">ngày</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <small class="text-muted fs-8 d-block mt-1">
                                     <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
                                 </small>

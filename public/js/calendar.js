@@ -25,9 +25,72 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentWeekStartDate = getStartOfWeek(todayDate);
 
+    function formatShortDate(day, month, year) {
+        const d = String(day).padStart(2, '0');
+        const m = String(month).padStart(2, '0');
+        return `${d}/${m}/${year}`;
+    }
+
+    function getRemindTimeValue(selectId) {
+        const sel = document.getElementById(selectId);
+        if (!sel) return 15;
+        if (sel.value === 'custom') {
+            const box = sel.closest('.notif-remind-box');
+            const num = parseInt(box?.querySelector('.custom-time-num')?.value || 15);
+            const unit = parseInt(box?.querySelector('.custom-time-unit')?.value || 1);
+            return Math.max(0, num * unit);
+        }
+        return parseInt(sel.value) || 15;
+    }
+
+    function setRemindTimeValue(selectId, valueInMinutes) {
+        const sel = document.getElementById(selectId);
+        if (!sel) return;
+        const val = parseInt(valueInMinutes !== undefined && valueInMinutes !== null ? valueInMinutes : 15);
+        const box = sel.closest('.notif-remind-box');
+        const customBox = box?.querySelector('.custom-time-inputs');
+
+        const presetValues = ['0', '5', '10', '15', '30', '60', '120', '1440', '2880', '10080'];
+        if (presetValues.includes(String(val))) {
+            sel.value = String(val);
+            if (customBox) customBox.classList.add('d-none');
+        } else {
+            sel.value = 'custom';
+            if (customBox) customBox.classList.remove('d-none');
+            const numInput = box?.querySelector('.custom-time-num');
+            const unitSelect = box?.querySelector('.custom-time-unit');
+            if (numInput && unitSelect) {
+                if (val > 0 && val % 1440 === 0) {
+                    numInput.value = val / 1440;
+                    unitSelect.value = '1440';
+                } else if (val > 0 && val % 60 === 0) {
+                    numInput.value = val / 60;
+                    unitSelect.value = '60';
+                } else {
+                    numInput.value = val;
+                    unitSelect.value = '1';
+                }
+            }
+        }
+    }
+
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.classList.contains('notif-select-time')) {
+            const box = e.target.closest('.notif-remind-box');
+            const customBox = box?.querySelector('.custom-time-inputs');
+            if (customBox) {
+                if (e.target.value === 'custom') {
+                    customBox.classList.remove('d-none');
+                } else {
+                    customBox.classList.add('d-none');
+                }
+            }
+        }
+    });
+
     const currentMonthTitleEl = document.getElementById('currentMonthTitle');
     if (currentMonthTitleEl) {
-        currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
+        currentMonthTitleEl.textContent = formatShortDate(activeSelectedDay, currentMonth, currentYear);
     }
 
 
@@ -261,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!calendarGrid) return;
 
         if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
+            currentMonthTitleEl.textContent = formatShortDate(activeSelectedDay, currentMonth, currentYear);
         }
 
         const headerHtml = `
@@ -381,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (currentMonthTitleEl) {
-            currentMonthTitleEl.textContent = `Ngày ${activeSelectedDay}, Tháng ${currentMonth}, ${currentYear}`;
+            currentMonthTitleEl.textContent = formatShortDate(activeSelectedDay, currentMonth, currentYear);
         }
 
         let stripHtml = '';
@@ -715,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const sel = document.getElementById(`${prefix}SoNgayNhac`);
             const grp = document.getElementById(`${prefix}RemindGroup`);
             if (sw) sw.checked = false;
-            if (sel) sel.value = "1";
+            setRemindTimeValue(`${prefix}SoNgayNhac`, 15);
             if (grp) grp.classList.remove('show');
         });
 
@@ -853,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_ket_thuc: `${dateStr} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createHocTapBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createHocTapSoNgayNhac')?.value || 1),
+                so_ngay_nhac: getRemindTimeValue('createHocTapSoNgayNhac'),
                 quy_tac_lap: repeat,
                 ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
             };
@@ -881,7 +944,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_ket_thuc: `${dateStr} ${endTime}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createTapLuyenBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createTapLuyenSoNgayNhac')?.value || 1),
+                so_ngay_nhac: getRemindTimeValue('createTapLuyenSoNgayNhac'),
                 quy_tac_lap: repeat,
                 ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
             };
@@ -907,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_bat_dau: `${dateStr} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createDeadlineBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createDeadlineSoNgayNhac')?.value || 1),
+                so_ngay_nhac: getRemindTimeValue('createDeadlineSoNgayNhac'),
                 quy_tac_lap: repeat,
                 ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
             };
@@ -933,7 +996,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 thoi_gian_bat_dau: `${dateStr} ${time}:00`,
                 mo_ta: location,
                 bat_thong_bao: document.getElementById('createCaNhanBatThongBao')?.checked || false,
-                so_ngay_nhac: parseInt(document.getElementById('createCaNhanSoNgayNhac')?.value || 1),
+                so_ngay_nhac: getRemindTimeValue('createCaNhanSoNgayNhac'),
                 quy_tac_lap: repeat,
                 ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
             };
@@ -973,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const editGrp = document.getElementById('editEventRemindGroup');
 
         if (editSw) editSw.checked = evt.batThongBao || false;
-        if (editSel) editSel.value = evt.soNgayNhac || 1;
+        setRemindTimeValue('editEventSoNgayNhac', evt.soNgayNhac);
         if (editGrp) {
             if (evt.batThongBao) editGrp.classList.add('show');
             else editGrp.classList.remove('show');
@@ -1013,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', function () {
             thoi_gian_bat_dau: `${dateStr} ${startTime}:00`,
             mo_ta: location,
             bat_thong_bao: document.getElementById('editEventBatThongBao')?.checked || false,
-            so_ngay_nhac: parseInt(document.getElementById('editEventSoNgayNhac')?.value || 1),
+            so_ngay_nhac: getRemindTimeValue('editEventSoNgayNhac'),
             quy_tac_lap: repeat,
             ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
         };
