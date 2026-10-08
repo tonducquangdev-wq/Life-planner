@@ -1139,6 +1139,14 @@ class TapLuyenController extends Controller
             }
         });
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Đã sao chép lịch tập \"{$sourcePlan->ten_ke_hoach}\" vào danh sách kế hoạch của bạn!",
+                'plan_name' => $sourcePlan->ten_ke_hoach,
+            ]);
+        }
+
         return redirect()->route('tap-luyen.index')
             ->with('status', "Đã sao chép lịch tập \"{$sourcePlan->ten_ke_hoach}\" vào danh sách kế hoạch của bạn!");
     }

@@ -218,7 +218,7 @@
                             <i class="bi bi-journal-text"></i>
                         </div>
                         <h3 class="feature-card-title">Quản Lý Môn Học</h3>
-                        <p class="feature-card-desc">Lưu trữ danh sách môn học, số tín chỉ, bài tập và lịch thi cực kỳ gọn gàng.</p>
+                        <p class="feature-card-desc">Lưu trữ danh sách môn học, bài tập và lịch thi cực kỳ gọn gàng.</p>
                     </div>
                 </div>
 
@@ -320,7 +320,7 @@
                             <i class="bi bi-pencil-square"></i>
                         </div>
                         <h3 class="workflow-title">Thêm Môn Học & Lịch Trình</h3>
-                        <p class="workflow-desc">Cập nhật danh sách môn học, số tín chỉ và kế hoạch tập luyện cá nhân của bạn.</p>
+                        <p class="workflow-desc">Cập nhật danh sách môn học, bài tập và kế hoạch rèn luyện cá nhân của bạn.</p>
                     </div>
                 </div>
 

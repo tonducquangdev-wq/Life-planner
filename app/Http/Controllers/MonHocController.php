@@ -14,6 +14,8 @@ class MonHocController extends Controller
     public function index()
     {
         $monHocs = MonHoc::where('user_id', Auth::id())
+            ->withCount('baiTaps')
+            ->with('baiTaps')
             ->latest()
             ->get();
 
@@ -72,9 +74,22 @@ class MonHocController extends Controller
         $normalizedStart = $this->normalizeDate($rawStart);
         $normalizedEnd = $this->normalizeDate($rawEnd);
 
+        // Tự động tạo mã môn nếu người dùng để trống
+        $maMon = trim((string) $request->input('ma_mon'));
+        if ($maMon === '') {
+            $rawLetters = preg_replace('/[^A-Za-z0-9]/', '', (string) $request->input('ten_mon', ''));
+            $slug = strtoupper(substr($rawLetters, 0, 4));
+            $maMon = ($slug ?: 'MH') . rand(100, 999);
+        }
+
         $request->merge([
+            'ma_mon' => $maMon,
             'ngay_bat_dau' => $normalizedStart,
             'ngay_ket_thuc' => $normalizedEnd,
+            'so_tin_chi' => $request->input('so_tin_chi') ? (int) $request->input('so_tin_chi') : 3,
+            'tien_do' => $request->input('tien_do') !== null ? (int) $request->input('tien_do') : 0,
+            'trang_thai' => $request->input('trang_thai') ?: 'dang_hoc',
+            'mau_sac' => $request->input('mau_sac') ?: '#6366f1',
         ]);
 
         $rules = [
@@ -82,7 +97,7 @@ class MonHocController extends Controller
             'ten_mon' => 'required|string|max:255',
             'giang_vien' => 'nullable|string|max:255',
             'phong_hoc' => 'nullable|string|max:255',
-            'so_tin_chi' => 'required|integer|min:1|max:20',
+            'so_tin_chi' => 'nullable|integer|min:1|max:20',
             'tien_do' => 'nullable|integer|min:0|max:100',
             'diem_so' => 'nullable|numeric|min:0|max:10',
             'ngay_bat_dau' => 'nullable|date',
@@ -98,8 +113,11 @@ class MonHocController extends Controller
         }
 
         $validated = $request->validate($rules, [
-            'ngay_ket_thuc.after_or_equal' => 'The ngày kết thúc field must be a date after or equal to ngày bắt đầu.',
+            'ten_mon.required' => 'Vui lòng nhập tên môn học.',
+            'ngay_ket_thuc.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.',
         ], [
+            'ten_mon' => 'tên môn học',
+            'ma_mon' => 'mã môn học',
             'ngay_bat_dau' => 'ngày bắt đầu',
             'ngay_ket_thuc' => 'ngày kết thúc',
         ]);
@@ -107,11 +125,35 @@ class MonHocController extends Controller
         // Gán user_id bằng Auth::id() và tạo môn học
         $validated['user_id'] = Auth::id();
         $validated['mau_sac'] = $request->input('mau_sac', '#6366f1');
-        $validated['tien_do'] = $request->input('tien_do', 0);
+        $validated['tien_do'] = (int) $request->input('tien_do', 0);
+        $validated['so_tin_chi'] = (int) $request->input('so_tin_chi', 3);
         $validated['ngay_bat_dau'] = $normalizedStart;
         $validated['ngay_ket_thuc'] = $normalizedEnd;
 
-        MonHoc::create($validated);
+        $monHoc = MonHoc::create($validated);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Môn học đã được thêm thành công!',
+                'data' => [
+                    'id' => $monHoc->id,
+                    'ma_mon' => $monHoc->ma_mon,
+                    'ten_mon' => $monHoc->ten_mon,
+                    'giang_vien' => $monHoc->giang_vien,
+                    'phong_hoc' => $monHoc->phong_hoc,
+                    'so_tin_chi' => $monHoc->so_tin_chi,
+                    'tien_do' => $monHoc->tien_do,
+                    'ngay_bat_dau' => $monHoc->ngay_bat_dau ? $monHoc->ngay_bat_dau->format('d/m/Y') : null,
+                    'ngay_ket_thuc' => $monHoc->ngay_ket_thuc ? $monHoc->ngay_ket_thuc->format('d/m/Y') : null,
+                    'mau_sac' => $monHoc->mau_sac,
+                    'trang_thai' => $monHoc->trang_thai,
+                    'show_url' => route('mon-hoc.show', $monHoc),
+                    'edit_url' => route('mon-hoc.edit', $monHoc),
+                    'destroy_url' => route('mon-hoc.destroy', $monHoc),
+                ],
+            ]);
+        }
 
         return redirect()->route('mon-hoc.index')
             ->with('status', 'Thêm môn học thành công!');
@@ -162,6 +204,15 @@ class MonHocController extends Controller
         if ($hasEnd) {
             $mergeData['ngay_ket_thuc'] = $normalizedEnd;
         }
+        if (!$request->has('so_tin_chi')) {
+            $mergeData['so_tin_chi'] = $monHoc->so_tin_chi ?? 3;
+        }
+        if (!$request->has('tien_do')) {
+            $mergeData['tien_do'] = $monHoc->tien_do ?? 0;
+        }
+        if (!$request->has('diem_so')) {
+            $mergeData['diem_so'] = $monHoc->diem_so;
+        }
         if (!empty($mergeData)) {
             $request->merge($mergeData);
         }
@@ -171,7 +222,7 @@ class MonHocController extends Controller
             'ten_mon' => 'required|string|max:255',
             'giang_vien' => 'nullable|string|max:255',
             'phong_hoc' => 'nullable|string|max:255',
-            'so_tin_chi' => 'required|integer|min:1|max:20',
+            'so_tin_chi' => 'nullable|integer|min:1|max:20',
             'tien_do' => 'nullable|integer|min:0|max:100',
             'diem_so' => 'nullable|numeric|min:0|max:10',
             'ngay_bat_dau' => 'nullable|date',

@@ -88,6 +88,12 @@
                             <span>Báo cáo</span>
                         </a>
 
+                        <!-- Cộng đồng Gymer -->
+                        <a href="{{ route('workout.community') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-2xs text-decoration-none d-inline-flex align-items-center gap-1.5" title="Khám phá và chia sẻ lịch tập trong Cộng đồng Gymer">
+                            <i class="bi bi-people-fill text-primary"></i>
+                            <span>Cộng đồng Gymer</span>
+                        </a>
+
                         <!-- Chia sẻ Plan (nếu có active plan) -->
                         @if($activePlan)
                             <form method="POST" action="{{ route('workout.share.generate', ['id' => $activePlan->id]) }}" class="d-inline m-0">
@@ -827,6 +833,20 @@
 
                         <!-- TAB 2: QUẢN LÝ CÁC KẾ HOẠCH -->
                         <div class="tab-pane fade" id="pills-plans" role="tabpanel">
+                            <!-- Action Header: Title & Nút Cộng đồng Gymer -->
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-0 fs-7">
+                                        <i class="bi bi-layers-half text-primary me-1"></i>Danh sách Kế hoạch rèn luyện
+                                    </h6>
+                                    <small class="text-muted fs-8">Chọn kế hoạch áp dụng hoặc kết nối cùng cộng đồng gymer</small>
+                                </div>
+                                <a href="{{ route('workout.community') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fs-8 fw-semibold d-inline-flex align-items-center gap-1.5 shadow-2xs text-decoration-none">
+                                    <i class="bi bi-people-fill"></i>
+                                    <span>Cộng đồng Gymer</span>
+                                </a>
+                            </div>
+
                             <div class="card border-0 bg-light rounded-4 p-3 mb-3">
                                 <h6 class="fw-bold text-dark mb-2 fs-8"><i class="bi bi-folder-plus text-primary me-1"></i>Tạo kế hoạch tập luyện mới</h6>
                                 <div class="row g-2 align-items-end">
@@ -838,7 +858,10 @@
                                         <label class="form-label fs-8 text-muted mb-1 fw-semibold">Mô tả (tùy chọn)</label>
                                         <input type="text" class="form-control form-control-sm rounded-3" id="new-plan-desc" placeholder="VD: Tập 4 buổi mỗi tuần">
                                     </div>
-                                    <div class="col-12 text-end">
+                                    <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <a href="{{ route('workout.community') }}" class="text-primary fs-8 fw-semibold text-decoration-none d-inline-flex align-items-center gap-1">
+                                            <i class="bi bi-globe-americas"></i> Khám phá giáo án Cộng đồng Gymer &rarr;
+                                        </a>
                                         <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold" id="btn-create-plan">
                                             <i class="bi bi-plus-lg me-1"></i>Tạo kế hoạch
                                         </button>

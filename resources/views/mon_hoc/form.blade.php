@@ -59,53 +59,7 @@
         @enderror
     </div>
 
-    <!-- Số tín chỉ -->
-    <div class="col-md-4">
-        <label for="so_tin_chi" class="form-label fw-semibold">Số tín chỉ <span class="text-danger">*</span></label>
-        <input type="number" 
-               class="form-control @error('so_tin_chi') is-invalid @enderror" 
-               id="so_tin_chi" 
-               name="so_tin_chi" 
-               min="1" 
-               max="20" 
-               value="{{ old('so_tin_chi', $monHoc->so_tin_chi ?? 3) }}" 
-               required>
-        @error('so_tin_chi')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
 
-    <!-- Tiến độ (%) -->
-    <div class="col-md-4">
-        <label for="tien_do" class="form-label fw-semibold">Tiến độ (%)</label>
-        <input type="number" 
-               class="form-control @error('tien_do') is-invalid @enderror" 
-               id="tien_do" 
-               name="tien_do" 
-               min="0" 
-               max="100" 
-               value="{{ old('tien_do', $monHoc->tien_do ?? 0) }}">
-        @error('tien_do')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-
-    <!-- Điểm số -->
-    <div class="col-md-4">
-        <label for="diem_so" class="form-label fw-semibold">Điểm số (Thang 10)</label>
-        <input type="number" 
-               step="0.1" 
-               min="0" 
-               max="10" 
-               class="form-control @error('diem_so') is-invalid @enderror" 
-               id="diem_so" 
-               name="diem_so" 
-               value="{{ old('diem_so', $monHoc->diem_so ?? '') }}" 
-               placeholder="VD: 8.5">
-        @error('diem_so')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
 
     <!-- Ngày bắt đầu -->
     <div class="col-md-6">
