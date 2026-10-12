@@ -855,6 +855,48 @@ body {
     overflow: hidden;
 }
 
+/* ==========================================================================
+   7.1. NEUMORPHIC MODALS REFINED (CREATE EVENT & DAY DETAIL MODALS)
+   Triệt tiêu quầng sáng trắng gây chói, giảm độ lan/độ lệch của bóng sáng,
+   giữ nguyên phong cách Soft Neumorphism với viền xanh ghi mảnh và overlay dịu nhẹ.
+   ========================================================================== */
+#createEventModal .modal-content,
+#dayDetailModal .modal-content {
+    background: var(--neu-cal-surface) !important;
+    border-radius: var(--card-radius) !important;
+    border: 1px solid rgba(163, 177, 198, 0.4) !important;
+    box-shadow: 
+        8px 14px 28px rgba(163, 177, 198, 0.35),
+        0 18px 36px rgba(15, 23, 42, 0.12),
+        -2px -2px 8px rgba(255, 255, 255, 0.3) !important;
+    overflow: hidden;
+}
+
+#createEventModal .modal-header,
+#dayDetailModal .modal-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25) !important;
+    padding: 1.25rem 1.5rem;
+}
+
+#createEventModal .modal-footer,
+#dayDetailModal .modal-footer {
+    background: var(--neu-cal-surface) !important;
+    border-top: 1px solid rgba(163, 177, 198, 0.25) !important;
+    padding: 1rem 1.5rem;
+}
+
+/* Tinh chỉnh overlay (backdrop) riêng cho Modal: dịu mắt, không nặng nề */
+body:has(#createEventModal.show) .modal-backdrop.show,
+#createEventModal.show ~ .modal-backdrop.show,
+body:has(#dayDetailModal.show) .modal-backdrop.show,
+#dayDetailModal.show ~ .modal-backdrop.show {
+    background-color: #0f172a !important;
+    opacity: 0.38 !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
 .modal-custom .modal-header {
     background: transparent;
     border-bottom: 1px solid rgba(163, 177, 198, 0.2);
