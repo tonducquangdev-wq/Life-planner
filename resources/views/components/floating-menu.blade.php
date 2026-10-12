@@ -4,9 +4,9 @@
 <div class="floating-menu-container d-none d-lg-block" id="floatingMenuContainer">
     <!-- POPUP MENU -->
     <div class="floating-menu-popup" id="floatingMenuPopup" role="menu" aria-orientation="vertical">
-        <div class="px-2 py-1 mb-1 d-flex align-items-center justify-content-between">
-            <span class="fs-8 fw-bold text-uppercase text-muted letter-spacing-1">Điều hướng</span>
-            <span class="badge bg-primary-subtle text-primary rounded-pill fs-8">Life Planner</span>
+        <div class="floating-menu-header px-2 py-1 mb-2 d-flex align-items-center justify-content-between">
+            <span class="floating-menu-header-title text-uppercase">Điều hướng</span>
+            <span class="badge floating-menu-badge rounded-pill">Life Planner</span>
         </div>
 
         <ul class="floating-menu-list">
@@ -15,10 +15,10 @@
                 <a href="{{ route('calendar.index') }}" 
                    class="floating-menu-item {{ request()->routeIs('calendar.*') ? 'active' : '' }}"
                    title="Lịch cá nhân (Home)">
-                    <span class="menu-item-icon bg-primary-subtle text-primary">
+                    <span class="menu-item-icon icon-calendar">
                         <i class="bi bi-calendar3"></i>
                     </span>
-                    <span>📅 Lịch (Home)</span>
+                    <span class="menu-item-label">📅 Lịch (Home)</span>
                 </a>
             </li>
 
@@ -27,10 +27,10 @@
                 <a href="{{ route('mon-hoc.index') }}" 
                    class="floating-menu-item {{ request()->routeIs(['mon-hoc.*', 'bao-cao-hoc-tap.*', 'study.*']) ? 'active' : '' }}"
                    title="Học tập & Môn học">
-                    <span class="menu-item-icon bg-info-subtle text-info">
+                    <span class="menu-item-icon icon-study">
                         <i class="bi bi-mortarboard-fill"></i>
                     </span>
-                    <span>📚 Học tập</span>
+                    <span class="menu-item-label">📚 Học tập</span>
                 </a>
             </li>
 
@@ -39,10 +39,10 @@
                 <a href="{{ route('tap-luyen.index') }}" 
                    class="floating-menu-item {{ request()->routeIs(['tap-luyen.*', 'bao-cao-tap-luyen.*', 'workout.*']) ? 'active' : '' }}"
                    title="Thể chất & Rèn luyện">
-                    <span class="menu-item-icon bg-success-subtle text-success">
+                    <span class="menu-item-icon icon-workout">
                         <i class="bi bi-heart-pulse-fill"></i>
                     </span>
-                    <span>🏋️ Tập luyện</span>
+                    <span class="menu-item-label">🏋️ Tập luyện</span>
                 </a>
             </li>
 
@@ -55,10 +55,10 @@
                    data-bs-toggle="modal"
                    data-bs-target="#profileModal"
                    title="Hồ sơ & Cài đặt (Popup)">
-                    <span class="menu-item-icon bg-secondary-subtle text-secondary">
+                    <span class="menu-item-icon icon-profile">
                         <i class="bi bi-person-fill-gear"></i>
                     </span>
-                    <span>👤 Hồ sơ</span>
+                    <span class="menu-item-label">👤 Hồ sơ</span>
                 </button>
             </li>
         </ul>
@@ -66,7 +66,7 @@
 
     <!-- NÚT TOGGLE MENU (FLOAT BUTTON) -->
     <button type="button" class="floating-menu-btn" id="floatingMenuToggle" aria-label="Menu điều hướng nhanh" title="Menu điều hướng nhanh">
-        <i class="bi bi-list icon-open"></i>
+        <i class="bi bi-compass-fill icon-open"></i>
         <i class="bi bi-x-lg icon-close"></i>
     </button>
 </div>

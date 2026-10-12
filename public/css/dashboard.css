@@ -1424,7 +1424,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* ==========================================================================
-   8. FLOATING ACTION MENU (GÓC PHẢI BÊN DƯỚI MÀN HÌNH)
+   8. NEUMORPHIC FLOATING ACTION MENU (GÓC PHẢI BÊN DƯỚI MÀN HÌNH)
    ========================================================================== */
 .floating-menu-container {
     position: fixed;
@@ -1434,18 +1434,18 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 .floating-menu-btn {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
-    color: #ffffff;
-    border: none;
+    background: #eef2f6;
+    color: #4f46e5;
+    border: 2px solid rgba(255, 255, 255, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     cursor: pointer;
-    box-shadow: 0 6px 20px -4px rgba(79, 70, 229, 0.45), 0 3px 8px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 6px 6px 14px rgba(163, 177, 198, 0.55), -6px -6px 14px #ffffff;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     outline: none;
     padding: 0;
@@ -1453,28 +1453,43 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 .floating-menu-btn:hover {
-    transform: scale(1.08) translateY(-2px);
-    box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.6), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
-    color: #ffffff;
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 8px 8px 20px rgba(163, 177, 198, 0.65), -8px -8px 20px #ffffff;
+    color: #4338ca;
 }
 
 .floating-menu-btn:active {
     transform: scale(0.96);
+    box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.5), inset -3px -3px 6px #ffffff;
 }
 
 .floating-menu-btn .icon-open {
     display: inline-block;
-    transition: transform 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .floating-menu-btn .icon-close {
     display: none;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
+/* KHI MENU ĐANG MỞ (ACTIVE / OPEN STATE) */
 .floating-menu-container.active .floating-menu-btn {
-    background: #ef4444;
-    box-shadow: 0 6px 20px -4px rgba(239, 68, 68, 0.45);
+    background: #eef2f6;
+    color: #f43f5e;
+    border-color: rgba(244, 63, 94, 0.35);
+    box-shadow: 6px 6px 16px rgba(244, 63, 94, 0.25), -6px -6px 16px #ffffff, inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.floating-menu-container.active .floating-menu-btn:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 8px 8px 20px rgba(244, 63, 94, 0.35), -8px -8px 20px #ffffff;
+    color: #e11d48;
+}
+
+.floating-menu-container.active .floating-menu-btn:active {
+    transform: scale(0.96);
+    box-shadow: inset 3px 3px 6px rgba(244, 63, 94, 0.25), inset -3px -3px 6px #ffffff;
 }
 
 .floating-menu-container.active .floating-menu-btn .icon-open {
@@ -1489,13 +1504,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* POPUP MENU CARD */
 .floating-menu-popup {
     position: absolute;
-    bottom: 68px;
+    bottom: 72px;
     right: 0;
-    min-width: 230px;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 0.6rem;
-    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    min-width: 250px;
+    background: #eef2f6;
+    border-radius: 24px;
+    padding: 12px 10px 10px 10px;
+    box-shadow: 14px 14px 32px rgba(163, 177, 198, 0.55), -14px -14px 32px #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.95);
     opacity: 0;
     visibility: hidden;
     transform: translateY(12px) scale(0.94);
@@ -1510,83 +1526,142 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     transform: translateY(0) scale(1);
 }
 
+/* Header inside Popup */
+.floating-menu-popup .floating-menu-header,
+.floating-menu-popup > div:first-child {
+    padding: 4px 8px 8px 8px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.floating-menu-header-title,
+.floating-menu-popup .text-uppercase {
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-shadow: 1px 1px 1px #ffffff;
+}
+
+.floating-menu-badge,
+.floating-menu-popup .badge {
+    background: #eef2f6 !important;
+    color: #4f46e5 !important;
+    box-shadow: inset 2px 2px 4px rgba(163, 177, 198, 0.4), inset -2px -2px 4px #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    padding: 3px 10px !important;
+    border-radius: 999px !important;
+}
+
+/* Danh sách Menu */
 .floating-menu-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 4px;
 }
 
 .floating-menu-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.65rem 0.95rem;
-    border-radius: 12px;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 16px;
     color: #334155;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
-    transition: all 0.2s ease;
+    transition: all 0.22s cubic-bezier(0.34, 1.25, 0.64, 1);
+    border: 1.5px solid transparent;
+    background: transparent;
+    cursor: pointer;
 }
 
+/* Hover Menu Item */
+.floating-menu-item:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    transform: translateX(3px);
+    box-shadow: 4px 4px 10px rgba(163, 177, 198, 0.35), -4px -4px 10px #ffffff;
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Active Menu Item (Lõm/Nhấn sâu) */
+.floating-menu-item.active {
+    background: #eef2f6;
+    box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.45), inset -3px -3px 6px #ffffff;
+    color: #4f46e5;
+    font-weight: 700;
+    border-color: rgba(79, 70, 229, 0.2);
+}
+
+/* Khối biểu tượng Squircle nổi Neumorphic */
 .floating-menu-item .menu-item-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    transition: transform 0.2s ease;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    background: #eef2f6 !important;
+    box-shadow: 3px 3px 7px rgba(163, 177, 198, 0.45), -3px -3px 7px #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+    transition: all 0.2s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
 
-.floating-menu-item:hover {
-    background-color: #f1f5f9;
-    color: #0f172a;
-    transform: translateX(3px);
+/* Tone màu biểu tượng theo danh mục */
+.floating-menu-item .menu-item-icon.icon-calendar,
+.floating-menu-item .menu-item-icon.text-primary,
+.floating-menu-item .menu-item-icon.bg-primary-subtle {
+    color: #4f46e5 !important;
+}
+
+.floating-menu-item .menu-item-icon.icon-study,
+.floating-menu-item .menu-item-icon.text-info,
+.floating-menu-item .menu-item-icon.bg-info-subtle {
+    color: #0284c7 !important;
+}
+
+.floating-menu-item .menu-item-icon.icon-workout,
+.floating-menu-item .menu-item-icon.text-success,
+.floating-menu-item .menu-item-icon.bg-success-subtle {
+    color: #059669 !important;
+}
+
+.floating-menu-item .menu-item-icon.icon-profile,
+.floating-menu-item .menu-item-icon.text-secondary,
+.floating-menu-item .menu-item-icon.bg-secondary-subtle {
+    color: #64748b !important;
 }
 
 .floating-menu-item:hover .menu-item-icon {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    box-shadow: 4px 4px 10px rgba(163, 177, 198, 0.5), -4px -4px 10px #ffffff !important;
 }
 
-.floating-menu-item.active {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-    color: #4f46e5;
+.floating-menu-item.active .menu-item-icon {
+    background: rgba(79, 70, 229, 0.12) !important;
+    color: #4f46e5 !important;
+    box-shadow: inset 2px 2px 4px rgba(79, 70, 229, 0.2), inset -2px -2px 4px #ffffff !important;
+    border-color: rgba(79, 70, 229, 0.25) !important;
 }
 
+/* Đường phân cách rãnh khắc Neumorphic */
 .floating-menu-divider {
-    height: 1px;
-    background-color: #e2e8f0;
-    margin: 0.35rem 0.5rem;
-}
-
-/* DARK MODE CHO FLOATING MENU */
-[data-bs-theme="dark"] .floating-menu-popup {
-    background: #1E1E22;
-    border: 1px solid #2E2E34;
-    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65);
-}
-
-[data-bs-theme="dark"] .floating-menu-item {
-    color: #E8E8EA;
-}
-
-[data-bs-theme="dark"] .floating-menu-item:hover {
-    background-color: #26262B;
-    color: #ffffff;
-}
-
-[data-bs-theme="dark"] .floating-menu-item.active {
-    background: linear-gradient(135deg, rgba(108, 140, 255, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
-    color: #6C8CFF;
-}
-
-[data-bs-theme="dark"] .floating-menu-divider {
-    background-color: #2E2E34;
+    height: 2px;
+    background: rgba(163, 177, 198, 0.35);
+    box-shadow: 0 1px 0 #ffffff;
+    margin: 8px 6px;
+    border: none;
+    border-radius: 1px;
 }
 
 @keyframes rotateIn {
@@ -1659,24 +1734,24 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         display: none; /* Chỉ hiển thị icon mũi tên ở mobile cho gọn */
     }
 
-    /* 3. Mobile Bottom Navigation Bar (Thanh điều hướng Flutter) */
+    /* 3. Mobile Bottom Navigation Bar (Thanh điều hướng Neumorphic Flutter) */
     .mobile-bottom-nav {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         height: 64px;
-        background: rgba(255, 255, 255, 0.96);
+        background: rgba(238, 242, 246, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        border-top: 1.5px solid rgba(255, 255, 255, 0.9);
         z-index: 1045;
         display: flex;
         justify-content: space-around;
         align-items: center;
         padding: 0 6px;
         padding-bottom: env(safe-area-inset-bottom, 0px);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 -6px 20px rgba(163, 177, 198, 0.35);
     }
 
     [data-bs-theme="dark"] .mobile-bottom-nav {
@@ -1703,11 +1778,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
     .mobile-bottom-nav .nav-icon-wrapper {
         width: 38px;
-        height: 26px;
-        border-radius: 14px;
+        height: 28px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: inset 1.5px 1.5px 3px rgba(163, 177, 198, 0.35), inset -1.5px -1.5px 3px #ffffff;
         transition: all 0.2s ease;
     }
 
@@ -1717,13 +1793,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     }
 
     .mobile-bottom-nav .nav-item.active {
-        color: var(--primary-color, #6366f1);
+        color: #4f46e5;
         font-weight: 700;
     }
 
     .mobile-bottom-nav .nav-item.active .nav-icon-wrapper {
-        background-color: rgba(99, 102, 241, 0.12);
-        color: var(--primary-color, #6366f1);
+        background-color: rgba(79, 70, 229, 0.12);
+        color: #4f46e5;
+        box-shadow: 2px 2px 5px rgba(79, 70, 229, 0.25), -2px -2px 5px #ffffff;
     }
 
     [data-bs-theme="dark"] .mobile-bottom-nav .nav-item.active .nav-icon-wrapper {
@@ -1749,24 +1826,26 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         width: 52px;
         height: 52px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        color: #ffffff;
-        border: 4px solid #ffffff;
+        background: #eef2f6;
+        color: #4f46e5;
+        border: 2.5px solid rgba(255, 255, 255, 0.95);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
-        box-shadow: 0 8px 24px -2px rgba(79, 70, 229, 0.5);
+        box-shadow: 6px 6px 14px rgba(163, 177, 198, 0.6), -6px -6px 14px #ffffff;
         cursor: pointer;
         transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
     }
 
-    [data-bs-theme="dark"] .nav-fab-btn {
-        border-color: #0b1120;
+    .nav-fab-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 8px 8px 18px rgba(163, 177, 198, 0.7), -8px -8px 18px #ffffff;
     }
 
     .nav-fab-btn:active {
-        transform: scale(0.9);
+        transform: scale(0.92);
+        box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.5), inset -3px -3px 6px #ffffff;
     }
 
     /* 4. Ẩn Floating Menu trên Mobile vì đã có Bottom Nav */

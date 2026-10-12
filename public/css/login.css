@@ -1,472 +1,656 @@
-/* ==========================================
-   CSS Login - Life Planner (SaaS 2026 Minimalist Edition)
-   ========================================== */
+/* ==========================================================================
+   NEUMORPHISM 3D FLIP AUTH (LOGIN & REGISTER) - LIFE PLANNER
+   Inspired by Neumorphic Flip Card Reference & Modern Soft UI Design
+   Pure Vanilla CSS - No external UI library required
+   ========================================================================== */
 
 :root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    --primary-glow: rgba(79, 70, 229, 0.2);
+    /* Base Neumorphic Palette (Light Mode - Pale Blue-Gray) */
+    --neu-bg: #e7ebf0;
+    --neu-body-bg: radial-gradient(circle at 50% 35%, #edf3f8 0%, #dbe4ee 60%, #cbd6e2 100%);
     
-    --text-dark: #0f172a;
-    --text-slate: #334155;
-    --text-muted: #64748b;
-    --text-light: #94a3b8;
+    /* Neumorphic Shadow Tokens */
+    --neu-shadow-dark: rgba(163, 177, 198, 0.65);
+    --neu-shadow-light: rgba(255, 255, 255, 0.95);
+    --neu-shadow-subtle: rgba(163, 177, 198, 0.4);
+
+    /* Accent & Brand Colors */
+    --neu-accent: #2563eb;
+    --neu-accent-hover: #1d4ed8;
+    --neu-accent-glow: rgba(37, 99, 235, 0.25);
     
-    --card-bg: #ffffff;
-    --border-color: rgba(226, 232, 240, 0.9);
-    --border-focus: #6366f1;
+    /* Typography & Contrast Colors */
+    --neu-text-dark: #1e293b;
+    --neu-text-slate: #334155;
+    --neu-text-muted: #64748b;
+    --neu-text-light: #94a3b8;
+
+    /* Semantic Alerts */
+    --neu-danger: #ef4444;
+    --neu-success: #10b981;
+    --neu-warning: #f59e0b;
+
+    /* Card Sizing */
+    --card-radius: 35px;
+    --input-radius: 20px;
+    --btn-radius: 22px;
 }
 
-* {
+/* ==========================================================================
+   DARK MODE NEUMORPHIC OVERRIDES (data-bs-theme="dark")
+   ========================================================================== */
+[data-bs-theme="dark"] {
+    --neu-bg: #1e2227;
+    --neu-body-bg: radial-gradient(circle at 50% 35%, #24282e 0%, #1a1d21 60%, #131518 100%);
+    --neu-shadow-dark: rgba(0, 0, 0, 0.65);
+    --neu-shadow-light: rgba(255, 255, 255, 0.06);
+    --neu-shadow-subtle: rgba(0, 0, 0, 0.4);
+
+    --neu-accent: #3b82f6;
+    --neu-accent-hover: #60a5fa;
+    --neu-accent-glow: rgba(59, 130, 246, 0.3);
+
+    --neu-text-dark: #f1f5f9;
+    --neu-text-slate: #cbd5e1;
+    --neu-text-muted: #94a3b8;
+    --neu-text-light: #64748b;
+}
+
+/* Global Reset */
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
 body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: url('/images/auth_workspace_bg.jpg') no-repeat center center fixed;
+    background: var(--neu-body-bg) fixed no-repeat;
     background-size: cover;
-    color: var(--text-dark);
+    color: var(--neu-text-dark);
     min-height: 100vh;
     margin: 0;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-}
-
-/* Glassmorphism Soft Overlay over Background Photo */
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(248, 250, 252, 0.78) 0%, rgba(238, 242, 255, 0.72) 100%);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    pointer-events: none;
-    z-index: 0;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Page Outer Centering Wrapper */
-.login-page-wrapper {
+.neu-page-wrapper {
     width: 100%;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1rem;
+    padding: 2.5rem 1rem;
     position: relative;
     z-index: 1;
 }
 
-/* Single Centered Login Card */
-.login-card-2026 {
-    background: var(--card-bg);
-    border-radius: 24px;
-    padding: 3rem 2.5rem;
+/* ==========================================================================
+   3D FLIP CONTAINER ARCHITECTURE
+   ========================================================================== */
+.neu-flip-container {
+    perspective: 1200px;
+    -webkit-perspective: 1200px;
     width: 100%;
     max-width: 440px;
-    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.8);
-    border: 1px solid var(--border-color);
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    margin: 0 auto;
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+.neu-flip-card {
+    position: relative;
+    width: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.75s cubic-bezier(0.34, 1.25, 0.64, 1), min-height 0.35s ease;
+    border-radius: var(--card-radius);
 }
 
-/* Header Section (Centered Logo & Text) */
-.login-header-2026 {
-    text-align: center;
+/* 180deg Flip State */
+.neu-flip-card.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Front & Back Form Panels */
+.neu-form-panel {
+    border-radius: var(--card-radius);
+    background: var(--neu-bg);
+    box-shadow: 20px 20px 45px var(--neu-shadow-dark),
+                -20px -20px 45px var(--neu-shadow-light);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    padding: 38px 34px;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.75rem;
 }
 
-.brand-icon-box {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.65rem;
-    margin: 0 auto 1.15rem auto;
-    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Front Panel (Login) */
+.neu-login-panel {
+    position: relative;
+    z-index: 2;
+    transform: rotateY(0deg);
 }
 
-.brand-icon-box:hover {
+/* Back Panel (Sign Up) */
+.neu-signup-panel {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    z-index: 1;
+}
+
+/* When flipped, ensure back panel interactions and stacking are crisp */
+.neu-flip-card.is-flipped .neu-signup-panel {
+    z-index: 3;
+    position: relative; /* Allow content to dictate full height when active */
+}
+
+.neu-flip-card.is-flipped .neu-login-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   HEADER SECTION & NEUMORPHIC ICON BADGE
+   ========================================================================== */
+.neu-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.neu-icon-badge {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--neu-bg);
+    color: var(--neu-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin: 0 auto 1rem auto;
+    box-shadow: 8px 8px 16px var(--neu-shadow-dark),
+                -8px -8px 16px var(--neu-shadow-light);
+    transition: transform 0.3s cubic-bezier(0.34, 1.25, 0.64, 1), box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.neu-icon-badge:hover {
     transform: scale(1.06);
-    box-shadow: 0 14px 30px rgba(79, 70, 229, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    box-shadow: 10px 10px 20px var(--neu-shadow-dark),
+                -10px -10px 20px var(--neu-shadow-light);
 }
 
-.login-title-2026 {
+.neu-title {
     font-size: 1.85rem;
     font-weight: 800;
-    color: var(--text-dark);
+    color: var(--neu-text-dark);
     letter-spacing: -0.5px;
-    margin-bottom: 0.35rem;
-    text-align: center;
+    margin: 0 0 0.3rem 0;
+    line-height: 1.2;
 }
 
-.login-subtitle-2026 {
-    font-size: 0.95rem;
-    color: var(--text-muted);
+.neu-subtitle {
+    font-size: 0.9rem;
+    color: var(--neu-text-muted);
     font-weight: 500;
     margin: 0;
-    text-align: center;
+    line-height: 1.4;
 }
 
-/* Refined Minimal Demo Account Card */
-.demo-card-minimal {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 1.75rem;
+/* ==========================================================================
+   DEMO ACCOUNT CARD (NEUMORPHIC INSET)
+   ========================================================================== */
+.neu-demo-card {
+    background: var(--neu-bg);
+    border-radius: 18px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.35rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-subtle),
+                inset -3px -3px 6px var(--neu-shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-.demo-title {
-    font-size: 0.75rem;
+.neu-demo-title {
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    margin-bottom: 0.15rem;
+    letter-spacing: 0.6px;
+    color: var(--neu-accent);
+    margin-bottom: 0.1rem;
 }
 
-.demo-details {
-    font-size: 0.85rem;
+.neu-demo-details {
+    font-size: 0.82rem;
     font-weight: 600;
-    color: var(--text-slate);
+    color: var(--neu-text-slate);
 }
 
-.btn-demo-fill {
-    background: #ffffff;
-    color: var(--primary);
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
+.neu-btn-demo {
+    background: var(--neu-bg);
+    color: var(--neu-accent);
+    border: none;
+    border-radius: 12px;
     padding: 0.4rem 0.85rem;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
+    box-shadow: 3px 3px 7px var(--neu-shadow-dark),
+                -3px -3px 7px var(--neu-shadow-light);
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
-.btn-demo-fill:hover {
-    background: var(--primary);
-    color: #ffffff;
-    border-color: var(--primary);
+.neu-btn-demo:hover {
+    color: var(--neu-accent-hover);
+    box-shadow: 5px 5px 10px var(--neu-shadow-dark),
+                -5px -5px 10px var(--neu-shadow-light);
     transform: translateY(-1px);
 }
 
-/* Form Inputs Styling */
-.form-group-56 {
-    margin-bottom: 1.25rem;
+.neu-btn-demo:active {
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-dark),
+                inset -2px -2px 4px var(--neu-shadow-light);
+    transform: translateY(1px);
 }
 
-.form-label-2026 {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--text-slate);
-    margin-bottom: 0.45rem;
+/* ==========================================================================
+   INPUT FIELDS (NEUMORPHIC SUNKEN / INSET)
+   ========================================================================== */
+.neu-form-group {
+    margin-bottom: 1.15rem;
+}
+
+.neu-input-label {
     display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--neu-text-slate);
+    margin-bottom: 0.35rem;
+    padding-left: 0.35rem;
 }
 
-.input-container-56 {
+.neu-input-container {
     position: relative;
     display: flex;
     align-items: center;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 14px;
-    height: 56px;
-    padding: 0 1.25rem;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--neu-bg);
+    border-radius: var(--input-radius);
+    height: 52px;
+    padding: 0 1.15rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
+    transition: all 0.25s ease;
 }
 
-.input-container-56:focus-within {
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 4px var(--primary-glow);
+.neu-input-container:focus-within {
+    box-shadow: inset 5px 5px 10px var(--neu-shadow-dark),
+                inset -5px -5px 10px var(--neu-shadow-light),
+                0 0 0 2px var(--neu-accent-glow);
+    border-color: rgba(37, 99, 235, 0.3);
 }
 
-.input-container-56 .input-icon {
-    color: var(--text-muted);
+.neu-input-container.is-invalid {
+    box-shadow: inset 4px 4px 8px rgba(239, 68, 68, 0.25),
+                inset -4px -4px 8px var(--neu-shadow-light),
+                0 0 0 2px rgba(239, 68, 68, 0.4);
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+.neu-input-icon {
+    color: var(--neu-text-muted);
     font-size: 1.15rem;
-    margin-right: 0.85rem;
+    margin-right: 0.75rem;
     flex-shrink: 0;
     transition: color 0.2s ease;
 }
 
-.input-container-56:focus-within .input-icon {
-    color: var(--primary);
+.neu-input-container:focus-within .neu-input-icon {
+    color: var(--neu-accent);
 }
 
-.input-container-56 .form-control-clean {
-    border: none;
-    background: transparent;
-    outline: none;
+.neu-form-control {
     width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--neu-text-dark);
     font-size: 0.95rem;
-    color: var(--text-dark);
     font-weight: 500;
+    font-family: inherit;
     padding: 0;
 }
 
-.input-container-56 .form-control-clean::placeholder {
-    color: var(--text-light);
+.neu-form-control::placeholder {
+    color: var(--neu-text-light);
     font-weight: 400;
 }
 
-.toggle-pwd-btn {
+/* Password Eye Toggle Button */
+.neu-toggle-pwd {
     background: none;
     border: none;
-    color: var(--text-muted);
+    color: var(--neu-text-muted);
     font-size: 1.15rem;
     cursor: pointer;
     padding: 0;
-    margin-left: 0.65rem;
+    margin-left: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: color 0.2s ease;
 }
 
-.toggle-pwd-btn:hover {
-    color: var(--text-dark);
+.neu-toggle-pwd:hover {
+    color: var(--neu-accent);
 }
 
-/* Password Strength Indicator */
-.password-strength-box {
-    margin-top: 0.5rem;
+/* ==========================================================================
+   PASSWORD STRENGTH METER (REGISTER)
+   ========================================================================== */
+.neu-pwd-strength-box {
+    margin-top: 0.4rem;
+    margin-bottom: 0.9rem;
+    padding-left: 0.25rem;
 }
 
-.password-strength-bar {
-    height: 4px;
-    border-radius: 2px;
-    background-color: #e2e8f0;
+.neu-pwd-strength-track {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--neu-bg);
+    box-shadow: inset 1px 1px 3px var(--neu-shadow-dark),
+                inset -1px -1px 3px var(--neu-shadow-light);
     overflow: hidden;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.35rem;
 }
 
-.password-strength-fill {
+.neu-pwd-strength-fill {
     height: 100%;
     width: 0%;
-    border-radius: 2px;
+    border-radius: 3px;
     transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-.password-strength-text {
+.neu-pwd-strength-text {
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--neu-text-muted);
 }
 
-/* Options Row (Remember & Forgot) */
-.options-row-2026 {
+/* ==========================================================================
+   OPTIONS ROW & NEUMORPHIC CHECKBOX
+   ========================================================================== */
+.neu-options-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.75rem;
-    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
 }
 
-.checkbox-custom {
+.neu-checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    margin: 0;
-}
-
-.checkbox-custom input[type="checkbox"] {
-    width: 1.15em;
-    height: 1.15em;
-    border-radius: 4px;
-    accent-color: var(--primary);
-    cursor: pointer;
-}
-
-.checkbox-custom label {
-    color: var(--text-slate);
-    font-weight: 500;
+    gap: 0.6rem;
     cursor: pointer;
     user-select: none;
+    margin: 0;
+    color: var(--neu-text-slate);
+    font-weight: 500;
 }
 
-.forgot-link-2026 {
-    color: var(--primary);
+.neu-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: var(--neu-bg);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-dark),
+                inset -2px -2px 4px var(--neu-shadow-light);
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.neu-checkbox::before {
+    content: "\F26E"; /* bi-check-lg in Bootstrap Icons */
+    font-family: "bootstrap-icons";
+    font-size: 13px;
+    font-weight: bold;
+    color: #ffffff;
+    transform: scale(0);
+    transition: transform 0.15s ease-in-out;
+}
+
+.neu-checkbox:checked {
+    background: var(--neu-accent);
+    border-color: var(--neu-accent);
+    box-shadow: 2px 2px 6px rgba(37, 99, 235, 0.4);
+}
+
+.neu-checkbox:checked::before {
+    transform: scale(1);
+}
+
+.neu-forgot-link {
+    color: var(--neu-accent);
     font-weight: 600;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
-.forgot-link-2026:hover {
-    color: var(--primary-hover);
+.neu-forgot-link:hover {
+    color: var(--neu-accent-hover);
     text-decoration: underline;
 }
 
-/* Submit 56px Button */
-.btn-submit-56 {
+/* ==========================================================================
+   SUBMIT BUTTON (NEUMORPHIC RAISED PILL BUTTON)
+   ========================================================================== */
+.neu-btn-submit {
     width: 100%;
-    height: 56px;
-    border-radius: 14px;
-    background: var(--primary-gradient);
-    color: #ffffff;
+    height: 52px;
+    border-radius: var(--btn-radius);
+    background: var(--neu-bg);
+    color: var(--neu-accent);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.35);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    margin-bottom: 1.75rem;
+    gap: 0.5rem;
+    box-shadow: 6px 6px 14px var(--neu-shadow-dark),
+                -6px -6px 14px var(--neu-shadow-light);
+    transition: all 0.25s cubic-bezier(0.34, 1.25, 0.64, 1);
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.btn-submit-56:hover {
+.neu-btn-submit:hover {
+    color: var(--neu-accent-hover);
+    box-shadow: 8px 8px 18px var(--neu-shadow-dark),
+                -8px -8px 18px var(--neu-shadow-light);
     transform: translateY(-2px);
-    box-shadow: 0 14px 28px -4px rgba(79, 70, 229, 0.45);
-    color: #ffffff;
 }
 
-.btn-submit-56:active {
-    transform: translateY(0);
-    box-shadow: 0 6px 14px -2px rgba(79, 70, 229, 0.3);
+.neu-btn-submit:active {
+    box-shadow: inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
+    transform: translateY(1px);
 }
 
-/* Footer Prompt */
-.footer-prompt-2026 {
+/* ==========================================================================
+   FOOTER PROMPT & FLIP SWITCH TRIGGER
+   ========================================================================== */
+.neu-footer-prompt {
     text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-muted);
+    font-size: 0.88rem;
+    color: var(--neu-text-muted);
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
 }
 
-.register-link-2026 {
-    color: var(--primary);
+/* Neumorphic Circular Plus (+) Button from Reference Image */
+.neu-flip-circle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--neu-bg);
+    color: var(--neu-accent);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    box-shadow: 4px 4px 10px var(--neu-shadow-dark),
+                -4px -4px 10px var(--neu-shadow-light);
+    transition: all 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+    margin-left: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+}
+
+.neu-flip-circle-btn:hover {
+    transform: scale(1.12) rotate(90deg);
+    color: var(--neu-accent-hover);
+    box-shadow: 6px 6px 14px var(--neu-shadow-dark),
+                -6px -6px 14px var(--neu-shadow-light);
+}
+
+.neu-flip-circle-btn:active {
+    box-shadow: inset 2px 2px 5px var(--neu-shadow-dark),
+                inset -2px -2px 5px var(--neu-shadow-light);
+    transform: scale(0.96) rotate(90deg);
+}
+
+/* Link-style Flip Trigger */
+.neu-flip-link {
+    color: var(--neu-accent);
     font-weight: 700;
     text-decoration: none;
-    margin-left: 0.35rem;
+    cursor: pointer;
     transition: color 0.2s ease;
 }
 
-.register-link-2026:hover {
-    color: var(--primary-hover);
+.neu-flip-link:hover {
+    color: var(--neu-accent-hover);
     text-decoration: underline;
 }
 
-/* Alert Styling */
-.alert-custom {
-    border-radius: 12px;
-    font-size: 0.875rem;
-    border: none;
+/* ==========================================================================
+   NEUMORPHIC ALERTS & ERROR NOTIFICATIONS
+   ========================================================================== */
+.neu-alert {
+    border-radius: 16px;
     padding: 0.85rem 1.15rem;
     margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    border: none;
 }
 
-.alert-custom.alert-danger {
-    background-color: #fef2f2;
+.neu-alert-danger {
+    background: #fdf2f2;
     color: #991b1b;
-    border-left: 4px solid #f43f5e;
+    box-shadow: inset 2px 2px 5px rgba(239, 68, 68, 0.2),
+                inset -2px -2px 5px #ffffff;
+    border-left: 4px solid var(--neu-danger);
 }
 
-.alert-custom.alert-success {
-    background-color: #f0fdf4;
+.neu-alert-success {
+    background: #f0fdf4;
     color: #166534;
-    border-left: 4px solid #10b981;
+    box-shadow: inset 2px 2px 5px rgba(34, 197, 94, 0.2),
+                inset -2px -2px 5px #ffffff;
+    border-left: 4px solid var(--neu-success);
 }
 
-/* ==========================================
-   RESPONSIVE BREAKPOINTS (< 768px)
-   ========================================== */
+[data-bs-theme="dark"] .neu-alert-danger {
+    background: #2b1d1f;
+    color: #fca5a5;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.05);
+}
 
-@media (max-width: 767.98px) {
-    .login-page-wrapper {
-        padding: 1rem;
+[data-bs-theme="dark"] .neu-alert-success {
+    background: #19271e;
+    color: #86efac;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.05);
+}
+
+.neu-field-error {
+    color: var(--neu-danger);
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 0.35rem;
+    padding-left: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 575.98px) {
+    .neu-page-wrapper {
+        padding: 1.25rem 0.75rem;
     }
 
-    .login-card-2026 {
-        padding: 2.25rem 1.5rem;
-        border-radius: 20px;
-        max-width: 100%;
+    .neu-form-panel {
+        padding: 28px 20px;
+        border-radius: 28px;
     }
 
-    .login-title-2026 {
+    .neu-title {
         font-size: 1.6rem;
     }
 
-    .demo-card-minimal {
-        flex-direction: column;
-        align-items: flex-start;
+    .neu-icon-badge {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
     }
 
-    .btn-demo-fill {
+    .neu-demo-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .neu-btn-demo {
         width: 100%;
         text-align: center;
     }
-}
 
-/* ==========================================
-   DARK MODE OVERRIDES (BS 5.3 DATA-BS-THEME="DARK")
-   ========================================== */
-[data-bs-theme="dark"] body::before {
-    background: linear-gradient(135deg, rgba(18, 18, 18, 0.94) 0%, rgba(26, 26, 29, 0.9) 100%) !important;
-}
+    .neu-input-container {
+        height: 48px;
+    }
 
-[data-bs-theme="dark"] .login-card-2026 {
-    background: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
-    color: #E8E8EA !important;
+    .neu-btn-submit {
+        height: 48px;
+    }
 }
-
-[data-bs-theme="dark"] .login-title-2026 {
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .login-subtitle-2026,
-[data-bs-theme="dark"] .form-label-2026 {
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .form-control-2026 {
-    background-color: #1A1A1E !important;
-    border-color: #33333A !important;
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .form-control-2026:focus {
-    background-color: #1A1A1E !important;
-    border-color: #6C8CFF !important;
-    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25) !important;
-}
-
-[data-bs-theme="dark"] .demo-card-minimal {
-    background-color: #1A1A1E !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .demo-title {
-    color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .demo-details {
-    color: #A0A0A8 !important;
-}
-

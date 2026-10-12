@@ -37,9 +37,9 @@
     <div class="main-wrapper main-wrapper-full">
 
         <!-- ==========================================================================
-             2. HEADER THANH CÔNG CỤ TRÊN CÙNG
+             2. HEADER THANH CÔNG CỤ TRÊN CÙNG (NEUMORPHIC HEADER)
              ========================================================================== -->
-        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
+        <header class="top-header px-3 px-lg-4">
             <div class="d-flex align-items-center gap-3">
                 <!-- Brand logo hiển thị trên Header khi bỏ Sidebar -->
                 <a href="{{ route('calendar.index') }}" class="brand-link text-decoration-none d-flex align-items-center gap-2.5">
@@ -54,7 +54,7 @@
                 <!-- Thanh tìm kiếm nhanh -->
                 <div class="search-box d-none d-md-block ms-lg-3">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="form-control rounded-pill border-0 bg-light" id="searchCalendar" placeholder="Tìm kiếm lịch học, deadline, sự kiện...">
+                    <input type="text" class="form-control rounded-pill border-0" id="searchCalendar" placeholder="Tìm kiếm lịch học, deadline, sự kiện...">
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
 
                 <!-- CỘT TRÁI (75% DESKTOP | 100% TABLET/MOBILE): LỊCH THÁNG LỚN -->
                 <div class="col-12 col-lg-8 col-xl-9">
-                    <div class="custom-card mb-0 h-100 border-0 shadow-sm rounded-4">
+                    <div class="custom-card mb-0 h-100">
                         <!-- HEADER CARD LỊCH: THÁNG & NÚT LỌC MÀU SỰ KIỆN -->
                         <div class="card-header-custom flex-wrap gap-3">
                             <div class="d-flex align-items-center justify-content-between w-100 w-sm-auto gap-3">
@@ -110,7 +110,7 @@
                                         <i class="bi bi-calendar3 text-primary"></i>
                                         <span id="currentMonthTitle">{{ $currentMonthYear ?? date('d/m/Y') }}</span>
                                     </h5>
-                                    <div class="btn-group border rounded-pill p-1 bg-light ms-1">
+                                    <div class="d-flex align-items-center gap-1.5 ms-2">
                                         <button class="btn btn-sm btn-white rounded-circle shadow-none py-0 px-2" id="btnPrevMonth" title="Xem trước (Tuần/Tháng)">
                                             <i class="bi bi-chevron-left"></i>
                                         </button>
@@ -188,7 +188,7 @@
                 <div class="col-12 col-lg-4 col-xl-3 pb-5 pb-lg-0">
 
                     <!-- CARD 1: LỊCH TRÌNH HÔM NAY (HIỂN THỊ TRÊN DESKTOP, ẨN TRÊN MOBILE VÌ ĐÃ CÓ TRONG LỊCH TUẦN) -->
-                    <div class="side-card rounded-4 border-0 shadow-sm mb-3 d-none d-lg-block">
+                    <div class="side-card mb-3 d-none d-lg-block">
                         <div class="side-card-header">
                             <h6 class="side-card-title">
                                 <i class="bi bi-clock-history text-primary"></i>
@@ -202,70 +202,57 @@
                     </div>
 
                     <!-- CARD 2: DEADLINE SẮP ĐẾN HẠN (COMPACT TASK/DEADLINE LIST) -->
-                    <div class="side-card rounded-4 border-0 shadow-sm mb-4 mb-lg-0">
+                    <div class="side-card mb-4 mb-lg-0">
                         <div class="side-card-header d-flex align-items-center justify-content-between py-2.5 px-3">
                             <h6 class="side-card-title fs-7 mb-0">
                                 <i class="bi bi-hourglass-split text-warning"></i>
                                 <span>Deadline sắp tới</span>
                             </h6>
-                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">2</span>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">{{ count($sapDenHan ?? []) }}</span>
                         </div>
                         <div class="card-body p-2.5">
                             <div class="deadline-compact-list d-flex flex-column gap-2" id="upcomingDeadlineList">
-                                <!-- Deadline 1: Nộp đồ án PHP & Laravel -->
-                                <div class="deadline-compact-item urgent p-2.5 rounded-3">
+                                @forelse($sapDenHan ?? [] as $deadline)
+                                @php
+                                    $conLaiText = $deadline['con_lai'] ?? '';
+                                    $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2');
+                                @endphp
+                                <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }} p-2.5 rounded-3">
                                     <div class="d-flex align-items-start gap-2">
-                                        <span class="deadline-dot urgent mt-1 flex-shrink-0" aria-hidden="true"></span>
+                                        <span class="deadline-dot {{ $isUrgent ? 'urgent' : 'upcoming' }} mt-1 flex-shrink-0" aria-hidden="true"></span>
                                         <div class="flex-grow-1 min-w-0">
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
-                                                <span class="deadline-title fw-semibold text-truncate" title="Nộp đồ án PHP & Laravel">
-                                                    Nộp đồ án PHP & Laravel
+                                                <span class="deadline-title fw-semibold text-truncate" title="{{ $deadline['tieu_de'] ?? '' }}">
+                                                    {{ $deadline['tieu_de'] ?? 'Nộp bài tập' }}
                                                 </span>
-                                                <span class="deadline-tag badge bg-danger-subtle text-danger rounded-pill flex-shrink-0">
-                                                    Hôm nay
+                                                <span class="deadline-tag badge {{ $isUrgent ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning' }} rounded-pill flex-shrink-0">
+                                                    {{ $conLaiText }}
                                                 </span>
                                             </div>
                                             <div class="d-flex align-items-center justify-content-between gap-2 text-secondary deadline-meta">
-                                                <span class="text-truncate" title="Lập trình Web">
-                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>Lập trình Web
+                                                <span class="text-truncate" title="{{ $deadline['mon_hoc'] ?? '' }}">
+                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>{{ $deadline['mon_hoc'] ?? 'Môn học' }}
                                                 </span>
                                                 <span class="flex-shrink-0 deadline-date">
-                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59 • 14/09
+                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Deadline 2: Nộp bài CSDL MySQL -->
-                                <div class="deadline-compact-item upcoming p-2.5 rounded-3">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="deadline-dot upcoming mt-1 flex-shrink-0" aria-hidden="true"></span>
-                                        <div class="flex-grow-1 min-w-0">
-                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
-                                                <span class="deadline-title fw-semibold text-truncate" title="Nộp bài CSDL MySQL">
-                                                    Nộp bài CSDL MySQL
-                                                </span>
-                                                <span class="deadline-tag badge bg-warning-subtle text-warning rounded-pill flex-shrink-0">
-                                                    Còn 2 ngày
-                                                </span>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-between gap-2 text-secondary deadline-meta">
-                                                <span class="text-truncate" title="Cơ sở dữ liệu">
-                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>Cơ sở dữ liệu
-                                                </span>
-                                                <span class="flex-shrink-0 deadline-date">
-                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59 • 16/09
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                @empty
+                                <div class="empty-neu-card py-3">
+                                    <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
+                                    <p class="mb-0 fs-8">Không có deadline sắp tới!</p>
                                 </div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
 
                 </div>
+
+            </div>
 
             </div>
 
