@@ -1005,8 +1005,12 @@
                                 <div class="d-flex flex-column gap-2.5">
                                     @foreach($monHoc->lichHocs as $lich)
                                         <div class="p-3 rounded-3" style="background: var(--sd-surface); border: 1px solid var(--sd-surface-border);">
+                                            @php
+                                                $dowMap = [1 => 'Thứ 2', 2 => 'Thứ 3', 3 => 'Thứ 4', 4 => 'Thứ 5', 5 => 'Thứ 6', 6 => 'Thứ 7', 7 => 'Chủ Nhật'];
+                                                $tenThu = $dowMap[$lich->ngay_trong_tuan] ?? ('Thứ ' . $lich->ngay_trong_tuan);
+                                            @endphp
                                             <div class="d-flex align-items-center justify-content-between mb-1">
-                                                <span class="fw-bold fs-7 text-primary">Thứ {{ $lich->ngay_trong_tuan }}</span>
+                                                <span class="fw-bold fs-7 text-primary">{{ $tenThu }}</span>
                                                 <span class="badge bg-secondary-subtle text-secondary small">
                                                     {{ substr($lich->gio_bat_dau, 0, 5) }} - {{ substr($lich->gio_ket_thuc, 0, 5) }}
                                                 </span>

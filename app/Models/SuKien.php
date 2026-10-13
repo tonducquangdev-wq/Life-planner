@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class SuKien extends Model
 {
@@ -27,6 +28,7 @@ class SuKien extends Model
         'ngay_ket_thuc_lap',
         'nhom_lap_id',
         'cong_viec_id',
+        'mon_hoc_id',
     ];
 
     protected function casts(): array
@@ -50,15 +52,20 @@ class SuKien extends Model
         return $this->belongsTo(CongViec::class, 'cong_viec_id');
     }
 
+    public function monHoc(): BelongsTo
+    {
+        return $this->belongsTo(MonHoc::class, 'mon_hoc_id');
+    }
+
     /**
      * Scope lọc các sự kiện đến hạn gửi email nhắc nhở trong ngày.
      * Công thức: thoi_gian_bat_dau - so_ngay_nhac = date
      */
     public function scopeCanNhacThongBao($query, $date = null)
     {
-        $targetDate = $date ? \Illuminate\Support\Carbon::parse($date)->toDateString() : \Illuminate\Support\Carbon::today()->toDateString();
+        $targetDate = $date ? Carbon::parse($date)->toDateString() : Carbon::today()->toDateString();
+
         return $query->where('bat_thong_bao', true)
             ->whereRaw('DATE(DATE_SUB(thoi_gian_bat_dau, INTERVAL so_ngay_nhac DAY)) = ?', [$targetDate]);
     }
 }
-

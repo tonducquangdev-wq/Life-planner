@@ -116,6 +116,53 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
+
+    <!-- Lịch học & Đồng bộ Lịch trình -->
+    <div class="col-12">
+        <div class="card border bg-light-subtle rounded-3 p-3 mt-2">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <label class="form-label fw-bold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-check text-primary fs-5"></i>
+                    <span>Lịch học hàng tuần & Đồng bộ Lịch trình</span>
+                </label>
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input cursor-pointer" type="checkbox" id="dong_bo_calendar" name="dong_bo_calendar" value="1" checked>
+                    <label class="form-check-label small fw-semibold text-primary cursor-pointer" for="dong_bo_calendar">
+                        Tự động thêm vào Lịch trình
+                    </label>
+                </div>
+            </div>
+            <p class="text-muted small mb-3">
+                Chọn các thứ học trong tuần và khung giờ học để hệ thống tự động sinh thời khóa biểu vào Trang Lịch.
+            </p>
+
+            @php
+                $existingDays = isset($monHoc) && $monHoc->lichHocs ? $monHoc->lichHocs->pluck('ngay_trong_tuan')->toArray() : [];
+                $firstLich = isset($monHoc) && $monHoc->lichHocs ? $monHoc->lichHocs->first() : null;
+                $defaultStartH = $firstLich ? substr($firstLich->gio_bat_dau, 0, 5) : '08:00';
+                $defaultEndH = $firstLich ? substr($firstLich->gio_ket_thuc, 0, 5) : '10:30';
+            @endphp
+
+            <label class="form-label small fw-semibold text-muted mb-1.5">Các thứ học trong tuần:</label>
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                @foreach([1 => 'Thứ 2', 2 => 'Thứ 3', 3 => 'Thứ 4', 4 => 'Thứ 5', 5 => 'Thứ 6', 6 => 'Thứ 7', 7 => 'Chủ Nhật'] as $dowVal => $dowName)
+                    <input type="checkbox" class="btn-check" id="dow_{{ $dowVal }}" name="ngay_trong_tuan[]" value="{{ $dowVal }}" autocomplete="off" {{ in_array($dowVal, old('ngay_trong_tuan', $existingDays)) ? 'checked' : '' }}>
+                    <label class="btn btn-outline-primary btn-sm rounded-pill px-3" for="dow_{{ $dowVal }}">{{ $dowName }}</label>
+                @endforeach
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="gio_bat_dau" class="form-label small fw-semibold text-muted mb-1">Giờ bắt đầu học</label>
+                    <input type="time" class="form-control" id="gio_bat_dau" name="gio_bat_dau" value="{{ old('gio_bat_dau', $defaultStartH) }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="gio_ket_thuc" class="form-label small fw-semibold text-muted mb-1">Giờ kết thúc học</label>
+                    <input type="time" class="form-control" id="gio_ket_thuc" name="gio_ket_thuc" value="{{ old('gio_ket_thuc', $defaultEndH) }}">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

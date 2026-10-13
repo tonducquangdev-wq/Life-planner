@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GiaSu;
 use App\Models\MonHoc;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class MonHocController extends Controller
@@ -56,7 +58,7 @@ class MonHocController extends Controller
         }
 
         try {
-            return \Illuminate\Support\Carbon::parse($value)->format('Y-m-d');
+            return Carbon::parse($value)->format('Y-m-d');
         } catch (\Throwable $e) {
             return $value;
         }
@@ -79,7 +81,7 @@ class MonHocController extends Controller
         if ($maMon === '') {
             $rawLetters = preg_replace('/[^A-Za-z0-9]/', '', (string) $request->input('ten_mon', ''));
             $slug = strtoupper(substr($rawLetters, 0, 4));
-            $maMon = ($slug ?: 'MH') . rand(100, 999);
+            $maMon = ($slug ?: 'MH').rand(100, 999);
         }
 
         $request->merge([
@@ -132,10 +134,19 @@ class MonHocController extends Controller
 
         $monHoc = MonHoc::create($validated);
 
+        // Tự động đồng bộ môn học vào bảng lịch học (lich_hoc) và trang Lịch trình (su_kien)
+        $dongBoCalendar = $request->has('dong_bo_calendar') ? $request->boolean('dong_bo_calendar') : true;
+        $daysOfWeek = $request->input('ngay_trong_tuan', []);
+        $gioBatDau = $request->input('gio_bat_dau', '08:00');
+        $gioKetThuc = $request->input('gio_ket_thuc', '10:30');
+
+        $eventsCount = $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Môn học đã được thêm thành công!',
+                'message' => 'Môn học đã được thêm thành công'.($dongBoCalendar ? " và tự động đồng bộ {$eventsCount} buổi vào Trang Lịch!" : '!'),
+                'events_created' => $eventsCount,
                 'data' => [
                     'id' => $monHoc->id,
                     'ma_mon' => $monHoc->ma_mon,
@@ -156,7 +167,7 @@ class MonHocController extends Controller
         }
 
         return redirect()->route('mon-hoc.index')
-            ->with('status', 'Thêm môn học thành công!');
+            ->with('status', 'Thêm môn học thành công'.($dongBoCalendar ? ' và tự động thêm vào Lịch trình!' : '!'));
     }
 
     /**
@@ -167,7 +178,7 @@ class MonHocController extends Controller
         // Kiểm tra quyền sở hữu môn học
         abort_if($monHoc->user_id !== Auth::id(), 403);
 
-        $monHoc->load('baiTaps');
+        $monHoc->load(['baiTaps', 'lichHocs', 'suKiens']);
 
         return view('mon_hoc.show', compact('monHoc'));
     }
@@ -204,16 +215,16 @@ class MonHocController extends Controller
         if ($hasEnd) {
             $mergeData['ngay_ket_thuc'] = $normalizedEnd;
         }
-        if (!$request->has('so_tin_chi')) {
+        if (! $request->has('so_tin_chi')) {
             $mergeData['so_tin_chi'] = $monHoc->so_tin_chi ?? 3;
         }
-        if (!$request->has('tien_do')) {
+        if (! $request->has('tien_do')) {
             $mergeData['tien_do'] = $monHoc->tien_do ?? 0;
         }
-        if (!$request->has('diem_so')) {
+        if (! $request->has('diem_so')) {
             $mergeData['diem_so'] = $monHoc->diem_so;
         }
-        if (!empty($mergeData)) {
+        if (! empty($mergeData)) {
             $request->merge($mergeData);
         }
 
@@ -246,7 +257,7 @@ class MonHocController extends Controller
         }
 
         if ($effectiveStartDate && $effectiveEndDate) {
-            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:' . $effectiveStartDate;
+            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:'.$effectiveStartDate;
         } else {
             $rules['ngay_ket_thuc'] = 'nullable|date';
         }
@@ -267,8 +278,15 @@ class MonHocController extends Controller
 
         $monHoc->update($validated);
 
+        $dongBoCalendar = $request->has('dong_bo_calendar') ? $request->boolean('dong_bo_calendar') : true;
+        $daysOfWeek = $request->input('ngay_trong_tuan');
+        $gioBatDau = $request->input('gio_bat_dau');
+        $gioKetThuc = $request->input('gio_ket_thuc');
+
+        $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+
         return redirect()->route('mon-hoc.index')
-            ->with('status', 'Cập nhật môn học thành công!');
+            ->with('status', 'Cập nhật môn học thành công'.($dongBoCalendar ? ' và đã đồng bộ vào Lịch trình!' : '!'));
     }
 
     /**
@@ -389,17 +407,17 @@ class MonHocController extends Controller
         $monHocId = $request->input('mon_hoc_id');
         $mucGia = $request->input('muc_gia');
 
-        $query = \App\Models\GiaSu::with('monHoc');
+        $query = GiaSu::with('monHoc');
 
-        if (!empty($keyword)) {
+        if (! empty($keyword)) {
             $query->where(function ($q) use ($keyword) {
                 $q->where('ho_ten', 'like', "%{$keyword}%")
-                  ->orWhere('chuyen_mon', 'like', "%{$keyword}%")
-                  ->orWhere('mo_ta_kinh_nghiem', 'like', "%{$keyword}%");
+                    ->orWhere('chuyen_mon', 'like', "%{$keyword}%")
+                    ->orWhere('mo_ta_kinh_nghiem', 'like', "%{$keyword}%");
             });
         }
 
-        if (!empty($monHocId)) {
+        if (! empty($monHocId)) {
             $query->where('mon_hoc_id', $monHocId);
         }
 

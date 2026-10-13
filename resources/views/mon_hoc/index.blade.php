@@ -747,6 +747,36 @@
             box-shadow: 0 0 0 3px var(--nm-surface), 0 0 0 5px var(--nm-primary) !important;
         }
 
+        /* Day of week chips in Modal */
+        .nm-day-chip {
+            background: var(--nm-surface) !important;
+            border: var(--nm-border-subtle) !important;
+            box-shadow: 2px 2px 6px rgba(163, 177, 198, 0.4), -2px -2px 6px rgba(255, 255, 255, 0.8) !important;
+            color: var(--nm-text-main) !important;
+            font-size: 0.78rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
+            cursor: pointer;
+            padding: 0.35rem 0.75rem !important;
+        }
+
+        [data-bs-theme="dark"] .nm-day-chip {
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5), -1px -1px 4px rgba(255, 255, 255, 0.04) !important;
+        }
+
+        .nm-day-chip:hover {
+            transform: translateY(-2px);
+            color: var(--nm-primary) !important;
+        }
+
+        .btn-check:checked + .nm-day-chip {
+            background: var(--nm-primary-gradient) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4) !important;
+            transform: translateY(-2px) scale(1.04);
+        }
+
         /* 7. EMPTY STATES NEUMORPHIC */
         .nm-empty-card {
             background: var(--nm-surface);
@@ -1032,7 +1062,7 @@
                                         </div>
 
                                         <!-- Tín chỉ & Số lượng bài tập liên kết -->
-                                        <div class="d-flex align-items-center gap-2 mt-1 pt-1">
+                                        <div class="d-flex align-items-center gap-2 mt-1 pt-1 flex-wrap">
                                             <span class="nm-pill-chip" title="Số tín chỉ">
                                                 <i class="bi bi-award-fill text-warning me-1"></i>{{ $monHoc->so_tin_chi ?? 3 }} tín chỉ
                                             </span>
@@ -1041,6 +1071,9 @@
                                                 <i class="bi bi-journal-check text-success me-1"></i>{{ $monHoc->bai_taps_count }} bài tập
                                             </span>
                                             @endif
+                                            <a href="{{ route('calendar.index') }}" class="nm-pill-chip text-decoration-none" title="Xem trên Lịch trình">
+                                                <i class="bi bi-calendar-check text-primary me-1"></i>Lịch trình
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -1290,6 +1323,63 @@
                                     </div>
                                 </div>
                                 <div class="invalid-feedback small" id="error_mau_sac"></div>
+                            </div>
+
+                            <!-- 8. Lịch học & Tự động đồng bộ vào Lịch trình (Calendar Auto-Sync) -->
+                            <div class="col-12">
+                                <div class="p-3 rounded-4" style="background: var(--nm-surface); border: var(--nm-border-subtle); box-shadow: var(--nm-shadow-inset);">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label fw-semibold small mb-0 text-dark-nm d-flex align-items-center gap-1.5">
+                                            <i class="bi bi-calendar-check-fill text-primary"></i>
+                                            <span>Lịch học hàng tuần</span>
+                                        </label>
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input cursor-pointer" type="checkbox" id="modal_dong_bo_calendar" name="dong_bo_calendar" value="1" checked>
+                                            <label class="form-check-label small fw-semibold text-primary cursor-pointer" for="modal_dong_bo_calendar">
+                                                Tự động thêm vào Lịch
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-2.5">
+                                        Chọn thứ học và khung giờ để hệ thống tự động thêm thời khóa biểu vào Trang Lịch.
+                                    </p>
+
+                                    <!-- Nút chọn các Thứ trong tuần -->
+                                    <div class="d-flex align-items-center gap-1.5 flex-wrap mb-2.5" id="modalDayOfWeekButtons">
+                                        <input type="checkbox" class="btn-check" id="modal_dow_1" name="ngay_trong_tuan[]" value="1" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_1">Thứ 2</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_2" name="ngay_trong_tuan[]" value="2" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_2">Thứ 3</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_3" name="ngay_trong_tuan[]" value="3" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_3">Thứ 4</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_4" name="ngay_trong_tuan[]" value="4" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_4">Thứ 5</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_5" name="ngay_trong_tuan[]" value="5" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_5">Thứ 6</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_6" name="ngay_trong_tuan[]" value="6" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_6">Thứ 7</label>
+
+                                        <input type="checkbox" class="btn-check" id="modal_dow_7" name="ngay_trong_tuan[]" value="7" autocomplete="off">
+                                        <label class="btn btn-sm nm-day-chip rounded-pill" for="modal_dow_7">CN</label>
+                                    </div>
+
+                                    <!-- Khung giờ học -->
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label for="modal_gio_bat_dau" class="form-label small mb-1 text-muted">Giờ bắt đầu</label>
+                                            <input type="time" class="form-control nm-form-control form-control-sm" id="modal_gio_bat_dau" name="gio_bat_dau" value="08:00">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="modal_gio_ket_thuc" class="form-label small mb-1 text-muted">Giờ kết thúc</label>
+                                            <input type="time" class="form-control nm-form-control form-control-sm" id="modal_gio_ket_thuc" name="gio_ket_thuc" value="10:30">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1624,10 +1714,13 @@
                                             <strong class="nm-meta-value">${monHoc.ngay_bat_dau ? (monHoc.ngay_bat_dau + (monHoc.ngay_ket_thuc ? ' - ' + monHoc.ngay_ket_thuc : '')) : 'Linh hoạt'}</strong>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2 mt-1 pt-1">
+                                    <div class="d-flex align-items-center gap-2 mt-1 pt-1 flex-wrap">
                                         <span class="nm-pill-chip" title="Số tín chỉ">
                                             <i class="bi bi-award-fill text-warning me-1"></i>${monHoc.so_tin_chi || 3} tín chỉ
                                         </span>
+                                        <a href="/calendar" class="nm-pill-chip text-decoration-none" title="Xem trên Lịch trình">
+                                            <i class="bi bi-calendar-check text-primary me-1"></i>Lịch trình
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -1754,6 +1847,14 @@
 
                             // 2. Reset form
                             createForm.reset();
+                            const syncCheck = document.getElementById('modal_dong_bo_calendar');
+                            if (syncCheck) syncCheck.checked = true;
+                            const gbd = document.getElementById('modal_gio_bat_dau');
+                            if (gbd) gbd.value = '08:00';
+                            const gkt = document.getElementById('modal_gio_ket_thuc');
+                            if (gkt) gkt.value = '10:30';
+                            document.querySelectorAll('#modalDayOfWeekButtons input[type="checkbox"]').forEach(cb => cb.checked = false);
+
                             if (colorInput) colorInput.value = '#6366f1';
                             presetButtons.forEach((b, idx) => {
                                 if (idx === 0) b.classList.add('active');

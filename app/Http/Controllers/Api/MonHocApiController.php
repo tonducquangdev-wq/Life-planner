@@ -50,7 +50,7 @@ class MonHocApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lấy danh sách môn học thành công!',
-            'data'    => $danhSach,
+            'data' => $danhSach,
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -71,16 +71,16 @@ class MonHocApiController extends Controller
         ]);
 
         $rules = [
-            'ma_mon'        => 'required|string|max:50',
-            'ten_mon'       => 'required|string|max:255',
-            'giang_vien'    => 'nullable|string|max:255',
-            'phong_hoc'     => 'nullable|string|max:255',
-            'so_tin_chi'    => 'required|integer|min:1|max:20',
-            'tien_do'       => 'nullable|integer|min:0|max:100',
-            'diem_so'       => 'nullable|numeric|min:0|max:10',
-            'ngay_bat_dau'  => 'nullable|date',
-            'mau_sac'       => 'nullable|string|max:20',
-            'trang_thai'    => 'nullable|in:dang_hoc,da_hoan_thanh,tam_dung',
+            'ma_mon' => 'required|string|max:50',
+            'ten_mon' => 'required|string|max:255',
+            'giang_vien' => 'nullable|string|max:255',
+            'phong_hoc' => 'nullable|string|max:255',
+            'so_tin_chi' => 'required|integer|min:1|max:20',
+            'tien_do' => 'nullable|integer|min:0|max:100',
+            'diem_so' => 'nullable|numeric|min:0|max:10',
+            'ngay_bat_dau' => 'nullable|date',
+            'mau_sac' => 'nullable|string|max:20',
+            'trang_thai' => 'nullable|in:dang_hoc,da_hoan_thanh,tam_dung',
         ];
 
         if ($normalizedStart && $normalizedEnd) {
@@ -102,10 +102,18 @@ class MonHocApiController extends Controller
 
         $monHoc = MonHoc::create($validated);
 
+        $dongBoCalendar = $request->has('dong_bo_calendar') ? $request->boolean('dong_bo_calendar') : true;
+        $daysOfWeek = $request->input('ngay_trong_tuan', []);
+        $gioBatDau = $request->input('gio_bat_dau', '08:00');
+        $gioKetThuc = $request->input('gio_ket_thuc', '10:30');
+
+        $eventsCount = $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+
         return response()->json([
             'success' => true,
             'message' => 'Thêm môn học thành công!',
-            'data'    => $monHoc,
+            'events_created' => $eventsCount,
+            'data' => $monHoc->load(['lichHocs', 'suKiens']),
         ], 201, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -128,7 +136,7 @@ class MonHocApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Chi tiết môn học thành công!',
-            'data'    => $monHoc,
+            'data' => $monHoc,
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -164,16 +172,16 @@ class MonHocApiController extends Controller
         }
 
         $rules = [
-            'ma_mon'        => 'sometimes|required|string|max:50',
-            'ten_mon'       => 'sometimes|required|string|max:255',
-            'giang_vien'    => 'nullable|string|max:255',
-            'phong_hoc'     => 'nullable|string|max:255',
-            'so_tin_chi'    => 'sometimes|required|integer|min:1|max:20',
-            'tien_do'       => 'nullable|integer|min:0|max:100',
-            'diem_so'       => 'nullable|numeric|min:0|max:10',
-            'ngay_bat_dau'  => 'nullable|date',
-            'mau_sac'       => 'nullable|string|max:20',
-            'trang_thai'    => 'nullable|in:dang_hoc,da_hoan_thanh,tam_dung',
+            'ma_mon' => 'sometimes|required|string|max:50',
+            'ten_mon' => 'sometimes|required|string|max:255',
+            'giang_vien' => 'nullable|string|max:255',
+            'phong_hoc' => 'nullable|string|max:255',
+            'so_tin_chi' => 'sometimes|required|integer|min:1|max:20',
+            'tien_do' => 'nullable|integer|min:0|max:100',
+            'diem_so' => 'nullable|numeric|min:0|max:10',
+            'ngay_bat_dau' => 'nullable|date',
+            'mau_sac' => 'nullable|string|max:20',
+            'trang_thai' => 'nullable|in:dang_hoc,da_hoan_thanh,tam_dung',
         ];
 
         // Xác định ngày bắt đầu hiệu lực
@@ -192,7 +200,7 @@ class MonHocApiController extends Controller
         }
 
         if ($effectiveStartDate && $effectiveEndDate) {
-            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:' . $effectiveStartDate;
+            $rules['ngay_ket_thuc'] = 'nullable|date|after_or_equal:'.$effectiveStartDate;
         } else {
             $rules['ngay_ket_thuc'] = 'nullable|date';
         }
@@ -210,10 +218,17 @@ class MonHocApiController extends Controller
 
         $monHoc->update($validated);
 
+        $dongBoCalendar = $request->has('dong_bo_calendar') ? $request->boolean('dong_bo_calendar') : true;
+        $daysOfWeek = $request->input('ngay_trong_tuan');
+        $gioBatDau = $request->input('gio_bat_dau');
+        $gioKetThuc = $request->input('gio_ket_thuc');
+
+        $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật môn học thành công!',
-            'data'    => $monHoc->fresh(),
+            'data' => $monHoc->fresh(['lichHocs', 'suKiens']),
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -298,20 +313,20 @@ class MonHocApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lấy báo cáo học tập thành công!',
-            'data'    => [
-                'gpa'                     => $gpa4,
-                'gpa_10'                  => $gpa10,
-                'gpa_4'                   => $gpa4,
-                'tong_tin_chi'            => $tongTinChi,
-                'tin_chi_hoan_thanh'      => $tinChiHoanThanh,
-                'hoc_luc'                 => $xepLoai['label'],
-                'xep_loai'                => $xepLoai,
-                'tong_mon_hoc'            => $tongSoMon,
-                'so_mon_dang_hoc'         => $soMonDangHoc,
-                'so_mon_hoan_thanh'       => $soMonHoanThanh,
-                'tong_bai_tap'            => $tongBaiTap,
-                'bai_tap_hoan_thanh'      => $baiTapHoanThanh,
-                'bai_tap_chua_nop'        => $baiTapChuaNop,
+            'data' => [
+                'gpa' => $gpa4,
+                'gpa_10' => $gpa10,
+                'gpa_4' => $gpa4,
+                'tong_tin_chi' => $tongTinChi,
+                'tin_chi_hoan_thanh' => $tinChiHoanThanh,
+                'hoc_luc' => $xepLoai['label'],
+                'xep_loai' => $xepLoai,
+                'tong_mon_hoc' => $tongSoMon,
+                'so_mon_dang_hoc' => $soMonDangHoc,
+                'so_mon_hoan_thanh' => $soMonHoanThanh,
+                'tong_bai_tap' => $tongBaiTap,
+                'bai_tap_hoan_thanh' => $baiTapHoanThanh,
+                'bai_tap_chua_nop' => $baiTapChuaNop,
                 'ty_le_hoan_thanh_bai_tap' => $tyLeHoanThanhBaiTap,
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
