@@ -172,6 +172,14 @@
 
                             <!-- 2. KHUNG LỊCH TUẦN MOBILE (FLUTTER STYLE) -->
                             <div class="mobile-week-calendar-container d-none" id="mobileWeekCalendar">
+                                <!-- Gợi ý thao tác vuốt ngang trên Mobile -->
+                                <div class="mobile-week-hint d-flex align-items-center justify-content-between px-1 mb-2.5">
+                                    <span class="fs-8 text-secondary fw-semibold d-flex align-items-center gap-1.5">
+                                        <i class="bi bi-arrow-left-right text-primary"></i>
+                                        <span>Vuốt ngang để xem 7 ngày</span>
+                                    </span>
+                                </div>
+
                                 <!-- Thanh trượt 7 ngày trong tuần -->
                                 <div class="week-strip-wrapper mb-3">
                                     <div class="week-strip-grid" id="weekStripGrid">
@@ -203,47 +211,45 @@
 
                     <!-- CARD 2: DEADLINE SẮP ĐẾN HẠN (COMPACT TASK/DEADLINE LIST) -->
                     <div class="side-card mb-4 mb-lg-0">
-                        <div class="side-card-header d-flex align-items-center justify-content-between py-2.5 px-3">
+                        <div class="side-card-header d-flex align-items-center justify-content-between py-3 px-3.5">
                             <h6 class="side-card-title fs-7 mb-0">
                                 <i class="bi bi-hourglass-split text-warning"></i>
                                 <span>Deadline sắp tới</span>
                             </h6>
-                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">{{ count($sapDenHan ?? []) }}</span>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">{{ count($sapDenHan ?? []) }}</span>
                         </div>
-                        <div class="card-body p-2.5">
-                            <div class="deadline-compact-list d-flex flex-column gap-2" id="upcomingDeadlineList">
+                        <div class="card-body p-3">
+                            <div class="deadline-compact-list" id="upcomingDeadlineList">
                                 @forelse($sapDenHan ?? [] as $deadline)
                                 @php
-                                    $conLaiText = $deadline['con_lai'] ?? '';
-                                    $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2');
+                                $conLaiText = $deadline['con_lai'] ?? '';
+                                $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2');
                                 @endphp
-                                <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }} p-2.5 rounded-3">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="deadline-dot {{ $isUrgent ? 'urgent' : 'upcoming' }} mt-1 flex-shrink-0" aria-hidden="true"></span>
-                                        <div class="flex-grow-1 min-w-0">
-                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
-                                                <span class="deadline-title fw-semibold text-truncate" title="{{ $deadline['tieu_de'] ?? '' }}">
-                                                    {{ $deadline['tieu_de'] ?? 'Nộp bài tập' }}
-                                                </span>
-                                                <span class="deadline-tag badge {{ $isUrgent ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning' }} rounded-pill flex-shrink-0">
-                                                    {{ $conLaiText }}
-                                                </span>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-between gap-2 text-secondary deadline-meta">
-                                                <span class="text-truncate" title="{{ $deadline['mon_hoc'] ?? '' }}">
-                                                    <i class="bi bi-mortarboard me-1 opacity-75"></i>{{ $deadline['mon_hoc'] ?? 'Môn học' }}
-                                                </span>
-                                                <span class="flex-shrink-0 deadline-date">
-                                                    <i class="bi bi-clock me-1 opacity-75"></i>23:59
-                                                </span>
-                                            </div>
+                                <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }}">
+                                    <div class="d-flex align-items-center justify-content-between gap-2 mb-1.5">
+                                        <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1">
+                                            <span class="deadline-dot {{ $isUrgent ? 'urgent' : 'upcoming' }} flex-shrink-0" aria-hidden="true"></span>
+                                            <span class="deadline-title fw-bold text-truncate text-dark" title="{{ $deadline['tieu_de'] ?? '' }}">
+                                                {{ $deadline['tieu_de'] ?? 'Nộp bài tập' }}
+                                            </span>
                                         </div>
+                                        <span class="deadline-tag badge {{ $isUrgent ? 'badge-urgent' : 'badge-upcoming' }} rounded-pill flex-shrink-0">
+                                            {{ $conLaiText }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between gap-2 deadline-meta" style="padding-left: 16px;">
+                                        <span class="text-truncate text-secondary" title="{{ $deadline['mon_hoc'] ?? '' }}">
+                                            <i class="bi bi-mortarboard me-1 text-primary opacity-75"></i>{{ $deadline['mon_hoc'] ?? 'Môn học' }}
+                                        </span>
+                                        <span class="flex-shrink-0 text-secondary deadline-date">
+                                            <i class="bi bi-clock me-1 text-warning opacity-75"></i>23:59
+                                        </span>
                                     </div>
                                 </div>
                                 @empty
                                 <div class="empty-neu-card py-3">
                                     <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
-                                    <p class="mb-0 fs-8">Không có deadline sắp tới!</p>
+                                    <p class="mb-0 fs-8 text-muted">Không có deadline sắp tới!</p>
                                 </div>
                                 @endforelse
                             </div>
@@ -254,9 +260,9 @@
 
             </div>
 
-            </div>
+    </div>
 
-        </main>
+    </main>
     </div>
 
     <!-- ==========================================================================
@@ -329,6 +335,11 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link tab-ca-nhan" id="ca-nhan-tab" data-bs-toggle="tab" data-bs-target="#tab-ca-nhan" type="button" role="tab">
                                 🎉 Sự kiện cá nhân
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link tab-cong-viec" id="cong-viec-tab" data-bs-toggle="tab" data-bs-target="#tab-cong-viec" type="button" role="tab">
+                                💼 Công việc
                             </button>
                         </li>
                     </ul>
@@ -669,6 +680,91 @@
                             </form>
                         </div>
 
+                        <!-- TAB 5: CÔNG VIỆC -->
+                        <div class="tab-pane fade" id="tab-cong-viec" role="tabpanel">
+                            <form id="formCreateCongViec">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Tên công việc</label>
+                                    <input type="text" class="form-control rounded-3" id="createCongViecTitle" placeholder="Ví dụ: Thiết kế giao diện Dashboard / Họp khách hàng" required>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold fs-7 text-secondary">Ngày diễn ra</label>
+                                        <input type="date" class="form-control rounded-3" id="createCongViecDay" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold fs-7 text-secondary">Giờ bắt đầu</label>
+                                        <input type="time" class="form-control rounded-3" id="createCongViecTime" value="09:00" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold fs-7 text-secondary">Giờ kết thúc</label>
+                                        <input type="time" class="form-control rounded-3" id="createCongViecEndTime" value="11:30">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold fs-7 text-secondary">Quy tắc lặp</label>
+                                        <select class="form-select rounded-3" id="createCongViecRepeat">
+                                            <option value="once" selected>📌 Sự kiện 1 lần</option>
+                                            <option value="daily">📅 Lặp hàng ngày</option>
+                                            <option value="weekly">🔄 Lặp hàng tuần</option>
+                                            <option value="monthly">📆 Lặp hàng tháng</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 d-none" id="createCongViecEndRepeatGroup">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control rounded-3" id="createCongViecEndRepeat">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú / Dự án</label>
+                                    <input type="text" class="form-control rounded-3" id="createCongViecLocation" placeholder="Ví dụ: Phòng họp A • Báo cáo tiến độ Sprint">
+                                </div>
+                                <!-- PHẦN CẤU HÌNH THÔNG BÁO SỰ KIỆN -->
+                                <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <label class="form-check-label fw-semibold fs-7 text-dark mb-0 cursor-pointer d-flex align-items-center gap-2" for="createCongViecBatThongBao">
+                                            <i class="bi bi-bell-fill text-warning fs-6"></i>
+                                            <span>Bật thông báo</span>
+                                        </label>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input mt-0 cursor-pointer notif-toggle-switch" type="checkbox" role="switch" id="createCongViecBatThongBao" data-target="#createCongViecRemindGroup">
+                                        </div>
+                                    </div>
+                                    <div class="notif-remind-box mt-2" id="createCongViecRemindGroup">
+                                        <label class="form-label fw-semibold fs-7 text-secondary mb-1">
+                                            <i class="bi bi-envelope-paper me-1 text-primary"></i>Thời gian nhắc nhở
+                                        </label>
+                                        <select class="form-select rounded-3 notif-select-time" id="createCongViecSoNgayNhac">
+                                            <option value="0">Đúng giờ diễn ra</option>
+                                            <option value="5">Trước 5 phút</option>
+                                            <option value="10">Trước 10 phút</option>
+                                            <option value="15" selected>Trước 15 phút</option>
+                                            <option value="30">Trước 30 phút</option>
+                                            <option value="60">Trước 1 giờ</option>
+                                            <option value="120">Trước 2 giờ</option>
+                                            <option value="1440">Trước 1 ngày</option>
+                                            <option value="2880">Trước 2 ngày</option>
+                                            <option value="10080">Trước 1 tuần</option>
+                                            <option value="custom">⚙️ Tự thiết lập thời gian...</option>
+                                        </select>
+                                        <div class="custom-time-inputs mt-2 d-none">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-secondary fs-7 border-end-0">Trước</span>
+                                                <input type="number" class="form-control custom-time-num fs-7" min="1" value="15" placeholder="Nhập số">
+                                                <select class="form-select custom-time-unit fs-7" style="max-width: 110px;">
+                                                    <option value="1">phút</option>
+                                                    <option value="60">giờ</option>
+                                                    <option value="1440">ngày</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted fs-8 d-block mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Nếu bật, hệ thống sẽ gửi email nhắc nhở trước thời gian đã chọn.
+                                        </small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
 
@@ -703,6 +799,7 @@
                                 <option value="tap-luyen">🏋️ Tập luyện</option>
                                 <option value="deadline">⏰ Deadline</option>
                                 <option value="ca-nhan">🎉 Cá nhân</option>
+                                <option value="cong-viec">💼 Công việc</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -735,6 +832,22 @@
                         <div class="mb-3 d-none" id="editEventEndRepeatGroup">
                             <label class="form-label fw-semibold fs-7 text-secondary">Ngày kết thúc lặp <span class="text-danger">*</span></label>
                             <input type="date" class="form-control rounded-3" id="editEventEndRepeat">
+                        </div>
+                        <div class="alert alert-info py-2 px-3 fs-8 rounded-3 d-none mb-3" id="editEventOnceNotice">
+                            <i class="bi bi-info-circle-fill me-1"></i>Chuyển về <strong>Sự kiện 1 lần</strong> sẽ giữ lại các buổi trong quá khứ và chỉ xóa các buổi lặp từ ngày này trở đi.
+                        </div>
+                        <div class="mb-3 d-none" id="editEventRecurringScopeGroup">
+                            <label class="form-label fw-semibold fs-7 text-secondary">Phạm vi áp dụng</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="editUpdateMode" id="editModeAll" value="all" checked>
+                                    <label class="form-check-label fs-7 cursor-pointer" for="editModeAll">Tất cả các buổi trong chuỗi</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="editUpdateMode" id="editModeSingle" value="single">
+                                    <label class="form-check-label fs-7 cursor-pointer" for="editModeSingle">Chỉ riêng buổi này</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold fs-7 text-secondary">Địa điểm / Ghi chú</label>

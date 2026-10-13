@@ -51,7 +51,7 @@ class SuKienApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lấy danh sách sự kiện thành công!',
-            'data'    => $danhSach,
+            'data' => $danhSach,
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -63,26 +63,26 @@ class SuKienApiController extends Controller
         $quyTacLap = $request->input('quy_tac_lap', 'once');
 
         $rules = [
-            'tieu_de'           => 'required|string|max:255',
-            'mo_ta'             => 'nullable|string',
-            'loai_su_kien'      => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan,hoc-tap,tap-luyen,ca-nhan',
+            'tieu_de' => 'required|string|max:255',
+            'mo_ta' => 'nullable|string',
+            'loai_su_kien' => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan,cong_viec,hoc-tap,tap-luyen,ca-nhan,cong-viec',
             'thoi_gian_bat_dau' => 'required|date',
             'thoi_gian_ket_thuc' => 'required|date|after_or_equal:thoi_gian_bat_dau',
-            'mau_hien_thi'      => 'nullable|string|max:20',
-            'bat_thong_bao'     => 'nullable|boolean',
-            'so_ngay_nhac'      => 'nullable|integer|min:1|max:30',
-            'quy_tac_lap'       => 'nullable|string|in:once,daily,weekly,monthly',
+            'mau_hien_thi' => 'nullable|string|max:20',
+            'bat_thong_bao' => 'nullable|boolean',
+            'so_ngay_nhac' => 'nullable|integer|min:1|max:30',
+            'quy_tac_lap' => 'nullable|string|in:once,daily,weekly,monthly',
             'ngay_ket_thuc_lap' => 'nullable|date',
-            'cong_viec_id'      => 'nullable|integer|exists:cong_viec,id',
-            'force'             => 'nullable|boolean',
-            'van_them'          => 'nullable|boolean',
+            'cong_viec_id' => 'nullable|integer|exists:cong_viec,id',
+            'force' => 'nullable|boolean',
+            'van_them' => 'nullable|boolean',
         ];
 
         if (in_array($quyTacLap, ['daily', 'weekly', 'monthly'])) {
             $rules['ngay_ket_thuc_lap'] = 'required|date';
             if ($request->filled('thoi_gian_bat_dau')) {
                 $startDateStr = Carbon::parse($request->input('thoi_gian_bat_dau'))->toDateString();
-                $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:' . $startDateStr;
+                $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:'.$startDateStr;
             }
         }
 
@@ -92,10 +92,10 @@ class SuKienApiController extends Controller
             $conflicts = $this->checkScheduleConflicts($validated, $request->user()->id);
             if (! empty($conflicts)) {
                 return response()->json([
-                    'success'      => false,
+                    'success' => false,
                     'has_conflict' => true,
-                    'message'      => 'Phát hiện lịch trình bị trùng.',
-                    'conflicts'    => $conflicts,
+                    'message' => 'Phát hiện lịch trình bị trùng.',
+                    'conflicts' => $conflicts,
                 ], 409, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
             }
         }
@@ -124,10 +124,10 @@ class SuKienApiController extends Controller
             $i = 0;
             while (true) {
                 $instanceStart = match ($quyTacLap) {
-                    'daily'   => $start->copy()->addDays($i),
-                    'weekly'  => $start->copy()->addWeeks($i),
+                    'daily' => $start->copy()->addDays($i),
+                    'weekly' => $start->copy()->addWeeks($i),
                     'monthly' => $start->copy()->addMonthsNoOverflow($i),
-                    default   => $start->copy(),
+                    default => $start->copy(),
                 };
 
                 if ($instanceStart->gt($ngayKetThucLap)) {
@@ -159,10 +159,10 @@ class SuKienApiController extends Controller
         }
 
         return response()->json([
-            'success'           => true,
-            'message'           => 'Tạo sự kiện thành công!',
+            'success' => true,
+            'message' => 'Tạo sự kiện thành công!',
             'so_su_kien_da_tao' => $soSuKienDaTao,
-            'data'              => $suKien,
+            'data' => $suKien,
         ], 201, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -183,7 +183,7 @@ class SuKienApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Chi tiết sự kiện.',
-            'data'    => $suKien,
+            'data' => $suKien,
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -202,18 +202,18 @@ class SuKienApiController extends Controller
         }
 
         $rules = [
-            'tieu_de'           => 'sometimes|required|string|max:255',
-            'mo_ta'             => 'nullable|string',
-            'loai_su_kien'      => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan,hoc-tap,tap-luyen,ca-nhan',
-            'mau_hien_thi'      => 'nullable|string|max:20',
-            'bat_thong_bao'     => 'nullable|boolean',
-            'so_ngay_nhac'      => 'nullable|integer|min:1|max:30',
-            'quy_tac_lap'       => 'nullable|string|in:once,daily,weekly,monthly',
+            'tieu_de' => 'sometimes|required|string|max:255',
+            'mo_ta' => 'nullable|string',
+            'loai_su_kien' => 'nullable|string|in:hoc_tap,deadline,tap_luyen,ca_nhan,cong_viec,hoc-tap,tap-luyen,ca-nhan,cong-viec',
+            'mau_hien_thi' => 'nullable|string|max:20',
+            'bat_thong_bao' => 'nullable|boolean',
+            'so_ngay_nhac' => 'nullable|integer|min:1|max:30',
+            'quy_tac_lap' => 'nullable|string|in:once,daily,weekly,monthly',
             'ngay_ket_thuc_lap' => 'nullable|date',
-            'cong_viec_id'      => 'nullable|integer|exists:cong_viec,id',
-            'force'             => 'nullable|boolean',
-            'van_them'          => 'nullable|boolean',
-            'update_mode'       => 'nullable|string|in:single,all',
+            'cong_viec_id' => 'nullable|integer|exists:cong_viec,id',
+            'force' => 'nullable|boolean',
+            'van_them' => 'nullable|boolean',
+            'update_mode' => 'nullable|string|in:single,all',
         ];
 
         $newQuyTacLap = $request->input('quy_tac_lap', $suKien->quy_tac_lap ?? 'once');
@@ -228,24 +228,24 @@ class SuKienApiController extends Controller
             : ($suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null);
 
         $hasStartTime = $request->has('thoi_gian_bat_dau');
-        $hasEndTime   = $request->has('thoi_gian_ket_thuc');
+        $hasEndTime = $request->has('thoi_gian_ket_thuc');
 
         if ($hasStartTime && $hasEndTime) {
             $rules['thoi_gian_bat_dau'] = 'required|date';
             $rules['thoi_gian_ket_thuc'] = 'required|date|after_or_equal:thoi_gian_bat_dau';
         } elseif ($hasEndTime) {
-            $rules['thoi_gian_ket_thuc'] = 'required|date' . ($effectiveStart ? '|after_or_equal:' . $effectiveStart : '');
+            $rules['thoi_gian_ket_thuc'] = 'required|date'.($effectiveStart ? '|after_or_equal:'.$effectiveStart : '');
         } elseif ($hasStartTime) {
             $rules['thoi_gian_bat_dau'] = 'required|date';
             if ($suKien->thoi_gian_ket_thuc) {
                 $endTime = Carbon::parse($suKien->thoi_gian_ket_thuc)->toDateTimeString();
-                $rules['thoi_gian_bat_dau'] .= '|before_or_equal:' . $endTime;
+                $rules['thoi_gian_bat_dau'] .= '|before_or_equal:'.$endTime;
             }
         }
 
         if ($effectiveStart && $request->filled('ngay_ket_thuc_lap')) {
             $startDate = Carbon::parse($effectiveStart)->toDateString();
-            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:' . $startDate;
+            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:'.$startDate;
         }
 
         $validated = $request->validate($rules);
@@ -258,23 +258,28 @@ class SuKienApiController extends Controller
                 : (($suKien->quy_tac_lap === 'once' && in_array($newQuyTacLap, ['daily', 'weekly', 'monthly'])) ? $newQuyTacLap : 'once');
 
             $dataToVerify = array_merge([
-                'thoi_gian_bat_dau'  => $suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null,
+                'thoi_gian_bat_dau' => $suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null,
                 'thoi_gian_ket_thuc' => $suKien->thoi_gian_ket_thuc ? $suKien->thoi_gian_ket_thuc->toDateTimeString() : null,
-                'quy_tac_lap'        => $verifyQuyTacLap,
-                'ngay_ket_thuc_lap'  => $validated['ngay_ket_thuc_lap'] ?? ($suKien->ngay_ket_thuc_lap ? $suKien->ngay_ket_thuc_lap->format('Y-m-d') : null),
+                'quy_tac_lap' => $verifyQuyTacLap,
+                'ngay_ket_thuc_lap' => $validated['ngay_ket_thuc_lap'] ?? ($suKien->ngay_ket_thuc_lap ? $suKien->ngay_ket_thuc_lap->format('Y-m-d') : null),
             ], $validated);
             $dataToVerify['quy_tac_lap'] = $verifyQuyTacLap;
 
-            $excludeId = ($updateMode === 'single') ? $suKien->id : null;
-            $excludeGroup = ($updateMode === 'all') ? $suKien->nhom_lap_id : null;
+            if ($newQuyTacLap === 'once' && ! empty($suKien->nhom_lap_id)) {
+                $excludeId = $suKien->id;
+                $excludeGroup = $suKien->nhom_lap_id;
+            } else {
+                $excludeId = ($updateMode === 'single') ? $suKien->id : null;
+                $excludeGroup = ($updateMode === 'all') ? $suKien->nhom_lap_id : null;
+            }
 
             $conflicts = $this->checkScheduleConflicts($dataToVerify, $request->user()->id, $excludeId, $excludeGroup);
             if (! empty($conflicts)) {
                 return response()->json([
-                    'success'      => false,
+                    'success' => false,
                     'has_conflict' => true,
-                    'message'      => 'Phát hiện lịch trình bị trùng.',
-                    'conflicts'    => $conflicts,
+                    'message' => 'Phát hiện lịch trình bị trùng.',
+                    'conflicts' => $conflicts,
                 ], 409, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
             }
         }
@@ -291,7 +296,52 @@ class SuKienApiController extends Controller
         }
         unset($validated['force'], $validated['van_them'], $validated['update_mode']);
 
-        if ($updateMode === 'all' && ! empty($suKien->nhom_lap_id)) {
+        if ($newQuyTacLap === 'once' && ! empty($suKien->nhom_lap_id)) {
+            $nhomLapId = $suKien->nhom_lap_id;
+            $currentStart = $suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null;
+
+            // Chỉ xóa các buổi lặp từ ngày của buổi đang sửa trở đi (loại trừ chính buổi đang sửa)
+            SuKien::where('user_id', $request->user()->id)
+                ->where('nhom_lap_id', $nhomLapId)
+                ->where('id', '!=', $suKien->id)
+                ->when($currentStart, function ($q) use ($currentStart) {
+                    $q->where('thoi_gian_bat_dau', '>=', $currentStart);
+                })
+                ->delete();
+
+            // Những ngày/buổi đã qua (trước ngày chỉnh sửa) thì KHÔNG xóa, được giữ lại trong lịch sử.
+            if ($currentStart) {
+                $remainingPastEvents = SuKien::where('user_id', $request->user()->id)
+                    ->where('nhom_lap_id', $nhomLapId)
+                    ->where('id', '!=', $suKien->id)
+                    ->where('thoi_gian_bat_dau', '<', $currentStart)
+                    ->orderBy('thoi_gian_bat_dau', 'desc')
+                    ->get();
+
+                if ($remainingPastEvents->count() === 1) {
+                    $remainingPastEvents->first()->update([
+                        'nhom_lap_id' => null,
+                        'ngay_ket_thuc_lap' => null,
+                        'quy_tac_lap' => 'once',
+                    ]);
+                } elseif ($remainingPastEvents->count() > 1) {
+                    $lastPastDate = Carbon::parse($remainingPastEvents->first()->thoi_gian_bat_dau)->toDateString();
+                    SuKien::where('user_id', $request->user()->id)
+                        ->where('nhom_lap_id', $nhomLapId)
+                        ->where('id', '!=', $suKien->id)
+                        ->update([
+                            'ngay_ket_thuc_lap' => $lastPastDate,
+                        ]);
+                }
+            }
+
+            $validated['nhom_lap_id'] = null;
+            $validated['ngay_ket_thuc_lap'] = null;
+            $validated['quy_tac_lap'] = 'once';
+
+            $suKien->update($validated);
+            $suKien->refresh();
+        } elseif ($updateMode === 'all' && ! empty($suKien->nhom_lap_id)) {
             $updateData = [];
             if (isset($validated['tieu_de'])) {
                 $updateData['tieu_de'] = $validated['tieu_de'];
@@ -349,16 +399,16 @@ class SuKienApiController extends Controller
                     $existingStarts = SuKien::where('user_id', $request->user()->id)
                         ->where('nhom_lap_id', $suKien->nhom_lap_id)
                         ->pluck('thoi_gian_bat_dau')
-                        ->map(fn($dt) => Carbon::parse($dt)->toDateTimeString())
+                        ->map(fn ($dt) => Carbon::parse($dt)->toDateTimeString())
                         ->toArray();
 
                     $i = 0;
                     while (true) {
                         $instanceStart = match ($newQuyTacLap) {
-                            'daily'   => $baseStart->copy()->addDays($i),
-                            'weekly'  => $baseStart->copy()->addWeeks($i),
+                            'daily' => $baseStart->copy()->addDays($i),
+                            'weekly' => $baseStart->copy()->addWeeks($i),
                             'monthly' => $baseStart->copy()->addMonthsNoOverflow($i),
-                            default   => $baseStart->copy(),
+                            default => $baseStart->copy(),
                         };
 
                         if ($instanceStart->gt($ngayKetThucLimit)) {
@@ -368,16 +418,16 @@ class SuKienApiController extends Controller
                         $instanceStartStr = $instanceStart->toDateTimeString();
                         if (! in_array($instanceStartStr, $existingStarts)) {
                             $newInstance = [
-                                'user_id'           => $request->user()->id,
-                                'tieu_de'           => $firstEvent->tieu_de,
-                                'loai_su_kien'      => $firstEvent->loai_su_kien,
-                                'mo_ta'             => $firstEvent->mo_ta,
-                                'mau_hien_thi'      => $firstEvent->mau_hien_thi ?? '#3B82F6',
-                                'bat_thong_bao'     => $firstEvent->bat_thong_bao,
-                                'so_ngay_nhac'      => $firstEvent->so_ngay_nhac,
-                                'quy_tac_lap'       => $newQuyTacLap,
+                                'user_id' => $request->user()->id,
+                                'tieu_de' => $firstEvent->tieu_de,
+                                'loai_su_kien' => $firstEvent->loai_su_kien,
+                                'mo_ta' => $firstEvent->mo_ta,
+                                'mau_hien_thi' => $firstEvent->mau_hien_thi ?? '#3B82F6',
+                                'bat_thong_bao' => $firstEvent->bat_thong_bao,
+                                'so_ngay_nhac' => $firstEvent->so_ngay_nhac,
+                                'quy_tac_lap' => $newQuyTacLap,
                                 'ngay_ket_thuc_lap' => $effectiveNgayKetThucLap,
-                                'nhom_lap_id'       => $suKien->nhom_lap_id,
+                                'nhom_lap_id' => $suKien->nhom_lap_id,
                                 'thoi_gian_bat_dau' => $instanceStartStr,
                             ];
                             if ($baseEnd && $durationInSec !== null) {
@@ -417,10 +467,10 @@ class SuKienApiController extends Controller
                 $i = 1;
                 while (true) {
                     $instanceStart = match ($newQuyTacLap) {
-                        'daily'   => $start->copy()->addDays($i),
-                        'weekly'  => $start->copy()->addWeeks($i),
+                        'daily' => $start->copy()->addDays($i),
+                        'weekly' => $start->copy()->addWeeks($i),
                         'monthly' => $start->copy()->addMonthsNoOverflow($i),
-                        default   => $start->copy(),
+                        default => $start->copy(),
                     };
 
                     if ($instanceStart->gt($ngayKetThucLap)) {
@@ -449,7 +499,7 @@ class SuKienApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật sự kiện thành công!',
-            'data'    => $suKien->fresh(),
+            'data' => $suKien->fresh(),
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -551,11 +601,11 @@ class SuKienApiController extends Controller
                         $seenConflictIds[$evt->id] = true;
 
                         $conflicts[] = [
-                            'date'    => $evtStart->format('d/m/Y'),
-                            'title'   => $evt->tieu_de,
+                            'date' => $evtStart->format('d/m/Y'),
+                            'title' => $evt->tieu_de,
                             'tieu_de' => $evt->tieu_de,
-                            'type'    => str_replace('_', '-', $evt->loai_su_kien),
-                            'time'    => $evtStart->format('H:i') . ' - ' . $evtEnd->format('H:i'),
+                            'type' => str_replace('_', '-', $evt->loai_su_kien),
+                            'time' => $evtStart->format('H:i').' - '.$evtEnd->format('H:i'),
                         ];
                     }
                 }

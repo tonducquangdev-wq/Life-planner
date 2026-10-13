@@ -617,80 +617,295 @@ body {
 }
 
 /* ==========================================================================
-   5. WEEK VIEW (MOBILE / COMPACT STRIP)
+   5. WEEK VIEW (MOBILE / COMPACT STRIP - 2 DAYS PER SCREEN)
    ========================================================================== */
+.week-strip-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 3px 14px 3px;
+    width: 100%;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    container-type: inline-size;
+    container-name: weekstrip;
+}
+
+/* Custom Sleek Scrollbar for Week Strip */
+.week-strip-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+.week-strip-wrapper::-webkit-scrollbar-track {
+    background: rgba(163, 177, 198, 0.15);
+    border-radius: 10px;
+}
+.week-strip-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.4);
+    border-radius: 10px;
+}
+.week-strip-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(79, 70, 229, 0.7);
+}
+
 .week-strip-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    padding: 4px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: max-content;
+    padding: 4px 2px;
+    box-sizing: border-box;
 }
 
 .week-day-card {
     background: var(--neu-cal-surface);
-    border-radius: 14px;
-    padding: 8px 6px;
-    box-shadow: var(--neu-raised-xs);
+    border-radius: 16px;
+    padding: 11px 10px 14px 10px;
+    box-shadow: var(--neu-raised-sm);
     border: 1px solid rgba(255, 255, 255, 0.7);
-    text-align: center;
-    cursor: pointer;
     transition: all 0.2s cubic-bezier(0.34, 1.25, 0.64, 1);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+    cursor: pointer;
+    flex: 0 0 calc(50vw - 26px);
+    width: calc(50vw - 26px);
+    min-width: calc(50vw - 26px);
+    max-width: calc(50vw - 26px);
+}
+
+@supports (width: 1cqw) {
+    .week-day-card {
+        flex: 0 0 calc((100cqw - 10px) / 2);
+        width: calc((100cqw - 10px) / 2);
+        min-width: calc((100cqw - 10px) / 2);
+        max-width: calc((100cqw - 10px) / 2);
+    }
 }
 
 .week-day-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--neu-raised-sm);
+    box-shadow: var(--neu-raised-hover);
 }
 
 .week-day-card.active {
     background: #ffffff;
-    border: 2px solid var(--neu-primary);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    border: 2px solid var(--neu-primary) !important;
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.22) !important;
 }
 
 .week-day-card.is-today:not(.active) {
     border: 1.5px solid var(--neu-primary);
 }
 
+.week-day-header {
+    text-align: center;
+    padding: 4px 0 8px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed rgba(163, 177, 198, 0.35);
+}
+
 .week-day-card .day-name {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--neu-text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .week-day-card .day-number {
     display: block;
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--neu-text-dark);
     margin-top: 2px;
+    line-height: 1;
 }
 
-.week-day-card.active .day-number {
+.week-day-card.active .day-number,
+.week-day-card.is-today .day-number {
     color: var(--neu-primary);
+}
+
+.week-events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
 }
 
 /* Week details item */
 .week-event-detail-item {
-    background: var(--neu-cal-surface);
+    background: #ffffff;
     border-radius: 12px;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    box-shadow: var(--neu-raised-xs);
-    border-left: 3px solid transparent;
+    padding: 10px 11px;
+    box-shadow: 0 2px 6px rgba(163, 177, 198, 0.2);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-left: 3.5px solid var(--neu-primary);
+    text-align: left;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-.week-event-detail-item.hoc-tap { border-left-color: var(--event-blue-dot); }
-.week-event-detail-item.tap-luyen { border-left-color: var(--event-green-dot); }
-.week-event-detail-item.deadline { border-left-color: var(--event-orange-dot); }
-.week-event-detail-item.ca-nhan { border-left-color: var(--event-purple-dot); }
-.week-event-detail-item.cong-viec { border-left-color: var(--event-indigo-dot); }
+.week-event-detail-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(163, 177, 198, 0.35);
+}
+
+.week-event-detail-item.hoc-tap {
+    border-left-color: var(--event-blue-dot);
+    background: #eff6ff;
+    border-color: rgba(191, 219, 254, 0.7);
+}
+
+.week-event-detail-item.tap-luyen {
+    border-left-color: var(--event-green-dot);
+    background: #f0fdf4;
+    border-color: rgba(187, 247, 208, 0.7);
+}
+
+.week-event-detail-item.deadline {
+    border-left-color: var(--event-orange-dot);
+    background: #fff7ed;
+    border-color: rgba(254, 215, 170, 0.7);
+}
+
+.week-event-detail-item.ca-nhan {
+    border-left-color: var(--event-purple-dot);
+    background: #faf5ff;
+    border-color: rgba(233, 213, 255, 0.7);
+}
+
+.week-event-detail-item.cong-viec {
+    border-left-color: var(--event-indigo-dot);
+    background: #eef2ff;
+    border-color: rgba(199, 210, 254, 0.7);
+}
+
+.week-event-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.35;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.week-event-title i {
+    font-size: 0.82rem;
+    vertical-align: -1px;
+}
+
+.week-event-meta {
+    font-size: 0.73rem;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    line-height: 1.3;
+}
+
+.week-event-time {
+    color: #475569;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.week-event-time i {
+    color: var(--neu-primary);
+    font-size: 0.72rem;
+}
+
+.week-event-loc {
+    color: #64748b;
+    font-size: 0.71rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.week-event-loc i {
+    color: #e11d48;
+    font-size: 0.72rem;
+}
 
 .week-event-empty {
     font-size: 0.78rem;
-    color: var(--neu-text-light);
-    padding: 4px;
+    color: #94a3b8;
+    padding: 24px 8px;
+    text-align: center;
+    border: 1px dashed rgba(163, 177, 198, 0.4);
+    border-radius: 12px;
+    background: rgba(228, 234, 242, 0.35);
+    margin: 4px 0;
+}
+
+/* Responsive Week View: Exactly 2 days per screen on mobile */
+@media (max-width: 767.98px) {
+    .content-body {
+        padding: 0.85rem 0.5rem !important;
+    }
+
+    .week-strip-wrapper {
+        padding: 4px 2px 14px 2px !important;
+    }
+
+    .week-strip-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        width: max-content !important;
+        gap: 10px !important;
+        padding: 4px 2px !important;
+        box-sizing: border-box !important;
+    }
+
+    .week-day-card {
+        flex: 0 0 calc(50vw - 26px) !important;
+        width: calc(50vw - 26px) !important;
+        min-width: calc(50vw - 26px) !important;
+        max-width: calc(50vw - 26px) !important;
+        scroll-snap-align: start !important;
+        box-sizing: border-box !important;
+    }
+
+    @supports (width: 1cqw) {
+        .week-day-card {
+            flex: 0 0 calc((100cqw - 10px) / 2) !important;
+            width: calc((100cqw - 10px) / 2) !important;
+            min-width: calc((100cqw - 10px) / 2) !important;
+            max-width: calc((100cqw - 10px) / 2) !important;
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    .week-strip-grid {
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .week-day-card {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
 }
 
 /* ==========================================================================
@@ -754,15 +969,18 @@ body {
 
 /* Deadline Compact List */
 .deadline-compact-list {
-    max-height: 290px;
+    max-height: 330px;
     overflow-y: auto;
-    padding-right: 2px;
+    overflow-x: hidden !important;
+    padding: 2px 3px 6px 3px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Custom Scrollbar */
 .deadline-compact-list::-webkit-scrollbar,
 .modal-body::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
 
 .deadline-compact-list::-webkit-scrollbar-track,
@@ -772,32 +990,46 @@ body {
 
 .deadline-compact-list::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb {
-    background: rgba(163, 177, 198, 0.5);
+    background: rgba(163, 177, 198, 0.4);
     border-radius: 10px;
 }
 
+.deadline-compact-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(163, 177, 198, 0.65);
+}
+
 .deadline-compact-item {
-    background: var(--neu-cal-surface);
+    background: #ffffff;
     border-radius: 14px;
-    padding: 10px 12px;
-    box-shadow: var(--neu-raised-xs);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    transition: all 0.2s ease;
+    padding: 12px 14px;
+    margin-bottom: 11px;
+    box-shadow: 0 2px 8px rgba(163, 177, 198, 0.22), 0 1px 2px rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-left: 4px solid #f59e0b;
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deadline-compact-item:last-child {
+    margin-bottom: 0;
 }
 
 .deadline-compact-item:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--neu-raised-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(163, 177, 198, 0.35);
 }
 
 .deadline-compact-item.urgent {
-    border-left: 3.5px solid #ef4444;
-    background: #fdf5f5;
+    border-left: 4px solid #ef4444;
+    background: linear-gradient(135deg, #ffffff 0%, #fff7f7 100%);
+    border-color: rgba(254, 202, 202, 0.6) rgba(226, 232, 240, 0.8) rgba(226, 232, 240, 0.8) #ef4444;
 }
 
 .deadline-compact-item.upcoming {
-    border-left: 3.5px solid #f59e0b;
-    background: #fffcf5;
+    border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, #ffffff 0%, #fffdf7 100%);
+    border-color: rgba(254, 243, 199, 0.6) rgba(226, 232, 240, 0.8) rgba(226, 232, 240, 0.8) #f59e0b;
 }
 
 .deadline-dot {
@@ -805,20 +1037,50 @@ body {
     height: 8px;
     border-radius: 50%;
     display: inline-block;
+    flex-shrink: 0;
 }
 
-.deadline-dot.urgent { background-color: #ef4444; }
-.deadline-dot.upcoming { background-color: #f59e0b; }
+.deadline-dot.urgent {
+    background-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.deadline-dot.upcoming {
+    background-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
 
 .deadline-title {
-    font-size: 0.85rem;
+    font-size: 0.86rem;
     font-weight: 700;
-    color: var(--neu-text-dark);
+    color: #1e293b;
+    line-height: 1.3;
 }
 
 .deadline-meta {
     font-size: 0.76rem;
-    color: var(--neu-text-muted);
+    color: #64748b;
+    line-height: 1.25;
+}
+
+.deadline-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+}
+
+.deadline-tag.badge-urgent {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.deadline-tag.badge-upcoming {
+    background-color: #fef3c7 !important;
+    color: #d97706 !important;
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 /* Empty States */
@@ -850,18 +1112,24 @@ body {
 .modal-custom .modal-content {
     background: var(--neu-cal-surface) !important;
     border-radius: var(--card-radius) !important;
-    border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    box-shadow: 16px 16px 36px var(--neu-shadow-dark), -16px -16px 36px var(--neu-shadow-light) !important;
+    border: 1px solid rgba(163, 177, 198, 0.4) !important;
+    box-shadow: 
+        8px 14px 28px rgba(163, 177, 198, 0.35),
+        0 18px 36px rgba(15, 23, 42, 0.12),
+        -2px -2px 8px rgba(255, 255, 255, 0.3) !important;
     overflow: hidden;
 }
 
 /* ==========================================================================
-   7.1. NEUMORPHIC MODALS REFINED (CREATE EVENT & DAY DETAIL MODALS)
+   7.1. NEUMORPHIC MODALS REFINED (CREATE EVENT, EDIT EVENT & DETAIL MODALS)
    Triệt tiêu quầng sáng trắng gây chói, giảm độ lan/độ lệch của bóng sáng,
    giữ nguyên phong cách Soft Neumorphism với viền xanh ghi mảnh và overlay dịu nhẹ.
    ========================================================================== */
 #createEventModal .modal-content,
-#dayDetailModal .modal-content {
+#editEventModal .modal-content,
+#dayDetailModal .modal-content,
+#deleteEventChoiceModal .modal-content,
+#scheduleConflictModal .modal-content {
     background: var(--neu-cal-surface) !important;
     border-radius: var(--card-radius) !important;
     border: 1px solid rgba(163, 177, 198, 0.4) !important;
@@ -873,14 +1141,20 @@ body {
 }
 
 #createEventModal .modal-header,
-#dayDetailModal .modal-header {
+#editEventModal .modal-header,
+#dayDetailModal .modal-header,
+#deleteEventChoiceModal .modal-header,
+#scheduleConflictModal .modal-header {
     background: transparent;
     border-bottom: 1px solid rgba(163, 177, 198, 0.25) !important;
     padding: 1.25rem 1.5rem;
 }
 
 #createEventModal .modal-footer,
-#dayDetailModal .modal-footer {
+#editEventModal .modal-footer,
+#dayDetailModal .modal-footer,
+#deleteEventChoiceModal .modal-footer,
+#scheduleConflictModal .modal-footer {
     background: var(--neu-cal-surface) !important;
     border-top: 1px solid rgba(163, 177, 198, 0.25) !important;
     padding: 1rem 1.5rem;
@@ -889,8 +1163,14 @@ body {
 /* Tinh chỉnh overlay (backdrop) riêng cho Modal: dịu mắt, không nặng nề */
 body:has(#createEventModal.show) .modal-backdrop.show,
 #createEventModal.show ~ .modal-backdrop.show,
+body:has(#editEventModal.show) .modal-backdrop.show,
+#editEventModal.show ~ .modal-backdrop.show,
 body:has(#dayDetailModal.show) .modal-backdrop.show,
-#dayDetailModal.show ~ .modal-backdrop.show {
+#dayDetailModal.show ~ .modal-backdrop.show,
+body:has(#deleteEventChoiceModal.show) .modal-backdrop.show,
+#deleteEventChoiceModal.show ~ .modal-backdrop.show,
+body:has(#scheduleConflictModal.show) .modal-backdrop.show,
+#scheduleConflictModal.show ~ .modal-backdrop.show {
     background-color: #0f172a !important;
     opacity: 0.38 !important;
     backdrop-filter: blur(4px) !important;
@@ -946,6 +1226,7 @@ body:has(#dayDetailModal.show) .modal-backdrop.show,
 #eventTab .nav-link.tab-tap-luyen.active { color: var(--event-green-text); }
 #eventTab .nav-link.tab-deadline.active { color: var(--event-orange-text); }
 #eventTab .nav-link.tab-ca-nhan.active { color: var(--event-purple-text); }
+#eventTab .nav-link.tab-cong-viec.active { color: var(--event-indigo-text); }
 
 /* Form Inputs inside Modals */
 .modal-custom .form-control,

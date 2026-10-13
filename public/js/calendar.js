@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const iconClass = typeIconMap[evtType] || 'bi-calendar-event';
 
                     eventsHtml += `
-                        <div class="week-event-detail-item ${evtType}" title="${evtTitle}">
+                        <div class="week-event-detail-item ${evtType}" data-event-id="${evt.id}" title="${evtTitle}">
                             <div class="week-event-title">
                                 <i class="bi ${iconClass} me-1"></i>${evtTitle}
                             </div>
@@ -483,7 +483,10 @@ document.addEventListener('DOMContentLoaded', function () {
             stripHtml += `
                 <div class="week-day-card ${isActive} ${todayClass}" data-day="${w.day}" data-month="${w.month}" data-year="${w.year}">
                     <div class="week-day-header">
-                        <span class="day-name">${w.dayName}</span>
+                        <div class="d-flex align-items-center justify-content-center gap-1">
+                            <span class="day-name">${w.dayName}</span>
+                            ${w.isToday ? '<span class="badge bg-primary text-white rounded-pill px-1.5 py-0 fs-8 fw-semibold">Hôm nay</span>' : ''}
+                        </div>
                         <span class="day-number">${w.day}</span>
                     </div>
                     <div class="week-events-container">
@@ -497,9 +500,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const activeWeekCard = weekStripGrid.querySelector('.week-day-card.active');
         if (activeWeekCard) {
-            activeWeekCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            activeWeekCard.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
         }
 
+        // Click trực tiếp vào sự kiện để mở modal Chỉnh sửa
+        weekStripGrid.querySelectorAll('.week-event-detail-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const eventId = parseInt(this.getAttribute('data-event-id'));
+                if (eventId) {
+                    openEditModal(eventId);
+                }
+            });
+        });
+
+        // Click vào thẻ ngày để chọn ngày và xem chi tiết
         weekStripGrid.querySelectorAll('.week-day-card').forEach(card => {
             card.addEventListener('click', function () {
                 const day = parseInt(this.getAttribute('data-day'));
@@ -510,7 +525,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentMonth = month;
                 currentYear = year;
 
-                renderWeekCalendarView();
+                weekStripGrid.querySelectorAll('.week-day-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+
+                if (currentMonthTitleEl) {
+                    currentMonthTitleEl.textContent = formatShortDate(activeSelectedDay, currentMonth, currentYear);
+                }
+
+                openDayDetailModal(day);
             });
         });
 
@@ -768,12 +790,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function openCreateModalWithDay(day) {
         const dateFormatted = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        ['createHocTapDay', 'createTapLuyenDay', 'createDeadlineDay', 'createCaNhanDay'].forEach(id => {
+        ['createHocTapDay', 'createTapLuyenDay', 'createDeadlineDay', 'createCaNhanDay', 'createCongViecDay'].forEach(id => {
             const input = document.getElementById(id);
             if (input) input.value = dateFormatted;
         });
 
-        ['createHocTap', 'createTapLuyen', 'createDeadline', 'createCaNhan'].forEach(prefix => {
+        ['createHocTap', 'createTapLuyen', 'createDeadline', 'createCaNhan', 'createCongViec'].forEach(prefix => {
             const sw = document.getElementById(`${prefix}BatThongBao`);
             const sel = document.getElementById(`${prefix}SoNgayNhac`);
             const grp = document.getElementById(`${prefix}RemindGroup`);
@@ -873,6 +895,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'createTapLuyenRepeat': 'createTapLuyenEndRepeatGroup',
         'createDeadlineRepeat': 'createDeadlineEndRepeatGroup',
         'createCaNhanRepeat': 'createCaNhanEndRepeatGroup',
+        'createCongViecRepeat': 'createCongViecEndRepeatGroup',
         'editEventRepeat': 'editEventEndRepeatGroup'
     };
 
@@ -974,6 +997,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 quy_tac_lap: repeat,
                 ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
             };
+        } else if (tabId === 'cong-viec-tab') {
+            const title = document.getElementById('createCongViecTitle').value.trim();
+            if (!title) { showToast('Vui lòng nhập tên công việc.', false); return; }
+            const dateStr = document.getElementById('createCongViecDay').value || `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(activeSelectedDay).padStart(2, '0')}`;
+            const parts = dateStr.split('-');
+            targetDay = parseInt(parts[2]) || activeSelectedDay;
+            const startTime = document.getElementById('createCongViecTime').value || '09:00';
+            const endTime = document.getElementById('createCongViecEndTime').value || '';
+            const location = document.getElementById('createCongViecLocation').value.trim();
+            const repeat = document.getElementById('createCongViecRepeat')?.value || 'once';
+            const endRepeat = document.getElementById('createCongViecEndRepeat')?.value;
+
+            if (repeat !== 'once' && !endRepeat) {
+                showToast('Vui lòng chọn ngày kết thúc lặp.', false);
+                return;
+            }
+
+            payload = {
+                tieu_de: title,
+                loai_su_kien: 'cong_viec',
+                thoi_gian_bat_dau: `${dateStr} ${startTime}:00`,
+                mo_ta: location,
+                bat_thong_bao: document.getElementById('createCongViecBatThongBao')?.checked || false,
+                so_ngay_nhac: getRemindTimeValue('createCongViecSoNgayNhac'),
+                quy_tac_lap: repeat,
+                ngay_ket_thuc_lap: repeat !== 'once' ? endRepeat : null
+            };
+
+            if (endTime) {
+                payload.thoi_gian_ket_thuc = `${dateStr} ${endTime}:00`;
+            }
         } else {
             const title = document.getElementById('createCaNhanTitle').value.trim();
             if (!title) { showToast('Vui lòng nhập tên sự kiện.', false); return; }
@@ -1008,10 +1062,39 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================================================
     // 7. SỬA SỰ KIỆN (PUT /calendar/events/{id})
     // ==========================================================================
+    let currentEditingEvent = null;
+
+    function updateEditModalRecurringUi() {
+        const editOnceNotice = document.getElementById('editEventOnceNotice');
+        const editScopeGroup = document.getElementById('editEventRecurringScopeGroup');
+        const editRepeatSel = document.getElementById('editEventRepeat');
+        const currentRepeatVal = editRepeatSel ? editRepeatSel.value : 'once';
+
+        const isRecurringSeries = Boolean(currentEditingEvent && currentEditingEvent.nhomLapId);
+
+        if (isRecurringSeries) {
+            if (currentRepeatVal === 'once') {
+                editOnceNotice?.classList.remove('d-none');
+                editScopeGroup?.classList.add('d-none');
+            } else {
+                editOnceNotice?.classList.add('d-none');
+                editScopeGroup?.classList.remove('d-none');
+            }
+        } else {
+            editOnceNotice?.classList.add('d-none');
+            editScopeGroup?.classList.add('d-none');
+        }
+    }
+
+    document.getElementById('editEventRepeat')?.addEventListener('change', function () {
+        updateEditModalRecurringUi();
+    });
+
     function openEditModal(eventId) {
         const evt = eventsList.find(e => e.id === eventId);
         if (!evt) return;
 
+        currentEditingEvent = evt;
         dayDetailModal?.hide();
 
         const evtDateStr = evt.start ? evt.start.substring(0, 10) : `${evt.year || currentYear}-${String(evt.month || currentMonth).padStart(2, '0')}-${String(evt.day || 1).padStart(2, '0')}`;
@@ -1030,6 +1113,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const editEndRepeatInput = document.getElementById('editEventEndRepeat');
         if (editEndRepeatInput) editEndRepeatInput.value = evt.ngayKetThucLap || '';
         toggleEndRepeatVisibility('editEventRepeat', 'editEventEndRepeatGroup');
+
+        const editModeAll = document.getElementById('editModeAll');
+        if (editModeAll) editModeAll.checked = true;
+        updateEditModalRecurringUi();
 
         const editSw = document.getElementById('editEventBatThongBao');
         const editSel = document.getElementById('editEventSoNgayNhac');
@@ -1083,6 +1170,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (endTime) {
             payload.thoi_gian_ket_thuc = `${dateStr} ${endTime}:00`;
+        }
+
+        const evt = currentEditingEvent || eventsList.find(e => e.id == id);
+        if (evt && evt.nhomLapId) {
+            if (repeat === 'once') {
+                payload.update_mode = 'all';
+            } else {
+                const selectedMode = document.querySelector('input[name="editUpdateMode"]:checked')?.value || 'all';
+                payload.update_mode = selectedMode;
+            }
         }
 
         await sendEventRequestWithConflictCheck(`/calendar/events/${id}`, 'PUT', payload, editEventModal, day);

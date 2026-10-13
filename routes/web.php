@@ -21,7 +21,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
-    
+
     // CRUD Sự kiện Lịch (Bảng su_kien)
     Route::get('/calendar/events', [SuKienController::class, 'index'])->name('calendar.events.index');
     Route::post('/calendar/events', [SuKienController::class, 'store'])->name('calendar.events.store');
@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
 
     // Quản lý Kế hoạch & Buổi tập tùy chỉnh
     Route::post('/tap-luyen/ke-hoach', [TapLuyenController::class, 'taoKeHoach'])->name('tap-luyen.ke-hoach.store');
+    Route::post('/tap-luyen/ke-hoach-mau/ap-dung', [TapLuyenController::class, 'apDungLichMau'])->name('tap-luyen.ke-hoach.ap-dung-mau');
     Route::post('/tap-luyen/ke-hoach/{id}/kich-hoat', [TapLuyenController::class, 'kichHoatKeHoach'])->name('tap-luyen.ke-hoach.activate');
     Route::delete('/tap-luyen/ke-hoach/{id}', [TapLuyenController::class, 'xoaKeHoach'])->name('tap-luyen.ke-hoach.destroy');
     Route::post('/tap-luyen/buoi-tap', [TapLuyenController::class, 'themBuoiTap'])->name('tap-luyen.buoi-tap.store');

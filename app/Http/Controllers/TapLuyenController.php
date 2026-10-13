@@ -7,6 +7,8 @@ use App\Models\BuoiTap;
 use App\Models\ChiTietBuoiTap;
 use App\Models\KeHoachTapLuyen;
 use App\Models\LichSuTapLuyen;
+use App\Models\SuKien;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -308,7 +310,7 @@ class TapLuyenController extends Controller
             // Xác định buổi tập:
             // Ưu tiên: Nếu người dùng chọn trực tiếp qua query param (?buoi_tap_id=xxx)
             $requestedBuoiTapId = $request->query('buoi_tap_id');
-            $isRestDay = !empty($dinhHuongHomNay['is_rest']);
+            $isRestDay = ! empty($dinhHuongHomNay['is_rest']);
 
             if ($requestedBuoiTapId) {
                 $currentBuoiTap = $activePlan->buoiTaps->firstWhere('id', (int) $requestedBuoiTapId);
@@ -333,12 +335,13 @@ class TapLuyenController extends Controller
         }
 
         // Danh sách thành viên cộng đồng Gymer để hiển thị trong Messenger Popup
-        $communityGymers = \App\Models\User::where('id', '!=', $userId)
+        $communityGymers = User::where('id', '!=', $userId)
             ->select(['id', 'ho_ten', 'email', 'anh_dai_dien'])
             ->take(10)
             ->get()
             ->map(function ($u, $idx) {
                 $statusList = ['Đang tập Push Day 💪', 'Vừa hoàn thành Leg Day 🔥', 'Online', 'Tập Cardio sáng 🏃', 'Đang nghỉ ngơi 😴'];
+
                 return [
                     'id' => $u->id,
                     'name' => $u->ho_ten ?? 'Gymer',
@@ -445,7 +448,6 @@ class TapLuyenController extends Controller
                 ], 403);
             }
         }
-
 
         if (! $buoiTapId) {
             $userBuoiTap = BuoiTap::whereHas('keHoachTapLuyen', function ($q) use ($userId) {
@@ -706,6 +708,146 @@ class TapLuyenController extends Controller
             'success' => true,
             'message' => "Đã tạo kế hoạch \"{$keHoach->ten_ke_hoach}\" thành công!",
             'data' => $keHoach,
+        ]);
+    }
+
+    /**
+     * Áp dụng Lịch tập mẫu: Tự động khởi tạo Kế hoạch, các Buổi tập,
+     * chi tiết bài tập và đồng bộ các buổi tập vào trang Lịch (Bảng su_kien).
+     */
+    public function apDungLichMau(Request $request)
+    {
+        $userId = Auth::id();
+
+        $request->validate([
+            'ten_ke_hoach' => 'required|string|max:255',
+            'mo_ta' => 'nullable|string|max:1000',
+            'so_tuan_lap' => 'nullable|integer|min:1|max:52',
+            'dong_bo_calendar' => 'nullable|boolean',
+            'bat_thong_bao' => 'nullable|boolean',
+            'sessions' => 'required|array|min:1',
+            'sessions.*.ten_buoi_tap' => 'required|string|max:255',
+            'sessions.*.ngay_trong_tuan' => 'required|integer|min:1|max:7',
+            'sessions.*.gio_bat_dau' => 'required|string',
+            'sessions.*.gio_ket_thuc' => 'required|string',
+            'sessions.*.exercises' => 'nullable|array',
+        ]);
+
+        $soTuan = (int) $request->input('so_tuan_lap', 4);
+        $dongBoCalendar = $request->boolean('dong_bo_calendar', true);
+        $batThongBao = $request->boolean('bat_thong_bao', true);
+        $sessions = $request->input('sessions', []);
+
+        $createdEventsCount = 0;
+
+        $keHoach = DB::transaction(function () use ($userId, $request, $sessions, $dongBoCalendar, $soTuan, $batThongBao, &$createdEventsCount) {
+            // 1. Đặt các kế hoạch hiện tại về inactive
+            KeHoachTapLuyen::where('user_id', $userId)->update(['is_active' => false]);
+
+            // 2. Tạo kế hoạch tập luyện mới
+            $keHoach = KeHoachTapLuyen::create([
+                'user_id' => $userId,
+                'ten_ke_hoach' => trim($request->input('ten_ke_hoach')),
+                'mo_ta' => $request->input('mo_ta') ?: 'Kế hoạch tạo từ lịch tập mẫu chuẩn',
+                'is_active' => true,
+            ]);
+
+            // 3. Tạo các buổi tập và bài tập chi tiết
+            foreach ($sessions as $idx => $s) {
+                $tenBuoiTap = trim($s['ten_buoi_tap']);
+                $ngayTrongTuan = (int) $s['ngay_trong_tuan'];
+                $moTa = $s['mo_ta'] ?? "Buổi tập {$tenBuoiTap}";
+
+                $buoiTap = BuoiTap::create([
+                    'ke_hoach_tap_luyen_id' => $keHoach->id,
+                    'ten_buoi_tap' => $tenBuoiTap,
+                    'mo_ta' => $moTa,
+                    'thu_tu' => $idx + 1,
+                    'ngay_trong_tuan' => $ngayTrongTuan,
+                ]);
+
+                // Chi tiết bài tập nếu có
+                $exercises = $s['exercises'] ?? [];
+                foreach ($exercises as $exIdx => $ex) {
+                    $exName = trim($ex['name'] ?? 'Bài tập');
+                    $exType = mb_strtolower($ex['type'] ?? 'strength');
+                    $exGroup = $ex['group'] ?? 'Toàn thân';
+
+                    $baiTap = BaiTapTheChat::firstOrCreate(
+                        ['ten_bai_tap' => $exName],
+                        [
+                            'nhom_co' => $exGroup,
+                            'loai_bai_tap' => $exType,
+                            'mo_ta' => "Bài tập {$exName}",
+                        ]
+                    );
+
+                    ChiTietBuoiTap::create([
+                        'buoi_tap_id' => $buoiTap->id,
+                        'bai_tap_the_chat_id' => $baiTap->id,
+                        'thu_tu' => $exIdx + 1,
+                        'loai_bai_tap' => $exType,
+                        'so_sets' => ! empty($ex['sets']) ? (int) $ex['sets'] : 3,
+                        'so_reps' => ! empty($ex['reps']) ? (string) $ex['reps'] : '10-12',
+                        'thoi_luong' => ! empty($ex['duration']) ? (int) $ex['duration'] : null,
+                        'don_vi_thoi_gian' => $ex['duration_unit'] ?? 'phut',
+                    ]);
+                }
+
+                // 4. Đồng bộ lịch tập vào Trang Lịch (Bảng su_kien)
+                if ($dongBoCalendar) {
+                    $gioBatDau = trim($s['gio_bat_dau']);
+                    $gioKetThuc = trim($s['gio_ket_thuc']);
+
+                    $now = Carbon::now();
+                    $diffDays = $ngayTrongTuan - $now->dayOfWeekIso;
+                    if ($diffDays < 0) {
+                        $diffDays += 7;
+                    }
+                    $firstDate = $now->copy()->addDays($diffDays);
+
+                    $firstStart = Carbon::parse($firstDate->toDateString().' '.$gioBatDau.':00');
+                    $firstEnd = Carbon::parse($firstDate->toDateString().' '.$gioKetThuc.':00');
+                    if ($firstEnd->lte($firstStart)) {
+                        $firstEnd = $firstStart->copy()->addHour();
+                    }
+
+                    $ngayKetThucLap = $firstStart->copy()->addWeeks($soTuan)->toDateString();
+                    $nhomLapId = (string) Str::uuid();
+
+                    for ($w = 0; $w < $soTuan; $w++) {
+                        $instStart = $firstStart->copy()->addWeeks($w);
+                        $instEnd = $firstEnd->copy()->addWeeks($w);
+
+                        SuKien::create([
+                            'user_id' => $userId,
+                            'tieu_de' => "Tập luyện: {$tenBuoiTap}",
+                            'mo_ta' => "Lịch tập theo kế hoạch: {$keHoach->ten_ke_hoach}",
+                            'loai_su_kien' => 'tap_luyen',
+                            'thoi_gian_bat_dau' => $instStart,
+                            'thoi_gian_ket_thuc' => $instEnd,
+                            'mau_hien_thi' => '#10B981',
+                            'bat_thong_bao' => $batThongBao,
+                            'so_ngay_nhac' => 1,
+                            'quy_tac_lap' => 'weekly',
+                            'ngay_ket_thuc_lap' => $ngayKetThucLap,
+                            'nhom_lap_id' => $nhomLapId,
+                        ]);
+                        $createdEventsCount++;
+                    }
+                }
+            }
+
+            return $keHoach;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => "Đã tạo kế hoạch \"{$keHoach->ten_ke_hoach}\"".($dongBoCalendar ? " và tự động thêm {$createdEventsCount} buổi tập vào Trang Lịch!" : '!'),
+            'data' => [
+                'ke_hoach_id' => $keHoach->id,
+                'events_created' => $createdEventsCount,
+            ],
         ]);
     }
 
@@ -1031,6 +1173,7 @@ class TapLuyenController extends Controller
     public function checklist(Request $request)
     {
         $params = $request->has('buoi_tap_id') ? ['buoi_tap_id' => $request->input('buoi_tap_id')] : [];
+
         return redirect()->route('tap-luyen.index', $params);
     }
 
@@ -1044,7 +1187,7 @@ class TapLuyenController extends Controller
         $query = KeHoachTapLuyen::with(['buoiTaps.chiTietBuoiTaps.baiTapTheChat', 'user'])
             ->where('is_shared', true);
 
-        if (!empty($searchCode)) {
+        if (! empty($searchCode)) {
             $query->where('share_code', 'like', "%{$searchCode}%");
         }
 
@@ -1066,7 +1209,7 @@ class TapLuyenController extends Controller
             ->firstOrFail();
 
         if (empty($plan->share_code)) {
-            $plan->share_code = 'PPL-' . strtoupper(Str::random(5));
+            $plan->share_code = 'PPL-'.strtoupper(Str::random(5));
         }
         $plan->is_shared = true;
         $plan->save();
@@ -1110,8 +1253,8 @@ class TapLuyenController extends Controller
         DB::transaction(function () use ($sourcePlan, $userId) {
             $newPlan = KeHoachTapLuyen::create([
                 'user_id' => $userId,
-                'ten_ke_hoach' => $sourcePlan->ten_ke_hoach . ' (Sao chép)',
-                'mo_ta' => $sourcePlan->mo_ta ?: 'Lịch tập được sao chép từ cộng đồng Gymer (Mã: ' . $sourcePlan->share_code . ')',
+                'ten_ke_hoach' => $sourcePlan->ten_ke_hoach.' (Sao chép)',
+                'mo_ta' => $sourcePlan->mo_ta ?: 'Lịch tập được sao chép từ cộng đồng Gymer (Mã: '.$sourcePlan->share_code.')',
                 'is_active' => false,
             ]);
 

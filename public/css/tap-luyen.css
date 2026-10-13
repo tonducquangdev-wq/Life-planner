@@ -280,13 +280,79 @@ body {
 @media (max-width: 991.98px) {
     .workout-kpi-strip {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 }
 
 @media (max-width: 575.98px) {
     .workout-kpi-strip {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 9px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4.1. WORKOUT TAB PANE RESPONSIVE REORDERING
+   Trên Desktop: KPI -> Lịch tuần -> Khung tập luyện (Checklist trái, Timer phải)
+   Trên Mobile (< 992px): Lịch tuần -> Nhảy time lúc tập (Timer) -> Checklist -> KPI Stats
+   -------------------------------------------------------------------------- */
+.workout-tab-pane {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 992px) {
+    .workout-section-kpi {
+        order: 1;
+    }
+    .workout-section-schedule {
+        order: 2;
+    }
+    .workout-section-combat {
+        order: 3;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .workout-section-schedule {
+        order: 1 !important;
+        margin-bottom: 0.85rem !important;
+    }
+    .workout-section-combat {
+        order: 2 !important;
+        margin-bottom: 0.85rem !important;
+    }
+    .workout-section-kpi {
+        order: 3 !important;
+        margin-top: 0.5rem !important;
+    }
+
+    /* Đảm bảo Đồng hồ tập hiển thị tối ưu trên Mobile */
+    .workout-timer-sticky {
+        position: static !important;
+        margin-bottom: 0.85rem !important;
+    }
+
+    .workout-timer-box {
+        padding: 1rem 0.85rem !important;
+    }
+
+    .timer-display {
+        font-size: 2.25rem !important;
+    }
+
+    .workout-kpi-card {
+        padding: 0.75rem 0.85rem !important;
+        border-radius: 16px !important;
+    }
+
+    .workout-kpi-val {
+        font-size: 1.05rem !important;
+    }
+
+    .schedule-strip-card {
+        padding: 0.75rem 0.85rem !important;
+        border-radius: 18px !important;
     }
 }
 
@@ -2223,5 +2289,129 @@ body {
 [data-bs-theme="dark"] .comm-icon-box {
     background: var(--nm-surface);
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(255, 255, 255, 0.03);
+}
+
+/* ========================================================
+   WORKOUT HEADER COLLAPSE ACTIONS (MOBILE ONLY)
+   ======================================================== */
+#iconToggleWorkoutActions {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#btnToggleWorkoutActions[aria-expanded="true"] #iconToggleWorkoutActions {
+    transform: rotate(180deg);
+}
+
+#btnToggleWorkoutActions[aria-expanded="true"] {
+    background-color: var(--nm-primary, #6366f1);
+    color: #ffffff;
+    border-color: var(--nm-primary, #6366f1);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+}
+
+@media (max-width: 767.98px) {
+    .workout-actions-inner {
+        background: var(--nm-surface, #ffffff);
+        border: var(--nm-border-subtle, 1px solid rgba(0, 0, 0, 0.06));
+        border-radius: 18px;
+        padding: 14px 16px;
+        box-shadow: var(--nm-shadow-flat-sm, 0 4px 12px rgba(0, 0, 0, 0.05));
+        margin-top: 10px;
+    }
+}
+
+/* Mobile Navigation Tabs inside Tùy chọn Collapse */
+.workout-mobile-tabs-section {
+    width: 100%;
+}
+
+.workout-mobile-nav-pills {
+    background: transparent;
+}
+
+.workout-mobile-tab-btn {
+    background: var(--nm-bg, #f8fafc);
+    border: var(--nm-border-subtle, 1px solid rgba(0, 0, 0, 0.05));
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: var(--nm-text-main, #334155);
+    font-size: 0.88rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: var(--nm-shadow-flat-xs, 0 1px 3px rgba(0, 0, 0, 0.03));
+}
+
+.workout-mobile-tab-btn:hover {
+    background: var(--nm-surface, #ffffff);
+    color: var(--nm-primary, #6366f1);
+}
+
+.workout-mobile-tab-btn.active {
+    background: var(--nm-surface, #ffffff) !important;
+    color: var(--nm-primary, #6366f1) !important;
+    border: 1.5px solid var(--nm-primary, #6366f1) !important;
+    box-shadow: 0 3px 12px rgba(99, 102, 241, 0.15) !important;
+}
+
+.workout-mobile-tab-btn .active-check-icon {
+    display: none;
+}
+
+.workout-mobile-tab-btn.active .active-check-icon {
+    display: inline-block;
+}
+
+[data-bs-theme="dark"] .workout-mobile-tab-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.07);
+    color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] .workout-mobile-tab-btn.active {
+    background: #1e2230 !important;
+    border-color: #818cf8 !important;
+    color: #818cf8 !important;
+}
+
+.workout-mobile-divider {
+    height: 1px;
+    background: var(--nm-divider, rgba(0, 0, 0, 0.08));
+    width: 100%;
+}
+
+.workout-actions-buttons-section {
+    width: 100%;
+}
+
+/* ========================================================
+   PRESET WORKOUT ROUTINES MODAL (LỊCH TẬP MẪU)
+   ======================================================== */
+.preset-card {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.preset-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-float, 0 6px 16px rgba(0, 0, 0, 0.08)) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+.cfg-session-item {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.cfg-session-item:hover {
+    background-color: var(--nm-surface, #ffffff) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .preset-card {
+    background: #1e2230 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .cfg-session-item {
+    background: #191c28 !important;
+    border-color: rgba(255, 255, 255, 0.07) !important;
 }
 

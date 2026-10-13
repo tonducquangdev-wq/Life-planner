@@ -26,7 +26,8 @@ return new class extends Migration
                 'hoc_tap',
                 'deadline',
                 'tap_luyen',
-                'ca_nhan'
+                'ca_nhan',
+                'cong_viec',
             ]);
 
             $table->dateTime('thoi_gian_bat_dau');

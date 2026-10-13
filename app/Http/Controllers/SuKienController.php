@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CongViec;
 use App\Models\SuKien;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,7 +54,7 @@ class SuKienController extends Controller
         $quyTacLap = $validatedData['quy_tac_lap'] ?? 'once';
 
         $start = Carbon::parse($validatedData['thoi_gian_bat_dau']);
-        $end = !empty($validatedData['thoi_gian_ket_thuc'])
+        $end = ! empty($validatedData['thoi_gian_ket_thuc'])
             ? Carbon::parse($validatedData['thoi_gian_ket_thuc'])
             : $start->copy()->addHour();
 
@@ -62,7 +63,7 @@ class SuKienController extends Controller
             $durationInSeconds = 3600;
         }
 
-        $ngayKetThucLap = (!empty($validatedData['ngay_ket_thuc_lap']) && in_array($quyTacLap, ['daily', 'weekly', 'monthly']))
+        $ngayKetThucLap = (! empty($validatedData['ngay_ket_thuc_lap']) && in_array($quyTacLap, ['daily', 'weekly', 'monthly']))
             ? Carbon::parse($validatedData['ngay_ket_thuc_lap'])->endOfDay()
             : null;
 
@@ -113,7 +114,7 @@ class SuKienController extends Controller
 
                 // Kiểm tra giao nhau: instanceStart < evtEnd AND instanceEnd > evtStart
                 if ($instanceStart->lt($evtEnd) && $instanceEnd->gt($evtStart)) {
-                    if (!isset($seenConflictIds[$evt->id])) {
+                    if (! isset($seenConflictIds[$evt->id])) {
                         $seenConflictIds[$evt->id] = true;
 
                         $conflicts[] = [
@@ -121,7 +122,7 @@ class SuKienController extends Controller
                             'title' => $evt->tieu_de,
                             'tieu_de' => $evt->tieu_de,
                             'type' => str_replace('_', '-', $evt->loai_su_kien),
-                            'time' => $evtStart->format('H:i') . ' - ' . $evtEnd->format('H:i'),
+                            'time' => $evtStart->format('H:i').' - '.$evtEnd->format('H:i'),
                         ];
                     }
                 }
@@ -171,7 +172,7 @@ class SuKienController extends Controller
 
         if ($request->filled('thoi_gian_bat_dau') && $request->filled('ngay_ket_thuc_lap')) {
             $startDate = Carbon::parse($request->input('thoi_gian_bat_dau'))->toDateString();
-            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:' . $startDate;
+            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:'.$startDate;
         }
 
         $validated = $request->validate($rules, [
@@ -185,9 +186,9 @@ class SuKienController extends Controller
         ]);
 
         // Kiểm tra trùng lịch nếu chưa chọn lưu đè (force / van_them)
-        if (!$request->boolean('force') && !$request->boolean('van_them')) {
+        if (! $request->boolean('force') && ! $request->boolean('van_them')) {
             $conflicts = $this->checkScheduleConflicts($validated);
-            if (!empty($conflicts)) {
+            if (! empty($conflicts)) {
                 return response()->json([
                     'success' => false,
                     'has_conflict' => true,
@@ -203,12 +204,40 @@ class SuKienController extends Controller
         $validated['so_ngay_nhac'] = $request->input('so_ngay_nhac', 1);
         $validated['quy_tac_lap'] = $quyTacLap;
 
+        if (empty($validated['mau_hien_thi'])) {
+            $validated['mau_hien_thi'] = match ($validated['loai_su_kien']) {
+                'hoc_tap' => '#3B82F6',
+                'tap_luyen' => '#10B981',
+                'deadline' => '#F59E0B',
+                'ca_nhan' => '#8B5CF6',
+                'cong_viec' => '#6366F1',
+                default => '#6366F1',
+            };
+        }
+
+        if ($validated['loai_su_kien'] === 'cong_viec') {
+            if ($request->filled('cong_viec_id')) {
+                $validated['cong_viec_id'] = $request->input('cong_viec_id');
+            } else {
+                $congViec = CongViec::create([
+                    'user_id' => Auth::id(),
+                    'ten_cong_viec' => $validated['tieu_de'],
+                    'mo_ta' => $validated['mo_ta'] ?? null,
+                    'deadline' => $validated['thoi_gian_ket_thuc'] ?? $validated['thoi_gian_bat_dau'],
+                    'uu_tien' => $request->input('uu_tien', 'trung_binh'),
+                    'trang_thai' => 'can_lam',
+                    'dong_bo_calendar' => true,
+                ]);
+                $validated['cong_viec_id'] = $congViec->id;
+            }
+        }
+
         if (in_array($quyTacLap, ['daily', 'weekly', 'monthly'])) {
             $nhomLapId = (string) Str::uuid();
             $validated['nhom_lap_id'] = $nhomLapId;
 
             $start = Carbon::parse($validated['thoi_gian_bat_dau']);
-            $end = !empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
+            $end = ! empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
             $durationInSeconds = $end ? $start->diffInSeconds($end) : null;
             $ngayKetThucLap = Carbon::parse($validated['ngay_ket_thuc_lap'])->endOfDay();
 
@@ -301,12 +330,12 @@ class SuKienController extends Controller
             : ($suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null);
 
         if ($effectiveStart && $request->filled('thoi_gian_ket_thuc')) {
-            $rules['thoi_gian_ket_thuc'] .= '|after_or_equal:' . $effectiveStart;
+            $rules['thoi_gian_ket_thuc'] .= '|after_or_equal:'.$effectiveStart;
         }
 
         if ($effectiveStart && $request->filled('ngay_ket_thuc_lap')) {
             $startDate = Carbon::parse($effectiveStart)->toDateString();
-            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:' . $startDate;
+            $rules['ngay_ket_thuc_lap'] .= '|after_or_equal:'.$startDate;
         }
 
         $validated = $request->validate($rules, [
@@ -321,13 +350,19 @@ class SuKienController extends Controller
 
         $updateMode = $request->input('update_mode', 'single');
 
-        // Kiểm tra trùng lịch nếu chưa chọn lưu đè (force / van_them)
-        if (!$request->boolean('force') && !$request->boolean('van_them')) {
+        // Xác định điều kiện loại trừ trùng lịch
+        if ($newQuyTacLap === 'once' && ! empty($suKien->nhom_lap_id)) {
+            $excludeId = $suKien->id;
+            $excludeGroup = $suKien->nhom_lap_id;
+        } else {
             $excludeId = ($updateMode === 'single') ? $suKien->id : null;
             $excludeGroup = ($updateMode === 'all') ? $suKien->nhom_lap_id : null;
+        }
 
+        // Kiểm tra trùng lịch nếu chưa chọn lưu đè (force / van_them)
+        if (! $request->boolean('force') && ! $request->boolean('van_them')) {
             $conflicts = $this->checkScheduleConflicts($validated, $excludeId, $excludeGroup);
-            if (!empty($conflicts)) {
+            if (! empty($conflicts)) {
                 return response()->json([
                     'success' => false,
                     'has_conflict' => true,
@@ -346,7 +381,88 @@ class SuKienController extends Controller
         }
         unset($validated['force']);
 
-        if ($updateMode === 'all' && !empty($suKien->nhom_lap_id)) {
+        if (empty($validated['mau_hien_thi'])) {
+            $validated['mau_hien_thi'] = match ($validated['loai_su_kien']) {
+                'hoc_tap' => '#3B82F6',
+                'tap_luyen' => '#10B981',
+                'deadline' => '#F59E0B',
+                'ca_nhan' => '#8B5CF6',
+                'cong_viec' => '#6366F1',
+                default => '#6366F1',
+            };
+        }
+
+        if ($suKien->cong_viec_id) {
+            CongViec::where('id', $suKien->cong_viec_id)
+                ->where('user_id', Auth::id())
+                ->update([
+                    'ten_cong_viec' => $validated['tieu_de'],
+                    'mo_ta' => $validated['mo_ta'] ?? null,
+                    'deadline' => $validated['thoi_gian_ket_thuc'] ?? $validated['thoi_gian_bat_dau'],
+                ]);
+        } elseif ($validated['loai_su_kien'] === 'cong_viec') {
+            $congViec = CongViec::create([
+                'user_id' => Auth::id(),
+                'ten_cong_viec' => $validated['tieu_de'],
+                'mo_ta' => $validated['mo_ta'] ?? null,
+                'deadline' => $validated['thoi_gian_ket_thuc'] ?? $validated['thoi_gian_bat_dau'],
+                'uu_tien' => 'trung_binh',
+                'trang_thai' => 'can_lam',
+                'dong_bo_calendar' => true,
+            ]);
+            $validated['cong_viec_id'] = $congViec->id;
+        }
+
+        if ($newQuyTacLap === 'once' && ! empty($suKien->nhom_lap_id)) {
+            $nhomLapId = $suKien->nhom_lap_id;
+            $currentStart = $suKien->thoi_gian_bat_dau ? $suKien->thoi_gian_bat_dau->toDateTimeString() : null;
+
+            // Chỉ xóa các buổi lặp từ ngày của buổi đang sửa trở đi (loại trừ chính buổi đang sửa)
+            SuKien::where('user_id', Auth::id())
+                ->where('nhom_lap_id', $nhomLapId)
+                ->where('id', '!=', $suKien->id)
+                ->when($currentStart, function ($q) use ($currentStart) {
+                    $q->where('thoi_gian_bat_dau', '>=', $currentStart);
+                })
+                ->delete();
+
+            // Những ngày/buổi đã qua (trước ngày chỉnh sửa) thì KHÔNG xóa, được giữ lại trong lịch sử.
+            // Cập nhật lại ngay_ket_thuc_lap cho các buổi trong quá khứ để không còn trỏ về tương lai.
+            if ($currentStart) {
+                $remainingPastEvents = SuKien::where('user_id', Auth::id())
+                    ->where('nhom_lap_id', $nhomLapId)
+                    ->where('id', '!=', $suKien->id)
+                    ->where('thoi_gian_bat_dau', '<', $currentStart)
+                    ->orderBy('thoi_gian_bat_dau', 'desc')
+                    ->get();
+
+                if ($remainingPastEvents->count() === 1) {
+                    // Nếu quá khứ chỉ còn 1 buổi duy nhất, tách nó thành sự kiện 1 lần
+                    $remainingPastEvents->first()->update([
+                        'nhom_lap_id' => null,
+                        'ngay_ket_thuc_lap' => null,
+                        'quy_tac_lap' => 'once',
+                    ]);
+                } elseif ($remainingPastEvents->count() > 1) {
+                    // Nếu còn từ 2 buổi trở lên trong quá khứ, giới hạn ngay_ket_thuc_lap tại buổi cuối của quá khứ
+                    $lastPastDate = Carbon::parse($remainingPastEvents->first()->thoi_gian_bat_dau)->toDateString();
+                    SuKien::where('user_id', Auth::id())
+                        ->where('nhom_lap_id', $nhomLapId)
+                        ->where('id', '!=', $suKien->id)
+                        ->update([
+                            'ngay_ket_thuc_lap' => $lastPastDate,
+                        ]);
+                }
+            }
+
+            // Cắt đứt chuỗi lặp, biến sự kiện hiện tại thành sự kiện đơn 1 lần
+            $validated['nhom_lap_id'] = null;
+            $validated['ngay_ket_thuc_lap'] = null;
+            $validated['quy_tac_lap'] = 'once';
+
+            $suKien->update($validated);
+            $suKien->refresh();
+        } elseif ($updateMode === 'all' && ! empty($suKien->nhom_lap_id)) {
             // Cập nhật thông tin dùng chung cho tất cả các buổi lặp trong nhóm
             SuKien::where('user_id', Auth::id())
                 ->where('nhom_lap_id', $suKien->nhom_lap_id)
@@ -362,7 +478,7 @@ class SuKienController extends Controller
                 ]);
 
             // Nếu có ngay_ket_thuc_lap mới, xử lý xóa các buổi lặp thừa hoặc sinh thêm buổi lặp thiếu
-            if (!empty($validated['ngay_ket_thuc_lap'])) {
+            if (! empty($validated['ngay_ket_thuc_lap'])) {
                 $ngayKetThucLimit = Carbon::parse($validated['ngay_ket_thuc_lap'])->endOfDay();
 
                 // Xóa các lần lặp phát sinh SAU ngày kết thúc mới
@@ -385,7 +501,7 @@ class SuKienController extends Controller
                     $existingStarts = SuKien::where('user_id', Auth::id())
                         ->where('nhom_lap_id', $suKien->nhom_lap_id)
                         ->pluck('thoi_gian_bat_dau')
-                        ->map(fn($dt) => Carbon::parse($dt)->toDateTimeString())
+                        ->map(fn ($dt) => Carbon::parse($dt)->toDateTimeString())
                         ->toArray();
 
                     $i = 0;
@@ -402,7 +518,7 @@ class SuKienController extends Controller
                         }
 
                         $instanceStartStr = $instanceStart->toDateTimeString();
-                        if (!in_array($instanceStartStr, $existingStarts)) {
+                        if (! in_array($instanceStartStr, $existingStarts)) {
                             $newInstance = [
                                 'user_id' => Auth::id(),
                                 'tieu_de' => $validated['tieu_de'],
@@ -433,12 +549,12 @@ class SuKienController extends Controller
             $suKien->refresh();
         } else {
             // Nếu đổi từ 'once' sang chuỗi lặp mới khi sửa 1 buổi đơn
-            if ($suKien->quy_tac_lap === 'once' && in_array($newQuyTacLap, ['daily', 'weekly', 'monthly']) && !empty($validated['ngay_ket_thuc_lap'])) {
+            if ($suKien->quy_tac_lap === 'once' && in_array($newQuyTacLap, ['daily', 'weekly', 'monthly']) && ! empty($validated['ngay_ket_thuc_lap'])) {
                 $nhomLapId = (string) Str::uuid();
                 $validated['nhom_lap_id'] = $nhomLapId;
 
                 $start = Carbon::parse($validated['thoi_gian_bat_dau']);
-                $end = !empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
+                $end = ! empty($validated['thoi_gian_ket_thuc']) ? Carbon::parse($validated['thoi_gian_ket_thuc']) : null;
                 $durationInSeconds = $end ? $start->diffInSeconds($end) : null;
                 $ngayKetThucLap = Carbon::parse($validated['ngay_ket_thuc_lap'])->endOfDay();
 
@@ -503,9 +619,15 @@ class SuKienController extends Controller
     {
         $suKien = SuKien::where('user_id', Auth::id())->findOrFail($id);
 
+        if ($suKien->cong_viec_id) {
+            CongViec::where('id', $suKien->cong_viec_id)
+                ->where('user_id', Auth::id())
+                ->update(['dong_bo_calendar' => false]);
+        }
+
         $mode = request()->input('mode', request()->query('mode', 'single'));
 
-        if ($mode === 'all' && !empty($suKien->nhom_lap_id)) {
+        if ($mode === 'all' && ! empty($suKien->nhom_lap_id)) {
             SuKien::where('user_id', Auth::id())
                 ->where('nhom_lap_id', $suKien->nhom_lap_id)
                 ->delete();
