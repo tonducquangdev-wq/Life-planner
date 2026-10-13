@@ -624,14 +624,14 @@
          ========================================================================= -->
     <div class="community-messenger-popup shadow-lg" id="communityMessengerPopup" role="dialog" aria-modal="true" aria-label="Kênh Chat Thế Giới Gymer">
         <!-- HEADER KÊNH CHAT THẾ GIỚI -->
-        <div class="community-popup-header d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-            <div class="d-flex align-items-center gap-2 min-w-0">
-                <div class="header-icon-circle bg-primary-subtle text-primary flex-shrink-0">
+        <div class="community-popup-header">
+            <div class="d-flex align-items-center gap-2.5 min-w-0">
+                <div class="header-icon-circle">
                     <i class="fa-solid fa-earth-americas"></i>
                 </div>
                 <div class="min-w-0">
                     <h6 class="fw-bold mb-0 text-dark-emphasis fs-7 text-truncate">Kênh Chat Thế Giới</h6>
-                    <small class="text-success fs-9 d-flex align-items-center gap-1 fw-medium">
+                    <small class="text-success fs-9 d-flex align-items-center gap-1.5 fw-medium">
                         <span class="online-indicator-dot"></span>
                         <span id="worldOnlineCountText">12 Gymer đang online</span>
                     </small>
@@ -639,28 +639,28 @@
             </div>
 
             <!-- Nút công cụ & đóng -->
-            <div class="d-flex align-items-center gap-1 flex-shrink-0">
-                <button type="button" class="btn btn-sm btn-light rounded-circle p-1 text-muted" id="btnRefreshWorldChat" title="Tải lại tin nhắn">
-                    <i class="fa-solid fa-arrows-rotate fs-8"></i>
+            <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                <button type="button" class="chat-tool-btn" id="btnRefreshWorldChat" title="Tải lại tin nhắn">
+                    <i class="fa-solid fa-arrows-rotate fs-7"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-light rounded-circle p-1 text-muted" id="btnCloseCommunityPopup" aria-label="Đóng chat" title="Đóng">
+                <button type="button" class="chat-tool-btn" id="btnCloseCommunityPopup" aria-label="Đóng chat" title="Đóng">
                     <i class="fa-solid fa-xmark fs-7"></i>
                 </button>
             </div>
         </div>
 
         <!-- BODY: DÒNG THỜI GIAN TIN NHẮN (CUỘN ĐỘC LẬP) -->
-        <div class="world-chat-body flex-grow-1 p-2.5 d-flex flex-column min-h-0" id="worldChatContainer">
-            <div class="world-chat-messages d-flex flex-column gap-2 flex-grow-1 overflow-y-auto" id="worldChatMessages">
+        <div class="world-chat-body" id="worldChatContainer">
+            <div class="world-chat-messages" id="worldChatMessages">
                 <!-- Sẽ được fill bằng JavaScript -->
             </div>
         </div>
 
         <!-- FOOTER: KHUNG NHẬP LIỆU GỬI TIN NHẮN -->
-        <div class="world-chat-footer p-2 border-top">
-            <form id="worldChatForm" class="d-flex align-items-center gap-1.5" onsubmit="return false;">
-                <input type="text" class="form-control form-control-sm rounded-pill px-3 py-1 fs-8" id="worldChatMessageInput" placeholder="Nhắn tin lên kênh thế giới..." autocomplete="off">
-                <button type="submit" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" id="btnSendWorldMessage" style="width: 32px; height: 32px;" title="Gửi">
+        <div class="world-chat-footer">
+            <form id="worldChatForm" class="d-flex align-items-center gap-2" onsubmit="return false;">
+                <input type="text" class="form-control" id="worldChatMessageInput" placeholder="Nhắn tin lên kênh thế giới..." autocomplete="off">
+                <button type="submit" id="btnSendWorldMessage" title="Gửi">
                     <i class="fa-solid fa-paper-plane fs-8"></i>
                 </button>
             </form>
