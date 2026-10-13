@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\MonHoc;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -191,5 +191,52 @@ class MonHocDateValidationTest extends TestCase
             'ngay_ket_thuc' => '2026-09-20',
         ]);
         $res5->assertStatus(422);
+    }
+
+    public function test_mon_hoc_index_renders_neumorphic_view_successfully(): void
+    {
+        $user = User::factory()->create();
+
+        $monHoc1 = MonHoc::create([
+            'user_id' => $user->id,
+            'ma_mon' => 'INT3306',
+            'ten_mon' => 'Lập trình Web & Laravel',
+            'giang_vien' => 'TS. Nguyễn Văn A',
+            'phong_hoc' => 'Phòng B2.04',
+            'so_tin_chi' => 3,
+            'tien_do' => 85,
+            'trang_thai' => 'dang_hoc',
+            'mau_sac' => '#6366f1',
+        ]);
+
+        $monHoc2 = MonHoc::create([
+            'user_id' => $user->id,
+            'ma_mon' => 'INT2204',
+            'ten_mon' => 'Cơ sở dữ liệu nâng cao',
+            'giang_vien' => 'ThS. Trần Thị B',
+            'phong_hoc' => 'Phòng A1.02',
+            'so_tin_chi' => 4,
+            'tien_do' => 100,
+            'trang_thai' => 'da_hoan_thanh',
+            'mau_sac' => '#3b82f6',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('mon-hoc.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('mon_hoc.index');
+        $response->assertSee('Danh sách Môn Học');
+        $response->assertSee('Lập trình Web & Laravel');
+        $response->assertSee('Cơ sở dữ liệu nâng cao');
+        $response->assertSee('TS. Nguyễn Văn A');
+        $response->assertSee('Phòng B2.04');
+        $response->assertSee('Phòng A1.02');
+        $response->assertSee('Đang học');
+        $response->assertSee('Đã hoàn thành');
+        $response->assertSee('createMonHocModal');
+        $response->assertSee('createMonHocForm');
+        $response->assertSee('nm-course-card');
+        $response->assertSee(route('study.tutors'));
+        $response->assertSee(route('calendar.index'));
     }
 }

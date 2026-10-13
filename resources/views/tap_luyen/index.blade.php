@@ -48,7 +48,7 @@
     <div class="main-wrapper main-wrapper-full">
 
         <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
-        @include('layouts.topbar', ['title' => 'Tập luyện'])
+        @include('layouts.topbar', ['title' => 'Theo dõi Thể chất'])
 
         <!-- CONTENT BODY (CUỘN ĐỘC LẬP) -->
         <main class="content-body">
@@ -269,7 +269,7 @@
                                     </div>
                                     <div>
                                         <div class="d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="text-muted fs-8 fw-semibold text-uppercase letter-spacing-1">Buổi tập hôm nay:</span>
+                                            <span class="text-muted fs-8 fw-semibold text-uppercase letter-spacing-1">Tiến độ buổi tập:</span>
                                             <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-0.5 fs-8 fw-bold" id="workout-title-display">
                                                 {{ $currentBuoiTap ? $currentBuoiTap->ten_buoi_tap : 'Buổi rèn luyện' }}
                                             </span>
@@ -406,7 +406,7 @@
                                                     <i class="bi bi-stopwatch fs-6"></i>
                                                 </div>
                                                 <div>
-                                                    <h6 class="fw-bold text-dark mb-0 fs-7">Đồng hồ rèn luyện</h6>
+                                                    <h6 class="fw-bold text-dark mb-0 fs-7">Đồng hồ tập</h6>
                                                 </div>
                                             </div>
                                             <span class="badge workout-status-badge badge-not-started" id="workout-status-badge">

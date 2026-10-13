@@ -1,40 +1,128 @@
 /* ==========================================================================
    MODULE THỂ CHẤT & TẬP LUYỆN (TAP-LUYEN.CSS)
-   LIFE PLANNER - MODERN PRODUCTIVITY & FITNESS DASHBOARD
-   Thiết kế cân đối, tinh gọn, chuẩn Bootstrap 5 & Dark Mode Tokens
+   LIFE PLANNER - MODERN SOFT NEUMORPHISM DESIGN SYSTEM
+   Đồng bộ với Calendar, Quản lý Môn học và Gia sư
+   Giảm độ lan và độ tương phản bóng, triệt tiêu hào quang trắng chói gắt.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. DESIGN TOKENS & TYPOGRAPHY UTILITIES
+   1. DESIGN TOKENS & SOFT NEUMORPHISM VARIABLES
    -------------------------------------------------------------------------- */
 :root {
-    --lp-primary: #6C8CFF;
-    --lp-primary-hover: #5574EE;
-    --lp-primary-subtle: rgba(108, 140, 255, 0.12);
-    --lp-primary-border: rgba(108, 140, 255, 0.3);
+    /* Soft Neumorphism Base Surfaces */
+    --nm-bg: #e8ecf2;
+    --nm-surface: #eef2f6;
+    --nm-surface-hover: #f3f6fa;
+    --nm-surface-subtle: #e4eaf2;
+
+    /* Soft Dual Shadows - Giảm độ lan, tạo chiều sâu êm dịu */
+    --nm-shadow-flat: 4px 4px 10px rgba(163, 177, 198, 0.42), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    --nm-shadow-flat-sm: 2px 2px 6px rgba(163, 177, 198, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.8);
+    --nm-shadow-card: 8px 8px 18px rgba(163, 177, 198, 0.38), -8px -8px 18px rgba(255, 255, 255, 0.85);
+    --nm-shadow-card-hover: 12px 12px 24px rgba(163, 177, 198, 0.46), -10px -10px 22px rgba(255, 255, 255, 0.95);
+    --nm-shadow-btn: 4px 4px 10px rgba(163, 177, 198, 0.38), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    --nm-shadow-btn-hover: 6px 6px 14px rgba(163, 177, 198, 0.44), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    --nm-shadow-primary: 5px 5px 14px rgba(79, 70, 229, 0.32), -3px -3px 8px rgba(255, 255, 255, 0.7);
+
+    /* Inset Concave Shadows cho inputs, timers & container tracks */
+    --nm-shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.38), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+    --nm-shadow-inset-deep: inset 4px 4px 8px rgba(163, 177, 198, 0.46), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+
+    /* Đường viền tinh tế */
+    --nm-border: 1.5px solid rgba(255, 255, 255, 0.75);
+    --nm-border-subtle: 1px solid rgba(163, 177, 198, 0.28);
+    --nm-divider: rgba(163, 177, 198, 0.32);
+
+    /* Màu văn bản phân cấp chuẩn */
+    --nm-text-main: #1e293b;
+    --nm-text-muted: #64748b;
+    --nm-text-light: #94a3b8;
+
+    /* Tone màu nhấn Indigo / Violet */
+    --nm-primary: #4f46e5;
+    --nm-primary-hover: #4338ca;
+    --nm-primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    --nm-primary-hover-gradient: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+
+    /* Tương thích ngược với các biến --lp-* hiện có */
+    --lp-primary: #4f46e5;
+    --lp-primary-hover: #4338ca;
+    --lp-primary-subtle: rgba(79, 70, 229, 0.12);
+    --lp-primary-border: rgba(79, 70, 229, 0.25);
     --lp-success: #10B981;
     --lp-success-subtle: rgba(16, 185, 129, 0.12);
     --lp-warning: #F59E0B;
     --lp-danger: #EF4444;
-    --lp-card-radius: 12px;
-    --lp-item-radius: 8px;
-    --lp-card-border: #E2E8F0;
-    --lp-bg-card: #FFFFFF;
-    --lp-bg-surface: #F8FAFC;
-    --lp-text-main: #0F172A;
-    --lp-text-muted: #64748B;
+    --lp-card-radius: 22px;
+    --lp-item-radius: 14px;
+    --lp-card-border: var(--nm-border);
+    --lp-bg-card: var(--nm-surface);
+    --lp-bg-surface: var(--nm-surface);
+    --lp-text-main: var(--nm-text-main);
+    --lp-text-muted: var(--nm-text-muted);
 }
 
+/* GIAO DIỆN TỐI (DARK MODE NEUMORPHISM) */
 [data-bs-theme="dark"] {
-    --lp-primary: #6C8CFF;
-    --lp-primary-hover: #829DFF;
-    --lp-primary-subtle: rgba(108, 140, 255, 0.15);
-    --lp-primary-border: rgba(108, 140, 255, 0.35);
-    --lp-card-border: #2E2E34;
-    --lp-bg-card: #1E1E22;
-    --lp-bg-surface: #161619;
-    --lp-text-main: #E8E8EA;
-    --lp-text-muted: #A0A0A8;
+    --nm-bg: #151821;
+    --nm-surface: #1b1e2a;
+    --nm-surface-hover: #222634;
+    --nm-surface-subtle: #202432;
+
+    --nm-shadow-flat: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.035);
+    --nm-shadow-flat-sm: 2px 2px 6px rgba(0, 0, 0, 0.4), -2px -2px 5px rgba(255, 255, 255, 0.03);
+    --nm-shadow-card: 8px 8px 20px rgba(0, 0, 0, 0.5), -6px -6px 16px rgba(255, 255, 255, 0.035);
+    --nm-shadow-card-hover: 12px 12px 26px rgba(0, 0, 0, 0.6), -8px -8px 20px rgba(255, 255, 255, 0.045);
+    --nm-shadow-btn: 4px 4px 10px rgba(0, 0, 0, 0.42), -3px -3px 8px rgba(255, 255, 255, 0.03);
+    --nm-shadow-btn-hover: 6px 6px 14px rgba(0, 0, 0, 0.52), -4px -4px 10px rgba(255, 255, 255, 0.045);
+    --nm-shadow-primary: 5px 5px 14px rgba(99, 102, 241, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.04);
+
+    --nm-shadow-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.6), inset -3px -3px 6px rgba(255, 255, 255, 0.03);
+    --nm-shadow-inset-deep: inset 4px 4px 8px rgba(0, 0, 0, 0.7), inset -4px -4px 8px rgba(255, 255, 255, 0.04);
+
+    --nm-border: 1.5px solid rgba(255, 255, 255, 0.06);
+    --nm-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+    --nm-divider: rgba(255, 255, 255, 0.08);
+
+    --nm-text-main: #f1f5f9;
+    --nm-text-muted: #94a3b8;
+    --nm-text-light: #64748b;
+
+    --nm-primary: #6366f1;
+    --nm-primary-hover: #4f46e5;
+    --nm-primary-gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    --nm-primary-hover-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+
+    --lp-primary: #6366f1;
+    --lp-primary-hover: #818cf8;
+    --lp-primary-subtle: rgba(99, 102, 241, 0.15);
+    --lp-primary-border: rgba(99, 102, 241, 0.3);
+    --lp-card-border: var(--nm-border);
+    --lp-bg-card: var(--nm-surface);
+    --lp-bg-surface: var(--nm-surface);
+    --lp-text-main: var(--nm-text-main);
+    --lp-text-muted: var(--nm-text-muted);
+}
+
+/* Áp dụng nền tổng thể chuẩn Neumorphism */
+body {
+    background-color: var(--nm-bg) !important;
+    color: var(--nm-text-main) !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.main-wrapper-full {
+    background-color: var(--nm-bg);
+}
+
+.content-body {
+    padding: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+    .content-body {
+        padding: 1rem 0.75rem;
+    }
 }
 
 .font-numeric {
@@ -45,21 +133,10 @@
     letter-spacing: 0.04em;
 }
 
-.fs-7 {
-    font-size: 0.84rem !important;
-}
-
-.fs-8 {
-    font-size: 0.76rem !important;
-}
-
-.fs-9 {
-    font-size: 0.69rem !important;
-}
-
-.fs-10 {
-    font-size: 0.625rem !important;
-}
+.fs-7 { font-size: 0.84rem !important; }
+.fs-8 { font-size: 0.76rem !important; }
+.fs-9 { font-size: 0.69rem !important; }
+.fs-10 { font-size: 0.625rem !important; }
 
 .line-clamp-1 {
     display: -webkit-box;
@@ -75,64 +152,98 @@
     overflow: hidden;
 }
 
-.shadow-2xs {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-xs {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.transition-all {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* --------------------------------------------------------------------------
-   2. HEADER & TOOLBAR
+   2. TOPBAR VÀ HEADER TOOLBAR NEUMORPHIC
    -------------------------------------------------------------------------- */
+.top-header {
+    background-color: var(--nm-surface) !important;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25) !important;
+    box-shadow: 0 4px 16px rgba(163, 177, 198, 0.22) !important;
+    transition: all 0.25s ease;
+}
+
+[data-bs-theme="dark"] .top-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+}
+
+.top-header .btn-back-to-calendar {
+    background: var(--nm-surface) !important;
+    border: var(--nm-border) !important;
+    box-shadow: var(--nm-shadow-btn) !important;
+    color: var(--nm-text-main) !important;
+    font-weight: 600;
+    border-radius: 9999px !important;
+    padding: 0.45rem 1.15rem !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.top-header .btn-back-to-calendar:hover {
+    box-shadow: var(--nm-shadow-btn-hover) !important;
+    color: var(--nm-primary) !important;
+    transform: translateX(-3px) translateY(-1px);
+}
+
+.top-header .btn-back-to-calendar:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateX(-1px) scale(0.98);
+}
+
 .workout-header-wrapper {
-    margin-bottom: 0.85rem;
+    margin-bottom: 1.25rem;
 }
 
 .workout-page-title {
     font-size: clamp(1.35rem, 2vw, 1.65rem);
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.02em;
-    color: var(--lp-text-main);
+    color: var(--nm-text-main);
 }
 
 .workout-page-subtitle {
-    font-size: 0.82rem;
-    color: var(--lp-text-muted);
+    font-size: 0.84rem;
+    color: var(--nm-text-muted);
 }
 
 .workout-title-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(239, 68, 68, 0.12);
-    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    font-size: 1.1rem;
     flex-shrink: 0;
 }
 
+/* --------------------------------------------------------------------------
+   3. SEGMENT CONTROL TABS (VIEW SWITCHER TRACK)
+   -------------------------------------------------------------------------- */
 .nav-segment-control {
-    background-color: #F1F5F9;
-    border: 1px solid #E2E8F0;
-    gap: 2px;
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    border-radius: 9999px;
+    padding: 5px;
+    gap: 4px;
 }
 
 .nav-segment-control .nav-link,
 .nav-segment-control .btn {
     border: none;
     font-weight: 600;
-    font-size: 0.78rem;
-    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    padding: 0.45rem 1.15rem;
     border-radius: 9999px;
-    color: #64748B;
-    transition: all 0.18s ease;
+    color: var(--nm-text-muted);
+    transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -141,24 +252,29 @@
 
 .nav-segment-control .nav-link:hover,
 .nav-segment-control .btn:hover {
-    color: #1E293B;
+    color: var(--nm-text-main);
 }
 
 .nav-segment-control .nav-link.active,
 .nav-segment-control .btn.btn-primary {
-    background-color: var(--lp-primary);
-    color: #FFFFFF !important;
-    box-shadow: 0 1px 4px rgba(108, 140, 255, 0.35);
+    background: var(--nm-surface) !important;
+    color: var(--nm-primary) !important;
+    border: var(--nm-border) !important;
+    box-shadow: var(--nm-shadow-btn) !important;
+}
+
+[data-bs-theme="dark"] .nav-segment-control .nav-link.active {
+    color: #818cf8 !important;
 }
 
 /* --------------------------------------------------------------------------
-   3. QUICK STATS STRIP (KPI SUMMARY)
+   4. QUICK STATS STRIP (KPI SUMMARY CARDS)
    -------------------------------------------------------------------------- */
 .workout-kpi-strip {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 0.85rem;
+    gap: 14px;
+    margin-bottom: 1.25rem;
 }
 
 @media (max-width: 991.98px) {
@@ -170,63 +286,73 @@
 @media (max-width: 575.98px) {
     .workout-kpi-strip {
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 10px;
     }
 }
 
 .workout-kpi-card {
-    background-color: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-card-radius);
-    padding: 0.65rem 0.9rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 20px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 0.9rem 1.15rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    transition: all 0.2s ease;
+    gap: 0.85rem;
+    transition: all 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.workout-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-card-hover);
 }
 
 .workout-kpi-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     flex-shrink: 0;
 }
 
 .workout-kpi-label {
     font-size: 0.72rem;
-    color: var(--lp-text-muted);
-    font-weight: 600;
+    color: var(--nm-text-muted);
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
     line-height: 1.2;
 }
 
 .workout-kpi-val {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--lp-text-main);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
     line-height: 1.25;
 }
 
 /* --------------------------------------------------------------------------
-   4. WEEKLY SCHEDULE STRIP (7-DAY GRID)
+   5. WEEKLY SCHEDULE STRIP (7-DAY NEUMORPHIC GRID)
    -------------------------------------------------------------------------- */
 .schedule-strip-card {
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-card-radius);
-    transition: all 0.2s ease;
-    margin-bottom: 0.85rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 22px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.25rem;
 }
 
 .weekly-schedule-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 6px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -235,18 +361,11 @@
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
-        gap: 6px;
-        padding-bottom: 4px;
+        gap: 8px;
+        padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
         scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
-    }
-    .weekly-schedule-grid::-webkit-scrollbar {
-        height: 4px;
-    }
-    .weekly-schedule-grid::-webkit-scrollbar-thumb {
-        background: rgba(148, 163, 184, 0.4);
-        border-radius: 4px;
     }
 }
 
@@ -254,12 +373,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 6px 8px;
-    border-radius: 9px;
-    background-color: var(--lp-bg-surface);
-    border: 1px solid var(--lp-card-border);
-    min-height: 52px;
-    transition: all 0.16s ease;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-btn);
+    min-height: 58px;
+    transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
     cursor: pointer;
     text-decoration: none;
     position: relative;
@@ -268,28 +388,27 @@
 
 @media (max-width: 991.98px) {
     .schedule-day-box {
-        min-width: 90px;
+        min-width: 96px;
         flex: 0 0 auto;
     }
 }
 
 .schedule-day-box:hover:not(.is-today) {
-    background-color: #F1F5F9;
-    border-color: #CBD5E1;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-btn-hover);
 }
 
 .schedule-day-box .day-code {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: var(--lp-text-muted);
+    color: var(--nm-text-muted);
     text-transform: uppercase;
 }
 
 .schedule-day-box .session-name {
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    color: var(--lp-text-main);
+    color: var(--nm-text-main);
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -298,104 +417,111 @@
 }
 
 .schedule-day-box .today-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background-color: #EF4444;
+    background-color: #10b981;
     display: inline-block;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
 /* Today highlight */
 .schedule-day-box.is-today {
-    background: linear-gradient(135deg, rgba(108, 140, 255, 0.14) 0%, rgba(108, 140, 255, 0.06) 100%);
-    border-color: var(--lp-primary);
-    box-shadow: 0 1px 4px rgba(108, 140, 255, 0.2);
+    border-color: rgba(79, 70, 229, 0.4) !important;
+    box-shadow: var(--nm-shadow-primary);
 }
 
 .schedule-day-box.is-today .day-code {
-    color: #4F46E5;
+    color: var(--nm-primary);
     font-weight: 800;
 }
 
 .schedule-day-box.is-today .session-name {
-    color: #1E1B4B;
+    color: var(--nm-primary);
     font-weight: 700;
 }
 
 /* Rest day highlight */
 .schedule-day-box.is-rest {
     border-style: dashed;
-    background-color: var(--lp-bg-surface);
+    border-color: rgba(163, 177, 198, 0.35);
+    background: var(--nm-surface);
 }
 
 .schedule-day-box.is-rest .session-name {
-    color: var(--lp-text-muted);
+    color: var(--nm-text-muted);
     font-style: italic;
 }
 
 /* Selected highlight */
 .schedule-day-box.is-selected {
-    border-color: var(--lp-primary);
-    box-shadow: 0 0 0 1.5px var(--lp-primary);
+    box-shadow: 0 0 0 2px var(--nm-primary), var(--nm-shadow-btn);
 }
 
 /* --------------------------------------------------------------------------
-   5. WORKOUT PROGRESS CARD (SLIM HERO)
+   6. WORKOUT PROGRESS CARD (SLIM HERO)
    -------------------------------------------------------------------------- */
 .workout-progress-card {
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-card-radius);
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.85rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 22px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 1rem 1.35rem;
+    margin-bottom: 1.25rem;
 }
 
 .workout-progress-icon-badge {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    background-color: rgba(245, 158, 11, 0.12);
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     flex-shrink: 0;
 }
 
 .workout-slim-progress {
-    height: 6px !important;
-    background-color: #F1F5F9;
+    height: 7px !important;
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
     border-radius: 9999px;
     overflow: hidden;
 }
 
 .workout-slim-progress .progress-bar {
-    background-color: var(--lp-success);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
     transition: width 0.35s ease;
 }
 
 /* --------------------------------------------------------------------------
-   6. MAIN WORKOUT CARDS: CHECKLIST (LEFT) + TIMER (RIGHT)
+   7. MAIN WORKOUT CARDS: CHECKLIST (LEFT) + TIMER (RIGHT)
    -------------------------------------------------------------------------- */
 .workout-main-card {
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-card-radius);
-    padding: 1rem 1.15rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 24px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 1.25rem 1.4rem;
     transition: all 0.2s ease;
 }
 
 /* --------------------------------------------------------------------------
-   6.1 CHECKLIST HEADER COMPONENT
+   7.1 CHECKLIST HEADER COMPONENT
    -------------------------------------------------------------------------- */
 .checklist-header-box {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid var(--lp-card-border);
-    padding-bottom: 0.65rem;
+    gap: 10px;
+    margin-bottom: 0.95rem;
+    border-bottom: 1px solid var(--nm-divider);
+    padding-bottom: 0.85rem;
 }
 
 .checklist-header-top {
@@ -408,27 +534,29 @@
 .checklist-header-title-wrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     min-width: 0;
 }
 
 .checklist-header-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background-color: var(--lp-primary-subtle);
-    color: var(--lp-primary);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    color: var(--nm-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     flex-shrink: 0;
 }
 
 .checklist-header-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--lp-text-main);
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
     margin: 0;
     line-height: 1.25;
 }
@@ -436,7 +564,7 @@
 .checklist-header-count {
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--lp-text-muted);
+    color: var(--nm-text-muted);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -444,102 +572,106 @@
 .checklist-header-progress-wrap {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .checklist-header-progress-bar {
     flex-grow: 1;
-    height: 6px !important;
-    background-color: var(--lp-bg-surface);
+    height: 7px !important;
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
     border-radius: 9999px;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .checklist-header-progress-bar .progress-bar {
-    background-color: var(--lp-success);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
     transition: width 0.35s ease;
 }
 
 .checklist-header-percent {
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: var(--lp-primary);
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--nm-primary);
     font-variant-numeric: tabular-nums;
-    min-width: 34px;
+    min-width: 36px;
     text-align: right;
 }
 
 /* --------------------------------------------------------------------------
-   6.2 CHECKLIST ITEMS CONTAINER & ROWS (UNIFIED 4-ZONE LAYOUT)
+   7.2 CHECKLIST ITEMS CONTAINER & ROWS (TACTILE NEUMORPHIC ITEMS)
    -------------------------------------------------------------------------- */
 .workout-checklist-container {
     display: flex;
     flex-direction: column;
-    gap: 6px; /* Spacing between items: 4px - 8px */
+    gap: 8px;
     max-height: 480px;
     overflow-y: auto;
     padding-right: 4px;
     scrollbar-width: thin;
-    scrollbar-color: #CBD5E1 transparent;
+    scrollbar-color: rgba(163, 177, 198, 0.4) transparent;
 }
 
 .workout-checklist-container::-webkit-scrollbar {
-    width: 4px;
+    width: 5px;
 }
 
 .workout-checklist-container::-webkit-scrollbar-thumb {
-    background-color: #CBD5E1;
+    background-color: rgba(163, 177, 198, 0.4);
     border-radius: 6px;
 }
 
 .checklist-exercise-item {
     display: flex;
     align-items: center;
-    min-height: 48px; /* Uniform height: 44px – 52px */
-    padding: 8px 12px; /* Uniform padding: 8px – 12px */
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-left: 3.5px solid #CBD5E1 !important;
-    border-radius: var(--lp-item-radius);
-    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    min-height: 52px;
+    padding: 10px 14px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-left: 4px solid #cbd5e1 !important;
+    border-radius: 16px;
+    box-shadow: var(--nm-shadow-flat-sm);
+    transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
     cursor: pointer;
     user-select: none;
     box-sizing: border-box;
 }
 
 .checklist-exercise-item:hover {
-    background-color: #F8FAFC;
-    border-color: #CBD5E1;
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-btn-hover);
 }
 
 .checklist-exercise-item.active-exercise {
-    border-left-color: var(--lp-primary) !important;
-    background-color: rgba(108, 140, 255, 0.05);
+    border-left-color: var(--nm-primary) !important;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.25), var(--nm-shadow-flat-sm);
+    background: var(--nm-surface);
 }
 
 .checklist-exercise-item.completed {
-    border-left-color: var(--lp-success) !important;
-    background-color: rgba(16, 185, 129, 0.04);
+    border-left-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.05);
 }
 
 .checklist-exercise-item.completed .exercise-title {
     text-decoration: line-through;
-    color: var(--lp-text-muted) !important;
-    opacity: 0.78;
+    color: var(--nm-text-muted) !important;
+    opacity: 0.75;
 }
 
 .checklist-exercise-item.completed .checklist-item-metric-val {
     opacity: 0.75;
 }
 
-/* ZONE 1: Checkbox (Fixed 18x18px, perfectly aligned horizontally) */
+/* ZONE 1: Checkbox */
 .checklist-item-checkbox-col {
-    flex: 0 0 18px;
-    width: 18px;
-    height: 18px;
-    margin-right: 12px; /* Spacing Checkbox -> Tên: 10px – 12px */
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -547,14 +679,21 @@
 }
 
 .custom-check-box {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     margin: 0;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    accent-color: var(--lp-success);
-    flex-shrink: 0;
+    background-color: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    accent-color: #10b981;
+    transition: all 0.15s ease;
     display: block;
+}
+
+.custom-check-box:checked {
+    box-shadow: 2px 2px 6px rgba(16, 185, 129, 0.3);
 }
 
 /* ZONE 2-4: Item Content Wrapper */
@@ -563,10 +702,9 @@
     align-items: center;
     flex: 1 1 auto;
     min-width: 0;
-    gap: 12px; /* Spacing Tên -> Thông tin: 8px – 16px */
+    gap: 12px;
 }
 
-/* ZONE 2: Exercise Name (Uniform starting point, line-clamp-2 max) */
 .checklist-item-title-col {
     flex: 1 1 auto;
     min-width: 0;
@@ -577,19 +715,17 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: 0.84rem;
-    font-weight: 600;
-    color: var(--lp-text-main);
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--nm-text-main);
     line-height: 1.35;
-    overflow-wrap: break-word;
-    word-break: break-word;
     margin: 0;
 }
 
-/* ZONE 3: Sets / Reps / Metric Info (Tabular, aligned, dedicated column) */
+/* ZONE 3: Metrics */
 .checklist-item-meta-col {
     flex: 0 0 auto;
-    min-width: 82px;
+    min-width: 86px;
     text-align: right;
     display: flex;
     align-items: center;
@@ -599,11 +735,13 @@
 }
 
 .checklist-item-metric-val {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #4338CA;
-    background-color: rgba(108, 140, 255, 0.1);
-    padding: 2px 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--nm-primary);
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    padding: 3px 9px;
     border-radius: 9999px;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -612,41 +750,45 @@
 }
 
 .checklist-item-group-tag {
-    font-size: 0.68rem;
-    font-weight: 500;
-    color: var(--lp-text-muted);
-    background-color: var(--lp-bg-surface);
-    border: 1px solid var(--lp-card-border);
-    padding: 2px 7px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--nm-text-muted);
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-flat-sm);
+    padding: 2px 8px;
     border-radius: 9999px;
     white-space: nowrap;
     display: inline-block;
 }
 
-/* ZONE 4: Action / Status Area (Right aligned, fixed min-width to avoid layout shifts) */
+/* ZONE 4: Action / Status Area */
 .checklist-item-action-area {
     flex: 0 0 auto;
     min-width: 54px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    margin-left: 4px; /* Spacing Thông tin -> Action: ~16px total */
+    margin-left: 4px;
     flex-shrink: 0;
 }
 
 .completed-tag {
-    font-size: 0.68rem;
-    font-weight: 600;
-    padding: 2px 7px;
-    white-space: nowrap;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: var(--nm-shadow-flat-sm);
 }
 
 /* Mobile Responsive (< 576px) */
 @media (max-width: 575.98px) {
     .checklist-exercise-item {
         align-items: flex-start;
-        padding: 9px 10px;
-        min-height: auto;
+        padding: 10px 10px;
     }
     .checklist-item-checkbox-col {
         margin-top: 2px;
@@ -679,58 +821,12 @@
     }
 }
 
-/* Dark Mode Checklist Theme */
-[data-bs-theme="dark"] .checklist-exercise-item {
-    background: #1E1E22;
-    border-color: #2E2E34;
-    border-left-color: #3F3F46 !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item:hover {
-    background-color: #26262B;
-    border-color: #3F3F46;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item.active-exercise {
-    background-color: rgba(108, 140, 255, 0.1);
-    border-left-color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item.completed {
-    background-color: rgba(16, 185, 129, 0.08);
-    border-left-color: #10B981 !important;
-}
-
-[data-bs-theme="dark"] .checklist-header-box {
-    border-bottom-color: #2E2E34;
-}
-
-[data-bs-theme="dark"] .checklist-header-progress-bar {
-    background-color: #161619;
-    border-color: #2E2E34;
-}
-
-[data-bs-theme="dark"] .checklist-item-metric-val {
-    background-color: rgba(108, 140, 255, 0.15);
-    color: #829DFF;
-}
-
-[data-bs-theme="dark"] .checklist-item-group-tag {
-    background-color: #161619;
-    border-color: #2E2E34;
-    color: #A0A0A8;
-}
-
-[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
-    background-color: #3F3F46;
-}
-
 /* --------------------------------------------------------------------------
-   7. TIMER & PLAYER CARD
+   8. TIMER & PLAYER CARD
    -------------------------------------------------------------------------- */
 .workout-timer-sticky {
     position: sticky;
-    top: 10px;
+    top: 15px;
     z-index: 5;
 }
 
@@ -741,180 +837,185 @@
 }
 
 .workout-timer-box {
-    background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-    border: 1px solid var(--lp-card-border);
-    border-radius: 12px;
-    padding: 0.65rem 0.85rem;
+    background: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset-deep);
+    border-radius: 20px;
+    padding: 1.25rem 1rem;
 }
 
 .timer-display {
-    font-size: clamp(1.85rem, 2.5vw, 2.25rem);
+    font-size: clamp(2rem, 3vw, 2.5rem);
     font-weight: 800;
-    color: var(--lp-text-main);
+    color: var(--nm-text-main);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.5px;
     line-height: 1.1;
-    margin: 0.15rem 0;
+    margin: 0.25rem 0;
 }
 
 .active-exercise-card {
-    background: var(--lp-bg-surface);
-    border: 1px solid var(--lp-card-border);
-    border-radius: 10px;
-    padding: 0.65rem 0.85rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    border-radius: 16px;
+    padding: 0.85rem 1rem;
 }
 
 .exercise-title-text {
-    font-size: 0.88rem;
+    font-size: 0.92rem;
+    font-weight: 700;
     letter-spacing: -0.1px;
 }
 
 /* Status badge */
 .workout-status-badge {
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 9px;
+    padding: 3px 10px;
     border-radius: 9999px;
 }
 
 .badge-not-started {
-    background-color: #F1F5F9;
-    color: #64748B;
-    border: 1px solid #E2E8F0;
+    background: var(--nm-surface);
+    color: var(--nm-text-muted);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-flat-sm);
 }
 
 .badge-running {
-    background-color: rgba(108, 140, 255, 0.14);
-    color: #4F46E5;
-    border: 1px solid rgba(108, 140, 255, 0.35);
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--nm-primary);
+    border: 1px solid rgba(79, 70, 229, 0.3);
     animation: statusPulse 2s infinite ease-in-out;
 }
 
 .badge-paused {
-    background-color: rgba(245, 158, 11, 0.14);
-    color: #D97706;
-    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge-completed {
-    background-color: rgba(16, 185, 129, 0.14);
+    background: rgba(16, 185, 129, 0.12);
     color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.35);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 @keyframes statusPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(108, 140, 255, 0.4); }
-    50% { box-shadow: 0 0 0 4px rgba(108, 140, 255, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(79, 70, 229, 0); }
 }
 
 .exercise-type-badge {
-    font-size: 0.68rem;
-    font-weight: 600;
+    font-size: 0.72rem;
+    font-weight: 700;
 }
 
 .badge-type-strength {
-    background-color: rgba(108, 140, 255, 0.14);
-    color: #4338CA;
-    border: 1px solid rgba(108, 140, 255, 0.28);
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--nm-primary);
+    border: 1px solid rgba(79, 70, 229, 0.25);
 }
 
 .badge-type-core {
-    background-color: rgba(20, 184, 166, 0.14);
-    color: #0F766E;
-    border: 1px solid rgba(20, 184, 166, 0.28);
+    background: rgba(20, 184, 166, 0.12);
+    color: #0f766e;
+    border: 1px solid rgba(20, 184, 166, 0.25);
 }
 
 .badge-type-cardio {
-    background-color: rgba(244, 63, 94, 0.14);
-    color: #BE123C;
-    border: 1px solid rgba(244, 63, 94, 0.28);
+    background: rgba(244, 63, 94, 0.12);
+    color: #be123c;
+    border: 1px solid rgba(244, 63, 94, 0.25);
 }
 
 .badge-type-other {
-    background-color: #F1F5F9;
-    color: #475569;
-    border: 1px solid #E2E8F0;
+    background: var(--nm-surface);
+    color: var(--nm-text-muted);
+    border: var(--nm-border-subtle);
 }
 
 /* --------------------------------------------------------------------------
-   8. CARD KẾ HOẠCH TẬP LUYỆN (WORKOUT PLAN CARDS - SECTION 7)
+   9. CARD KẾ HOẠCH TẬP LUYỆN (WORKOUT PLAN CARDS)
    -------------------------------------------------------------------------- */
 .plan-card-item {
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-card-radius);
-    padding: 1rem 1.15rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 22px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 1.25rem 1.35rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
     position: relative;
 }
 
 .plan-card-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-    border-color: #CBD5E1;
+    transform: translateY(-3px);
+    box-shadow: var(--nm-shadow-card-hover);
 }
 
 .plan-card-item.is-active-plan {
-    border-color: var(--lp-primary);
-    box-shadow: 0 0 0 1.5px var(--lp-primary), 0 4px 12px rgba(108, 140, 255, 0.12);
+    border-color: rgba(79, 70, 229, 0.45);
+    box-shadow: 0 0 0 2px var(--nm-primary), var(--nm-shadow-card);
 }
 
 .plan-card-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--lp-text-main);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
     line-height: 1.3;
 }
 
 .plan-card-desc {
-    font-size: 0.78rem;
-    color: var(--lp-text-muted);
-    min-height: 38px;
-    line-height: 1.4;
+    font-size: 0.82rem;
+    color: var(--nm-text-muted);
+    min-height: 40px;
+    line-height: 1.45;
 }
 
 .plan-card-progress-label {
     font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--lp-text-muted);
+    font-weight: 700;
+    color: var(--nm-text-muted);
 }
 
 .plan-card-progress-val {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--lp-primary);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--nm-primary);
 }
 
 .plan-card-meta {
-    font-size: 0.75rem;
-    color: var(--lp-text-muted);
-    font-weight: 500;
+    font-size: 0.78rem;
+    color: var(--nm-text-muted);
+    font-weight: 600;
 }
 
 /* --------------------------------------------------------------------------
-   9. WORKOUT SESSIONS LIST (SECTION 10)
+   10. WORKOUT SESSIONS LIST
    -------------------------------------------------------------------------- */
 .workout-session-item {
-    background: var(--lp-bg-card);
-    border: 1px solid var(--lp-card-border);
-    border-radius: var(--lp-item-radius);
-    padding: 0.65rem 0.95rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 16px;
+    box-shadow: var(--nm-shadow-flat-sm);
+    padding: 0.85rem 1.15rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    transition: all 0.18s ease;
+    gap: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 .workout-session-item:hover {
-    background-color: var(--lp-bg-surface);
-    border-color: #CBD5E1;
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-btn-hover);
 }
 
 .session-main-info {
@@ -923,25 +1024,26 @@
 }
 
 .session-title {
-    font-size: 0.86rem;
-    font-weight: 700;
-    color: var(--lp-text-main);
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
     line-height: 1.3;
 }
 
 .session-meta {
-    font-size: 0.74rem;
-    color: var(--lp-text-muted);
+    font-size: 0.78rem;
+    color: var(--nm-text-muted);
 }
 
 /* --------------------------------------------------------------------------
-   10. REST DAY CARD
+   11. REST DAY CARD
    -------------------------------------------------------------------------- */
 .rest-day-card {
-    background: var(--lp-bg-card);
-    border: 1px dashed #CBD5E1;
-    border-radius: var(--lp-card-radius);
-    padding: 2.5rem 1.5rem;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 24px;
+    box-shadow: var(--nm-shadow-card);
+    padding: 2.75rem 1.5rem;
 }
 
 .rest-day-icon-bounce {
@@ -954,65 +1056,104 @@
 }
 
 /* --------------------------------------------------------------------------
-   11. BUTTONS & CONTROLS POLISH
+   12. BUTTONS & CONTROLS NEUMORPHIC
    -------------------------------------------------------------------------- */
 .btn-sm {
-    padding: 0.35rem 0.85rem;
-    font-size: 0.78rem;
+    padding: 0.45rem 1rem;
+    font-size: 0.82rem;
     font-weight: 600;
     border-radius: 9999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
+    gap: 0.45rem;
     line-height: 1.35;
 }
 
 .btn-primary {
-    background-color: var(--lp-primary);
-    border-color: var(--lp-primary);
-    color: #FFFFFF;
+    background: var(--nm-primary-gradient) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: var(--nm-shadow-primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: var(--lp-primary-hover);
-    border-color: var(--lp-primary-hover);
-    color: #FFFFFF;
+.btn-primary:hover {
+    background: var(--nm-primary-hover-gradient) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 18px rgba(79, 70, 229, 0.42), -3px -3px 10px rgba(255, 255, 255, 0.8) !important;
 }
 
-.btn-outline-secondary {
-    border-color: var(--lp-card-border);
-    color: #475569;
-    background-color: var(--lp-bg-card);
+.btn-primary:active {
+    transform: scale(0.97) translateY(0);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25) !important;
 }
 
-.btn-outline-secondary:hover {
-    background-color: #F1F5F9;
-    border-color: #CBD5E1;
-    color: #1E293B;
+.btn-outline-secondary,
+.btn-outline-primary {
+    background: var(--nm-surface) !important;
+    border: var(--nm-border) !important;
+    box-shadow: var(--nm-shadow-btn) !important;
+    color: var(--nm-text-main) !important;
+    font-weight: 600;
+    transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-primary:hover {
+    color: var(--nm-primary) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-btn-hover) !important;
+}
+
+.btn-outline-secondary:active,
+.btn-outline-primary:active {
+    transform: scale(0.97) translateY(0);
+    box-shadow: var(--nm-shadow-inset) !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 4px 4px 12px rgba(16, 185, 129, 0.35) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 16px rgba(16, 185, 129, 0.45) !important;
+    color: #ffffff !important;
+}
+
+.btn-success:active {
+    transform: scale(0.97);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* --------------------------------------------------------------------------
-   12. FLOATING COMMUNITY BUTTON & POPUP
+   13. FLOATING COMMUNITY BUTTON & POPUP (MESSENGER POPUP)
    -------------------------------------------------------------------------- */
 .floating-community-btn {
     position: fixed;
-    bottom: 82px;
+    bottom: 84px;
     right: 24px;
     z-index: 1050;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+    background: var(--nm-primary-gradient);
     color: #FFFFFF;
-    border: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    box-shadow: 0 6px 20px -4px rgba(14, 165, 233, 0.45), 0 3px 8px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--nm-shadow-primary), 0 8px 24px rgba(79, 70, 229, 0.35);
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     outline: none;
     padding: 0;
@@ -1022,16 +1163,17 @@
 
 .floating-community-btn:hover {
     transform: scale(1.08) translateY(-2px);
-    box-shadow: 0 10px 24px -4px rgba(14, 165, 233, 0.6), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 28px rgba(79, 70, 229, 0.5);
     color: #FFFFFF;
 }
 
 .floating-community-btn:active {
     transform: scale(0.96);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .floating-community-btn.active {
-    background: #EF4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     box-shadow: 0 6px 20px -4px rgba(239, 68, 68, 0.45);
 }
 
@@ -1056,19 +1198,20 @@
 
 .floating-community-btn .community-tooltip {
     position: absolute;
-    right: 58px;
-    background: #1E1E22;
-    color: #FFFFFF;
-    font-size: 0.72rem;
-    font-weight: 600;
+    right: 60px;
+    background: var(--nm-surface);
+    color: var(--nm-text-main);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-card);
+    font-size: 0.74rem;
+    font-weight: 700;
     white-space: nowrap;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 5px 12px;
+    border-radius: 9999px;
     pointer-events: none;
     opacity: 0;
     transform: translateX(4px);
-    transition: all 0.18s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
 }
 
 .floating-community-btn:hover .community-tooltip {
@@ -1078,23 +1221,24 @@
 
 .community-messenger-popup {
     position: fixed;
-    bottom: 140px;
+    bottom: 144px;
     right: 24px;
-    width: 360px;
+    width: 370px;
     max-width: calc(100vw - 32px);
-    height: 420px;
+    height: 440px;
     max-height: calc(100vh - 160px);
-    background: #FFFFFF;
-    border-radius: 14px;
-    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 26px;
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.25), 8px 16px 32px rgba(163, 177, 198, 0.35);
     z-index: 1045;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(10px) scale(0.97);
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(12px) scale(0.97);
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .community-messenger-popup.active {
@@ -1104,113 +1248,184 @@
 }
 
 .community-popup-header {
-    background: #FFFFFF;
-    border-bottom: 1px solid #F1F5F9;
-}
-
-.header-icon-circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.95rem;
+    background: var(--nm-surface);
+    border-bottom: 1px solid var(--nm-divider);
 }
 
 .online-indicator-dot {
-    width: 6px;
-    height: 6px;
-    background-color: #22C55E;
+    width: 7px;
+    height: 7px;
+    background-color: #10b981;
     border-radius: 50%;
     display: inline-block;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
 .world-chat-body {
-    background: #F8FAFC;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-inset);
     flex: 1 1 0%;
     min-height: 0;
     overflow: hidden;
 }
 
-.world-chat-messages {
-    overflow-y: auto;
-    scrollbar-width: thin;
-    padding-right: 4px;
-}
-
-.world-msg-row {
-    display: flex;
-    gap: 7px;
-    align-items: flex-start;
-    max-width: 88%;
-}
-
-.world-msg-row.sent-by-me {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-}
-
-.world-msg-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #FFFFFF;
-    background: var(--lp-primary);
-}
-
 .world-msg-bubble {
-    background: #FFFFFF;
-    border-radius: 10px;
-    padding: 5px 9px;
-    font-size: 0.76rem;
-    line-height: 1.35;
-    border: 1px solid #F1F5F9;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    border-radius: 14px;
+    padding: 6px 11px;
+    font-size: 0.78rem;
+    line-height: 1.4;
     word-break: break-word;
+    color: var(--nm-text-main);
 }
 
 .world-msg-row.sent-by-me .world-msg-bubble {
-    background: var(--lp-primary);
+    background: var(--nm-primary-gradient);
     color: #FFFFFF;
     border-color: transparent;
+    box-shadow: var(--nm-shadow-primary);
     border-bottom-right-radius: 2px;
 }
 
-.world-msg-author {
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: #2563EB;
-    margin-bottom: 2px;
-}
-
-.world-msg-time {
-    font-size: 0.6rem;
-    color: #94A3B8;
-    margin-top: 2px;
-    display: block;
-}
-
-.world-msg-row.sent-by-me .world-msg-time {
-    color: rgba(255, 255, 255, 0.85);
-    text-align: right;
-}
-
 .world-chat-footer {
-    background: #FFFFFF;
-    border-top: 1px solid #E2E8F0;
+    background: var(--nm-surface);
+    border-top: 1px solid var(--nm-divider);
 }
 
 /* --------------------------------------------------------------------------
-   13. STRICT DARK MODE TOKENS (LIFE PLANNER SPEC)
-   Background: #121212 | Navbar: #1A1A1D | Card: #1E1E22 | Modal: #26262B
-   Border: #2E2E34 | Text: #E8E8EA | Secondary: #A0A0A8 | Primary: #6C8CFF
+   14. MODAL DIALOGS NEUMORPHIC (TÁCH BIỆT SHADOW VÀ OVERLAY, CHỐNG CHÓI)
    -------------------------------------------------------------------------- */
+.modal-content {
+    background: var(--nm-surface) !important;
+    border-radius: 28px !important;
+    border: 1px solid rgba(163, 177, 198, 0.4) !important;
+    box-shadow: 
+        0 20px 40px -10px rgba(15, 23, 42, 0.22),
+        6px 12px 28px rgba(163, 177, 198, 0.32),
+        inset 1px 1px 1px rgba(255, 255, 255, 0.6) !important;
+    overflow: hidden;
+    color: var(--nm-text-main) !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.45 !important;
+    background-color: #0f172a !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--nm-divider) !important;
+}
+
+.modal-body .bg-light,
+.modal-body .card.bg-light {
+    background: var(--nm-surface) !important;
+    border: var(--nm-border-subtle) !important;
+    box-shadow: var(--nm-shadow-inset) !important;
+    border-radius: 18px !important;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--nm-surface) !important;
+    border: var(--nm-border-subtle) !important;
+    box-shadow: var(--nm-shadow-inset) !important;
+    border-radius: 14px !important;
+    color: var(--nm-text-main) !important;
+    padding: 0.55rem 0.95rem !important;
+    font-size: 0.88rem !important;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: rgba(79, 70, 229, 0.5) !important;
+    box-shadow: var(--nm-shadow-inset), 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+    background-color: var(--nm-surface) !important;
+    color: var(--nm-text-main) !important;
+}
+
+.table-light {
+    background-color: var(--nm-surface) !important;
+    color: var(--nm-text-main) !important;
+    border-color: var(--nm-divider) !important;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--nm-text-main);
+    --bs-table-border-color: var(--nm-divider);
+    --bs-table-hover-bg: rgba(163, 177, 198, 0.12);
+}
+
+.dropdown-menu {
+    background-color: var(--nm-surface) !important;
+    border: var(--nm-border) !important;
+    box-shadow: var(--nm-shadow-card) !important;
+    border-radius: 18px !important;
+}
+
+.dropdown-item {
+    color: var(--nm-text-main) !important;
+    border-radius: 10px;
+    padding: 0.45rem 0.85rem;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--nm-surface-hover) !important;
+    color: var(--nm-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   15. GIAO DIỆN TỐI (DARK MODE STRICT TOKEN OVERRIDES)
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--nm-surface) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 
+        0 24px 48px -12px rgba(0, 0, 0, 0.8),
+        0 12px 28px -6px rgba(0, 0, 0, 0.5),
+        inset 1px 1px 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-bs-theme="dark"] .modal-backdrop.show {
+    opacity: 0.65 !important;
+    background-color: #020617 !important;
+}
+
+[data-bs-theme="dark"] .community-messenger-popup {
+    background: var(--nm-surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.7);
+}
+
+[data-bs-theme="dark"] .community-popup-header {
+    background: var(--nm-surface);
+    border-bottom-color: var(--nm-divider);
+}
+
+[data-bs-theme="dark"] .world-chat-body {
+    background: #141720;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+[data-bs-theme="dark"] .world-msg-bubble {
+    background: #1e2230;
+    border-color: rgba(255, 255, 255, 0.06);
+    color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .world-chat-footer {
+    background: var(--nm-surface);
+    border-top-color: var(--nm-divider);
+}
+
 [data-bs-theme="dark"] .workout-page-title,
 [data-bs-theme="dark"] .plan-card-title,
 [data-bs-theme="dark"] .session-title,
@@ -1222,7 +1437,7 @@
 [data-bs-theme="dark"] .schedule-day-box .session-name,
 [data-bs-theme="dark"] .checklist-exercise-item .text-dark,
 [data-bs-theme="dark"] .workout-kpi-val {
-    color: #E8E8EA !important;
+    color: #f1f5f9 !important;
 }
 
 [data-bs-theme="dark"] .text-muted,
@@ -1230,257 +1445,24 @@
 [data-bs-theme="dark"] .session-meta,
 [data-bs-theme="dark"] .plan-card-desc,
 [data-bs-theme="dark"] .plan-card-meta {
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .nav-segment-control {
-    background-color: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .nav-segment-control .nav-link,
-[data-bs-theme="dark"] .nav-segment-control .btn {
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .nav-segment-control .nav-link.active,
-[data-bs-theme="dark"] .nav-segment-control .btn.btn-primary {
-    background-color: #6C8CFF !important;
-    color: #FFFFFF !important;
-}
-
-[data-bs-theme="dark"] .schedule-strip-card,
-[data-bs-theme="dark"] .workout-progress-card,
-[data-bs-theme="dark"] .workout-main-card,
-[data-bs-theme="dark"] .plan-card-item,
-[data-bs-theme="dark"] .workout-session-item,
-[data-bs-theme="dark"] .rest-day-card,
-[data-bs-theme="dark"] .workout-kpi-card {
-    background-color: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box {
-    background-color: #161619 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box .day-code {
-    color: #A0A0A8 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box.is-today {
-    background: rgba(108, 140, 255, 0.12) !important;
-    border-color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box.is-today .day-code,
-[data-bs-theme="dark"] .schedule-day-box.is-today .session-name {
-    color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box.is-rest {
-    border-color: #2E2E34 !important;
-    background-color: #161619 !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box.is-rest .session-name {
-    color: #71717A !important;
-}
-
-[data-bs-theme="dark"] .schedule-day-box:hover:not(.is-today) {
-    background-color: #26262B !important;
-    border-color: #3A3A42 !important;
-}
-
-[data-bs-theme="dark"] .workout-slim-progress {
-    background-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item {
-    background-color: #161619 !important;
-    border-color: #2E2E34 !important;
-    border-left-color: #3A3A42 !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item:hover {
-    background-color: #1E1E22 !important;
-    border-color: #3A3A42 !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item.active-exercise {
-    background-color: rgba(108, 140, 255, 0.08) !important;
-    border-left-color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .checklist-exercise-item.completed {
-    background-color: rgba(16, 185, 129, 0.08) !important;
-    border-left-color: #10B981 !important;
-}
-
-[data-bs-theme="dark"] .workout-checklist-container::-webkit-scrollbar-thumb {
-    background-color: #2E2E34;
-}
-
-[data-bs-theme="dark"] .badge-group-tag {
-    background-color: #1E1E22 !important;
-    color: #A0A0A8 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .badge-metric-tag {
-    background-color: rgba(108, 140, 255, 0.15) !important;
-    color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .workout-timer-box,
-[data-bs-theme="dark"] .active-exercise-card {
-    background: #161619 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .badge-not-started {
-    background-color: #1E1E22 !important;
-    color: #A0A0A8 !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .badge-type-strength {
-    background-color: rgba(108, 140, 255, 0.15) !important;
-    color: #6C8CFF !important;
-    border-color: rgba(108, 140, 255, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-type-core {
-    background-color: rgba(20, 184, 166, 0.15) !important;
-    color: #5EEAD4 !important;
-    border-color: rgba(20, 184, 166, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-type-cardio {
-    background-color: rgba(244, 63, 94, 0.15) !important;
-    color: #FDA4AF !important;
-    border-color: rgba(244, 63, 94, 0.3) !important;
-}
-
-[data-bs-theme="dark"] .badge-type-other {
-    background-color: #1E1E22 !important;
-    color: #A0A0A8 !important;
-    border-color: #2E2E34 !important;
-}
-
-/* Dark Mode for Modals */
-[data-bs-theme="dark"] .modal-content {
-    background-color: #26262B !important;
-    border: 1px solid #2E2E34 !important;
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .modal-header,
-[data-bs-theme="dark"] .modal-footer {
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .modal-body .bg-light {
-    background-color: #1E1E22 !important;
-    border: 1px solid #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .table-light {
-    background-color: #1A1A1D !important;
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .table {
-    --bs-table-bg: transparent;
-    --bs-table-color: #E8E8EA;
-    --bs-table-border-color: #2E2E34;
-    --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
-}
-
-[data-bs-theme="dark"] .form-control,
-[data-bs-theme="dark"] .form-select {
-    background-color: #1E1E22 !important;
-    border-color: #2E2E34 !important;
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .form-control:focus,
-[data-bs-theme="dark"] .form-select:focus {
-    border-color: #6C8CFF !important;
-    background-color: #1E1E22 !important;
-    color: #E8E8EA !important;
-    box-shadow: 0 0 0 2px rgba(108, 140, 255, 0.25) !important;
-}
-
-[data-bs-theme="dark"] .btn-outline-secondary {
-    border-color: #2E2E34 !important;
-    color: #E8E8EA !important;
-    background-color: #1E1E22 !important;
-}
-
-[data-bs-theme="dark"] .btn-outline-secondary:hover {
-    background-color: #26262B !important;
-    border-color: #3A3A42 !important;
-    color: #FFFFFF !important;
-}
-
-[data-bs-theme="dark"] .dropdown-menu {
-    background-color: #26262B !important;
-    border-color: #2E2E34 !important;
-}
-
-[data-bs-theme="dark"] .dropdown-item {
-    color: #E8E8EA !important;
-}
-
-[data-bs-theme="dark"] .dropdown-item:hover,
-[data-bs-theme="dark"] .dropdown-item:focus {
-    background-color: #1E1E22 !important;
-    color: #6C8CFF !important;
-}
-
-[data-bs-theme="dark"] .community-messenger-popup {
-    background: #1E1E22;
-    border: 1px solid #2E2E34;
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.65);
-}
-
-[data-bs-theme="dark"] .community-popup-header {
-    background: #1A1A1D;
-    border-bottom-color: #2E2E34;
-}
-
-[data-bs-theme="dark"] .world-chat-body {
-    background: #121212;
-}
-
-[data-bs-theme="dark"] .world-msg-bubble {
-    background: #26262B;
-    border-color: #2E2E34;
-    color: #E8E8EA;
-}
-
-[data-bs-theme="dark"] .world-chat-footer {
-    background: #1A1A1D;
-    border-top-color: #2E2E34;
+    color: #94a3b8 !important;
 }
 
 /* --------------------------------------------------------------------------
-   14. RESPONSIVE BREAKPOINT TWEAKS
+   16. RESPONSIVE BREAKPOINT TWEAKS
    -------------------------------------------------------------------------- */
 @media (max-width: 576px) {
     .floating-community-btn {
-        bottom: 70px;
+        bottom: 74px;
         right: 18px;
-        width: 44px;
-        height: 44px;
-        font-size: 1.15rem;
+        width: 46px;
+        height: 46px;
+        font-size: 1.2rem;
     }
     .community-messenger-popup {
         right: 14px;
         width: calc(100vw - 28px);
-        bottom: 122px;
-        height: 390px;
+        bottom: 126px;
+        height: 400px;
     }
 }
