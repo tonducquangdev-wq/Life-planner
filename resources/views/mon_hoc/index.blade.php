@@ -851,7 +851,136 @@
             color: var(--nm-text-light);
         }
 
-        /* 8. RESPONSIVE FIXES */
+        /* 8. RESPONSIVE FIXES & UTILITIES */
+        .fs-7 { font-size: 0.84rem !important; }
+        .fs-8 { font-size: 0.76rem !important; }
+        .fs-9 { font-size: 0.69rem !important; }
+        .letter-spacing-1 { letter-spacing: 0.04em; }
+        .transition-transform { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* 9. NÚT TÙY CHỌN & TOOLBAR THU GỌN TRÊN MOBILE (ĐỒNG BỘ MODULE TẬP LUYỆN) */
+        .mon-hoc-title-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            box-shadow: var(--nm-shadow-flat);
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        #iconToggleMonHocActions {
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #btnToggleMonHocActions[aria-expanded="true"] #iconToggleMonHocActions {
+            transform: rotate(180deg);
+        }
+
+        #btnToggleMonHocActions[aria-expanded="true"] {
+            background-color: var(--nm-primary, #6366f1) !important;
+            color: #ffffff !important;
+            border-color: var(--nm-primary, #6366f1) !important;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.35) !important;
+        }
+
+        @media (max-width: 767.98px) {
+            .mon-hoc-actions-inner {
+                background: var(--nm-surface, #ffffff);
+                border: var(--nm-border-subtle, 1px solid rgba(0, 0, 0, 0.06));
+                border-radius: 20px;
+                padding: 14px 16px;
+                box-shadow: var(--nm-shadow-card, 0 4px 14px rgba(0, 0, 0, 0.05));
+                margin-top: 10px;
+            }
+        }
+
+        .mon-hoc-mobile-tabs-section {
+            width: 100%;
+        }
+
+        .mon-hoc-mobile-nav-pills {
+            background: transparent;
+        }
+
+        .mon-hoc-mobile-tab-btn {
+            background: var(--nm-surface-subtle, #f8fafc);
+            border: var(--nm-border-subtle, 1px solid rgba(0, 0, 0, 0.05));
+            border-radius: 14px;
+            padding: 10px 14px;
+            color: var(--nm-text-main, #334155);
+            font-size: 0.88rem;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: var(--nm-shadow-flat, 0 1px 3px rgba(0, 0, 0, 0.03));
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .mon-hoc-mobile-tab-btn:hover {
+            background: var(--nm-surface, #ffffff);
+            color: var(--nm-primary, #6366f1);
+        }
+
+        .mon-hoc-mobile-tab-btn.active {
+            background: var(--nm-surface, #ffffff) !important;
+            color: var(--nm-primary, #6366f1) !important;
+            border: 1.5px solid var(--nm-primary, #6366f1) !important;
+            box-shadow: 0 3px 12px rgba(99, 102, 241, 0.15) !important;
+            font-weight: 700;
+        }
+
+        .mon-hoc-mobile-tab-btn .active-check-icon {
+            display: none;
+        }
+
+        .mon-hoc-mobile-tab-btn.active .active-check-icon {
+            display: inline-block;
+        }
+
+        [data-bs-theme="dark"] .mon-hoc-mobile-tab-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.07);
+            color: #e2e8f0;
+        }
+
+        [data-bs-theme="dark"] .mon-hoc-mobile-tab-btn.active {
+            background: #1e2230 !important;
+            border-color: #818cf8 !important;
+            color: #818cf8 !important;
+        }
+
+        .mon-hoc-mobile-divider {
+            height: 1px;
+            background: var(--nm-divider, rgba(0, 0, 0, 0.08));
+            width: 100%;
+        }
+
+        /* Nút Chip trạng thái có thể bấm lọc */
+        .nm-stat-chip {
+            cursor: pointer;
+            outline: none;
+        }
+
+        .nm-stat-chip.active {
+            background: var(--nm-primary) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: var(--nm-shadow-primary) !important;
+        }
+
+        .nm-stat-chip.active .text-dark-nm {
+            color: #ffffff !important;
+        }
+
+        .nm-stat-chip.active .nm-stat-dot {
+            background-color: #ffffff !important;
+        }
+
         @media (max-width: 767.98px) {
             .nm-card-actions {
                 flex-wrap: wrap;
@@ -879,68 +1008,169 @@
             <div class="container-xl p-0">
 
                 <!-- =========================================================================
-                     HEADER NỘI DUNG: TIÊU ĐỀ, STATS CHIPS & HÀNH ĐỘNG CHÍNH
+                     HEADER NỘI DUNG: TIÊU ĐỀ, TÙY CHỌN & HÀNH ĐỘNG CHÍNH
                      ========================================================================= -->
-                <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <h4 class="fw-bold text-dark-nm mb-0" style="letter-spacing: -0.02em;">
-                                Danh sách Môn Học
-                            </h4>
-                            <span class="badge rounded-pill px-2.5 py-1 text-primary bg-primary-subtle fs-8 fw-bold">
-                                {{ $monHocs->count() }} môn
-                            </span>
-                        </div>
-                        <p class="text-muted mb-0 small">
-                            Quản lý danh sách các môn học, thông tin lớp học và thời gian của bạn.
-                        </p>
-                    </div>
+                <div class="mon-hoc-header-wrapper mb-3">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2.5">
+                        <!-- Title & Subtitle with Hierarchy + Mobile Toggle Button -->
+                        <div class="d-flex align-items-center justify-content-between w-100 w-md-auto">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="mon-hoc-title-icon"><i class="bi bi-journal-bookmark-fill text-primary"></i></span>
+                                    <h4 class="fw-bold text-dark-nm mb-0" style="letter-spacing: -0.02em;">
+                                        Danh sách Môn Học
+                                    </h4>
+                                    <span class="badge rounded-pill px-2.5 py-1 text-primary bg-primary-subtle fs-8 fw-bold">
+                                        {{ $monHocs->count() }} môn
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    Quản lý danh sách các môn học, thông tin lớp học và thời gian của bạn.
+                                </p>
+                            </div>
 
-                    <!-- Khu vực các nút hành động chính & Thanh tìm kiếm trực quan -->
-                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-start justify-content-lg-end">
-                        <!-- Ô tìm kiếm nội trang Neumorphic (Real-time Filter) -->
-                        <div class="nm-inline-search" id="nmInlineSearchBox">
-                            <i class="bi bi-search text-muted fs-7"></i>
-                            <input type="text" id="monHocSearchInput" placeholder="Tìm tên môn, mã môn, giảng viên..." autocomplete="off">
-                            <button type="button" class="btn btn-sm p-0 text-muted d-none border-0 bg-transparent" id="btnClearSearch" title="Xóa tìm kiếm">
-                                <i class="bi bi-x-circle-fill fs-6"></i>
+                            <!-- NÚT BẬT/TẮT THU GỌN TOÀN BỘ CÔNG CỤ TRÊN MOBILE (TÙY CHỌN NHƯ BÊN LUYỆN TẬP) -->
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 shadow-sm d-inline-flex align-items-center gap-1.5 d-md-none flex-shrink-0 ms-2"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#monHocHeaderActionsCollapse"
+                                aria-expanded="false"
+                                aria-controls="monHocHeaderActionsCollapse"
+                                id="btnToggleMonHocActions">
+                                <i class="bi bi-sliders"></i>
+                                <span>Tùy chọn</span>
+                                <i class="bi bi-chevron-down ms-0.5 fs-8 transition-transform" id="iconToggleMonHocActions"></i>
                             </button>
                         </div>
 
-                        <!-- Nút Tìm Gia Sư (Hành động phụ - Secondary Embossed) -->
-                        <a href="{{ route('study.tutors') }}" class="nm-btn-secondary" title="Kết nối giảng viên và trợ giảng">
-                            <i class="bi bi-person-video3 fs-6 text-primary"></i>
-                            <span>Tìm Gia sư</span>
-                        </a>
+                        <!-- Toolbar Actions: Thu gọn vào nút Tùy chọn trên Mobile, hiển thị trực quan trên Desktop -->
+                        <div class="collapse d-md-block w-100 w-md-auto" id="monHocHeaderActionsCollapse">
+                            <div class="mon-hoc-actions-inner d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 pt-2 pt-md-0">
 
-                        <!-- Nút Thêm Môn Học Mới (Hành động chính - Primary Gradient) -->
-                        <button type="button" class="nm-btn-primary"
-                                data-bs-toggle="modal" data-bs-target="#createMonHocModal" id="btnOpenCreateMonHoc">
-                            <i class="bi bi-plus-circle-fill fs-6"></i>
-                            <span>Thêm môn học mới</span>
-                        </button>
+                                <!-- NHÓM 1: BỘ LỌC TRẠNG THÁI TRÊN MOBILE (CHẾ ĐỘ XEM / LỌC TRẠNG THÁI) -->
+                                <div class="d-md-none mon-hoc-mobile-tabs-section">
+                                    <div class="text-muted fs-9 fw-bold text-uppercase letter-spacing-1 mb-2 px-1 d-flex align-items-center gap-1.5">
+                                        <i class="bi bi-layers-fill text-primary"></i> <span>Chế độ xem & Trạng thái</span>
+                                    </div>
+                                    <div class="nav nav-pills mon-hoc-mobile-nav-pills d-flex flex-column gap-1.5" id="monHocMobileTabs">
+                                        <!-- Tất cả môn học -->
+                                        <button class="nav-link active mon-hoc-mobile-tab-btn" type="button" data-filter="all">
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <span class="d-inline-flex align-items-center">
+                                                    <span class="nm-stat-dot bg-primary me-2"></span>
+                                                    <span class="fw-semibold">Tất cả môn học</span>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 fs-9 fw-bold" data-badge-count="all">{{ $monHocs->count() }}</span>
+                                                    <i class="bi bi-check2 text-primary active-check-icon fs-7"></i>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <!-- Đang học -->
+                                        <button class="nav-link mon-hoc-mobile-tab-btn" type="button" data-filter="dang_hoc">
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <span class="d-inline-flex align-items-center">
+                                                    <span class="nm-stat-dot bg-success me-2"></span>
+                                                    <span class="fw-semibold">Đang học</span>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5 fs-9 fw-bold" data-badge-count="dang_hoc">{{ $monHocs->where('trang_thai', 'dang_hoc')->count() }}</span>
+                                                    <i class="bi bi-check2 text-primary active-check-icon fs-7"></i>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        <!-- Đã hoàn thành -->
+                                        <button class="nav-link mon-hoc-mobile-tab-btn" type="button" data-filter="da_hoan_thanh">
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <span class="d-inline-flex align-items-center">
+                                                    <span class="nm-stat-dot bg-indigo me-2" style="background-color: #6366f1;"></span>
+                                                    <span class="fw-semibold">Đã hoàn thành</span>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <span class="badge bg-indigo-subtle text-primary rounded-pill px-2 py-0.5 fs-9 fw-bold" data-badge-count="da_hoan_thanh">{{ $monHocs->where('trang_thai', 'da_hoan_thanh')->count() }}</span>
+                                                    <i class="bi bi-check2 text-primary active-check-icon fs-7"></i>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        @if($monHocs->where('trang_thai', 'tam_dung')->count() > 0)
+                                        <!-- Tạm dừng -->
+                                        <button class="nav-link mon-hoc-mobile-tab-btn" type="button" data-filter="tam_dung">
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <span class="d-inline-flex align-items-center">
+                                                    <span class="nm-stat-dot bg-warning me-2"></span>
+                                                    <span class="fw-semibold">Tạm dừng</span>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 fs-9 fw-bold" data-badge-count="tam_dung">{{ $monHocs->where('trang_thai', 'tam_dung')->count() }}</span>
+                                                    <i class="bi bi-check2 text-primary active-check-icon fs-7"></i>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- ĐƯỜNG KẺ PHÂN CÁCH TRÊN MOBILE -->
+                                <div class="mon-hoc-mobile-divider d-md-none my-1"></div>
+
+                                <!-- NHÓM 2: TÌM KIẾM & CÁC NÚT TÁC VỤ (CẢ MOBILE LẪN DESKTOP) -->
+                                <div class="mon-hoc-actions-buttons-section w-100 w-md-auto">
+                                    <div class="d-md-none text-muted fs-9 fw-bold text-uppercase letter-spacing-1 mb-2 px-1 d-flex align-items-center gap-1.5">
+                                        <i class="bi bi-sliders text-primary"></i> <span>Tìm kiếm & Tác vụ</span>
+                                    </div>
+
+                                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                                        <!-- Ô tìm kiếm nội trang Neumorphic (Real-time Filter) -->
+                                        <div class="nm-inline-search" id="nmInlineSearchBox">
+                                            <i class="bi bi-search text-muted fs-7"></i>
+                                            <input type="text" id="monHocSearchInput" placeholder="Tìm tên môn, mã môn, giảng viên..." autocomplete="off">
+                                            <button type="button" class="btn btn-sm p-0 text-muted d-none border-0 bg-transparent" id="btnClearSearch" title="Xóa tìm kiếm">
+                                                <i class="bi bi-x-circle-fill fs-6"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Nút Tìm Gia Sư (Hành động phụ - Secondary Embossed) -->
+                                        <a href="{{ route('study.tutors') }}" class="nm-btn-secondary justify-content-center" title="Kết nối giảng viên và trợ giảng">
+                                            <i class="bi bi-person-video3 fs-6 text-primary"></i>
+                                            <span>Tìm Gia sư</span>
+                                        </a>
+
+                                        <!-- Nút Thêm Môn Học Mới (Hành động chính - Primary Gradient) -->
+                                        <button type="button" class="nm-btn-primary justify-content-center"
+                                                data-bs-toggle="modal" data-bs-target="#createMonHocModal" id="btnOpenCreateMonHoc">
+                                            <i class="bi bi-plus-circle-fill fs-6"></i>
+                                            <span>Thêm môn học mới</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Dải thống kê trạng thái nhanh (Neumorphic Status Chips) -->
-                <div class="d-flex align-items-center gap-2 flex-wrap mb-4" id="statsChipRow">
-                    <div class="nm-stat-chip">
+                <!-- Dải thống kê & bộ lọc trạng thái nhanh (Neumorphic Status Chips - CHỈ HIỂN THỊ TRÊN DESKTOP, TRÊN MOBILE ĐÃ GOM VÀO NÚT TÙY CHỌN) -->
+                <div class="d-none d-md-flex align-items-center gap-2 flex-wrap mb-4" id="statsChipRow">
+                    <button type="button" class="nm-stat-chip border-0 active" data-filter="all" title="Xem tất cả môn học">
                         <span class="nm-stat-dot bg-primary"></span>
                         <span>Tổng cộng: <strong class="text-dark-nm" id="statTotalCount">{{ $monHocs->count() }}</strong></span>
-                    </div>
-                    <div class="nm-stat-chip">
+                    </button>
+                    <button type="button" class="nm-stat-chip border-0" data-filter="dang_hoc" title="Lọc môn đang học">
                         <span class="nm-stat-dot bg-success"></span>
                         <span>Đang học: <strong class="text-dark-nm" id="statLearningCount">{{ $monHocs->where('trang_thai', 'dang_hoc')->count() }}</strong></span>
-                    </div>
-                    <div class="nm-stat-chip">
+                    </button>
+                    <button type="button" class="nm-stat-chip border-0" data-filter="da_hoan_thanh" title="Lọc môn đã hoàn thành">
                         <span class="nm-stat-dot bg-indigo" style="background-color: #6366f1;"></span>
                         <span>Đã hoàn thành: <strong class="text-dark-nm" id="statCompletedCount">{{ $monHocs->where('trang_thai', 'da_hoan_thanh')->count() }}</strong></span>
-                    </div>
+                    </button>
                     @if($monHocs->where('trang_thai', 'tam_dung')->count() > 0)
-                    <div class="nm-stat-chip">
+                    <button type="button" class="nm-stat-chip border-0" data-filter="tam_dung" title="Lọc môn tạm dừng">
                         <span class="nm-stat-dot bg-warning"></span>
-                        <span>Tạm dừng: <strong class="text-dark-nm">{{ $monHocs->where('trang_thai', 'tam_dung')->count() }}</strong></span>
-                    </div>
+                        <span>Tạm dừng: <strong class="text-dark-nm" id="statPausedCount">{{ $monHocs->where('trang_thai', 'tam_dung')->count() }}</strong></span>
+                    </button>
                     @endif
                 </div>
 
@@ -979,6 +1209,7 @@
                     @forelse($monHocs as $monHoc)
                     <div class="col-12 col-md-6 col-xl-4 mon-hoc-item" 
                          id="monHocCard{{ $monHoc->id }}"
+                         data-status="{{ $monHoc->trang_thai }}"
                          data-search="{{ Str::lower($monHoc->ten_mon . ' ' . $monHoc->ma_mon . ' ' . ($monHoc->giang_vien ?? '') . ' ' . ($monHoc->phong_hoc ?? '')) }}">
                         <div class="nm-course-card">
                             <!-- Dải màu trên đầu card xác định theo thuộc tính mau_sac -->
@@ -1442,22 +1673,29 @@
             const alertError = document.getElementById('modalAlertError');
             const alertErrorText = document.getElementById('modalAlertErrorText');
 
-            // 1. TÌM KIẾM THỜI GIAN THỰC (REAL-TIME FILTERING)
+            // 1. TÌM KIẾM VÀ LỌC TRẠNG THÁI THỜI GIAN THỰC (REAL-TIME FILTERING)
             const inlineSearchInput = document.getElementById('monHocSearchInput');
             const topbarSearchInput = document.querySelector('.top-header .search-box input');
             const btnClearSearch = document.getElementById('btnClearSearch');
             const searchEmptyState = document.getElementById('monHocSearchEmptyState');
             const searchEmptyKeywordText = document.getElementById('searchEmptyKeywordText');
             const btnResetSearchFromEmpty = document.getElementById('btnResetSearchFromEmpty');
+            let currentStatusFilter = 'all';
+            let currentSearchTerm = '';
 
-            function filterMonHocs(query) {
-                const term = (query || '').trim().toLowerCase();
+            function applyFilters() {
+                const term = currentSearchTerm.trim().toLowerCase();
                 const items = document.querySelectorAll('.mon-hoc-item');
                 let visibleCount = 0;
 
                 items.forEach(item => {
                     const searchData = item.getAttribute('data-search') || item.textContent.toLowerCase();
-                    if (!term || searchData.includes(term)) {
+                    const statusData = item.getAttribute('data-status') || '';
+
+                    const matchesSearch = !term || searchData.includes(term);
+                    const matchesStatus = (currentStatusFilter === 'all') || (statusData === currentStatusFilter);
+
+                    if (matchesSearch && matchesStatus) {
                         item.classList.remove('d-none');
                         visibleCount++;
                     } else {
@@ -1473,16 +1711,45 @@
 
                 // Cập nhật Empty Search State nếu không có kết quả
                 if (searchEmptyState) {
-                    if (term && visibleCount === 0 && items.length > 0) {
+                    if ((term || currentStatusFilter !== 'all') && visibleCount === 0 && items.length > 0) {
                         searchEmptyState.classList.remove('d-none');
                         if (searchEmptyKeywordText) {
-                            searchEmptyKeywordText.textContent = `Không tìm thấy môn học nào khớp với từ khóa "${query}".`;
+                            if (term && currentStatusFilter !== 'all') {
+                                searchEmptyKeywordText.textContent = `Không tìm thấy môn học nào khớp với từ khóa "${currentSearchTerm}" trong trạng thái đang chọn.`;
+                            } else if (term) {
+                                searchEmptyKeywordText.textContent = `Không tìm thấy môn học nào khớp với từ khóa "${currentSearchTerm}".`;
+                            } else {
+                                searchEmptyKeywordText.textContent = `Không có môn học nào ở trạng thái này.`;
+                            }
                         }
                     } else {
                         searchEmptyState.classList.add('d-none');
                     }
                 }
             }
+
+            function setStatusFilter(status) {
+                currentStatusFilter = status;
+
+                // Đồng bộ active state cho cả desktop chips lẫn mobile tab buttons
+                document.querySelectorAll('.nm-stat-chip[data-filter]').forEach(chip => {
+                    chip.classList.toggle('active', chip.getAttribute('data-filter') === status);
+                });
+
+                document.querySelectorAll('.mon-hoc-mobile-tab-btn[data-filter]').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-filter') === status);
+                });
+
+                applyFilters();
+            }
+
+            // Gắn sự kiện click cho các nút lọc trạng thái (Desktop & Mobile)
+            document.querySelectorAll('.nm-stat-chip[data-filter], .mon-hoc-mobile-tab-btn[data-filter]').forEach(el => {
+                el.addEventListener('click', function () {
+                    const filter = this.getAttribute('data-filter') || 'all';
+                    setStatusFilter(filter);
+                });
+            });
 
             // Đồng bộ giữa hai ô tìm kiếm (Inline & Topbar)
             if (inlineSearchInput) {
@@ -1491,7 +1758,8 @@
                     if (topbarSearchInput && topbarSearchInput.value !== val) {
                         topbarSearchInput.value = val;
                     }
-                    filterMonHocs(val);
+                    currentSearchTerm = val;
+                    applyFilters();
                 });
             }
 
@@ -1502,19 +1770,26 @@
                     if (inlineSearchInput && inlineSearchInput.value !== val) {
                         inlineSearchInput.value = val;
                     }
-                    filterMonHocs(val);
+                    currentSearchTerm = val;
+                    applyFilters();
                 });
             }
 
             function clearSearch() {
                 if (inlineSearchInput) inlineSearchInput.value = '';
                 if (topbarSearchInput) topbarSearchInput.value = '';
-                filterMonHocs('');
+                currentSearchTerm = '';
+                applyFilters();
                 if (inlineSearchInput) inlineSearchInput.focus();
             }
 
             if (btnClearSearch) btnClearSearch.addEventListener('click', clearSearch);
-            if (btnResetSearchFromEmpty) btnResetSearchFromEmpty.addEventListener('click', clearSearch);
+            if (btnResetSearchFromEmpty) {
+                btnResetSearchFromEmpty.addEventListener('click', function () {
+                    clearSearch();
+                    setStatusFilter('all');
+                });
+            }
 
             // 2. THEME ICON VÀ CHUYỂN ĐỔI CHẾ ĐỘ SÁNG / TỐI
             const quickThemeBtn = document.getElementById('quickThemeBtn');
@@ -1627,23 +1902,34 @@
                 });
             }
 
-            // Cập nhật số liệu thống kê nhanh trên thanh stats chips
+            // Cập nhật số liệu thống kê nhanh trên thanh stats chips và mobile tabs
             function updateQuickStats() {
                 const totalEl = document.getElementById('statTotalCount');
                 const learningEl = document.getElementById('statLearningCount');
                 const completedEl = document.getElementById('statCompletedCount');
+                const pausedEl = document.getElementById('statPausedCount');
                 const allItems = document.querySelectorAll('.mon-hoc-item');
                 
                 let learning = 0;
                 let completed = 0;
+                let paused = 0;
                 allItems.forEach(item => {
-                    if (item.querySelector('.nm-status-learning')) learning++;
-                    if (item.querySelector('.nm-status-completed')) completed++;
+                    const st = item.getAttribute('data-status') || '';
+                    if (st === 'dang_hoc' || item.querySelector('.nm-status-learning')) learning++;
+                    else if (st === 'da_hoan_thanh' || item.querySelector('.nm-status-completed')) completed++;
+                    else if (st === 'tam_dung' || item.querySelector('.nm-status-paused')) paused++;
                 });
 
                 if (totalEl) totalEl.textContent = allItems.length;
                 if (learningEl) learningEl.textContent = learning;
                 if (completedEl) completedEl.textContent = completed;
+                if (pausedEl) pausedEl.textContent = paused;
+
+                // Cập nhật badge trên mobile tabs
+                document.querySelectorAll('[data-badge-count="all"]').forEach(b => b.textContent = allItems.length);
+                document.querySelectorAll('[data-badge-count="dang_hoc"]').forEach(b => b.textContent = learning);
+                document.querySelectorAll('[data-badge-count="da_hoan_thanh"]').forEach(b => b.textContent = completed);
+                document.querySelectorAll('[data-badge-count="tam_dung"]').forEach(b => b.textContent = paused);
             }
 
             // Chèn thẻ môn học mới vào grid theo chuẩn Neumorphic mới
@@ -1663,6 +1949,7 @@
                 const colDiv = document.createElement('div');
                 colDiv.className = 'col-12 col-md-6 col-xl-4 mon-hoc-item card-newly-added';
                 colDiv.id = `monHocCard${monHoc.id}`;
+                colDiv.setAttribute('data-status', monHoc.trang_thai || 'dang_hoc');
                 colDiv.setAttribute('data-search', searchMeta);
                 colDiv.innerHTML = `
                     <div class="nm-course-card">
