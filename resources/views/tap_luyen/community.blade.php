@@ -38,32 +38,20 @@
     <!-- Google Font: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard & Workout CSS -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ time() }}">
 
     <style>
         :root {
-            --comm-bg: #F8FAFC;
-            --comm-card-bg: #FFFFFF;
-            --comm-card-border: #E2E8F0;
-            --comm-text-main: #0F172A;
-            --comm-text-muted: #64748B;
-            --comm-primary: #3B82F6;
-            --comm-primary-subtle: rgba(59, 130, 246, 0.1);
-            --comm-accent: #6C8CFF;
-            --comm-surface: #F1F5F9;
-        }
-
-        [data-bs-theme="dark"] {
-            --comm-bg: #121212;
-            --comm-card-bg: #1E1E22;
-            --comm-card-border: #2E2E34;
-            --comm-text-main: #E8E8EA;
-            --comm-text-muted: #A0A0A8;
-            --comm-primary: #6C8CFF;
-            --comm-primary-subtle: rgba(108, 140, 255, 0.15);
-            --comm-accent: #6C8CFF;
-            --comm-surface: #26262B;
+            --comm-bg: var(--nm-bg-page);
+            --comm-card-bg: var(--nm-surface);
+            --comm-card-border: var(--nm-border-subtle);
+            --comm-text-main: var(--nm-text-main);
+            --comm-text-muted: var(--nm-text-muted);
+            --comm-primary: var(--primary-color);
+            --comm-primary-subtle: rgba(79, 70, 229, 0.12);
+            --comm-accent: #6366f1;
+            --comm-surface: var(--nm-surface-sunken);
         }
 
         body {
@@ -73,237 +61,116 @@
             overflow-x: hidden;
         }
 
-        /* Hero Sub Header */
-        .community-hero-badge {
-            background: var(--comm-primary-subtle);
-            color: var(--comm-primary);
-            font-weight: 600;
-            font-size: 0.78rem;
-            padding: 4px 12px;
-            border-radius: 9999px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
         .community-header-title {
             font-size: 1.65rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            color: var(--comm-text-main);
+            color: var(--nm-text-main);
         }
 
         .community-header-subtitle {
-            color: var(--comm-text-muted);
+            color: var(--nm-text-muted);
             font-size: 0.88rem;
         }
 
-        /* Action Cards: Search & Share */
-        .comm-action-card {
-            background-color: var(--comm-card-bg);
-            border: 1px solid var(--comm-card-border);
-            border-radius: 18px;
-            padding: 1.25rem 1.5rem;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.05);
-        }
-
-        .comm-action-card:hover {
-            border-color: rgba(108, 140, 255, 0.4);
-            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        .comm-icon-box {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: var(--comm-primary-subtle);
-            color: var(--comm-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.05rem;
-            flex-shrink: 0;
-        }
-
-        /* Plan Card Grid */
-        .comm-plan-card {
-            background-color: var(--comm-card-bg);
-            border: 1px solid var(--comm-card-border);
-            border-radius: 18px;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.22s ease;
-            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.06);
-            position: relative;
-        }
-
-        .comm-plan-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(108, 140, 255, 0.45);
-            box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.15);
-        }
-
-        .comm-plan-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--comm-text-main);
-            line-height: 1.35;
-        }
-
-        .comm-plan-author {
-            color: var(--comm-text-muted);
-            font-size: 0.8rem;
-        }
-
-        .comm-plan-desc {
-            color: var(--comm-text-muted);
-            font-size: 0.82rem;
-            line-height: 1.45;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            min-height: 2.4em;
-        }
-
-        .comm-code-badge {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            background: var(--comm-primary-subtle);
-            color: var(--comm-primary);
-            border: 1px solid rgba(108, 140, 255, 0.25);
-            font-size: 0.78rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 9999px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: background 0.15s ease, transform 0.15s ease;
-        }
-
-        .comm-code-badge:hover {
-            transform: scale(1.04);
-            background: rgba(108, 140, 255, 0.25);
-        }
-
-        .comm-sessions-container {
-            background-color: var(--comm-surface);
-            border-radius: 12px;
-            padding: 10px 12px;
-            margin-bottom: 1rem;
-        }
-
-        .comm-session-chip {
-            background-color: var(--comm-card-bg);
-            color: var(--comm-text-main);
-            border: 1px solid var(--comm-card-border);
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 3px 8px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-
-        /* Buttons & Actions */
+        /* Buttons & Actions Neumorphic */
         .btn-comm-primary {
-            background-color: var(--comm-primary);
-            color: #FFFFFF;
+            background: var(--nm-primary-grad, linear-gradient(135deg, #6366f1 0%, #4f46e5 100%));
+            color: #FFFFFF !important;
             border: none;
             font-weight: 600;
             border-radius: 9999px;
-            transition: opacity 0.18s, transform 0.18s;
+            box-shadow: var(--nm-shadow-primary);
+            transition: all 0.2s ease;
         }
 
         .btn-comm-primary:hover {
-            color: #FFFFFF;
-            opacity: 0.92;
+            color: #FFFFFF !important;
+            opacity: 0.95;
             transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-comm-primary:active {
+            transform: translateY(0);
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .btn-comm-outline {
-            background-color: transparent;
-            color: var(--comm-text-main);
-            border: 1px solid var(--comm-card-border);
+            background: var(--nm-surface);
+            color: var(--nm-text-main);
+            border: var(--nm-border-subtle);
+            box-shadow: var(--nm-shadow-btn);
             font-weight: 600;
             border-radius: 9999px;
-            transition: all 0.18s ease;
+            transition: all 0.2s ease;
         }
 
         .btn-comm-outline:hover {
-            background-color: var(--comm-surface);
-            color: var(--comm-primary);
-            border-color: var(--comm-primary);
+            background: var(--nm-surface-hover);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--nm-shadow-card);
         }
 
-        /* Toast Container */
-        .comm-toast-container {
-            position: fixed;
-            top: 76px;
-            right: 24px;
-            z-index: 1099;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
+        .btn-comm-outline:active {
+            transform: translateY(0);
+            box-shadow: var(--nm-shadow-inset);
         }
 
-        .comm-toast {
-            background: var(--comm-card-bg);
-            color: var(--comm-text-main);
-            border: 1px solid var(--comm-card-border);
-            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.35);
+        /* Modal Neumorphism */
+        .modal-content {
+            background-color: var(--nm-surface) !important;
+            border: var(--nm-border-subtle) !important;
+            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.25), var(--nm-shadow-card) !important;
+            border-radius: 24px !important;
+        }
+
+        .modal-header {
+            background: var(--nm-surface) !important;
+            border-bottom: 1px solid var(--nm-divider) !important;
+        }
+
+        .modal-footer {
+            background: var(--nm-surface) !important;
+            border-top: 1px solid var(--nm-divider) !important;
+        }
+
+        .modal-backdrop.show {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background-color: rgba(15, 23, 42, 0.5) !important;
+            opacity: 1 !important;
+        }
+
+        .comm-modal-info-box {
+            background: var(--nm-surface-sunken);
+            box-shadow: var(--nm-shadow-inset);
+            border-radius: 16px;
+            padding: 1.15rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .comm-session-detail-card {
+            background: var(--nm-surface);
+            box-shadow: var(--nm-shadow-card);
+            border: var(--nm-border-subtle);
             border-radius: 14px;
-            padding: 12px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-            animation: slideInToast 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 380px;
+            padding: 1rem;
         }
 
-        @keyframes slideInToast {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .comm-list-group-item {
+            background: var(--nm-surface);
+            border: var(--nm-border-subtle);
+            box-shadow: var(--nm-shadow-card);
+            border-radius: 14px !important;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
         }
 
-        /* Modal Overrides for Dark Mode */
-        [data-bs-theme="dark"] .modal-content {
-            background-color: #26262B;
-            border: 1px solid #2E2E34;
-            color: #E8E8EA;
-        }
-
-        [data-bs-theme="dark"] .modal-header {
-            border-bottom-color: #2E2E34;
-        }
-
-        [data-bs-theme="dark"] .modal-footer {
-            border-top-color: #2E2E34;
-        }
-
-        [data-bs-theme="dark"] .list-group-item {
-            background-color: #1E1E22;
-            border-color: #2E2E34;
-            color: #E8E8EA;
-        }
-
-        [data-bs-theme="dark"] .table {
-            --bs-table-bg: transparent;
-            --bs-table-color: #E8E8EA;
-            --bs-table-border-color: #2E2E34;
+        .comm-list-group-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--nm-shadow-float);
         }
 
         /* Responsive adjustments */
@@ -349,7 +216,7 @@
                 <!-- =========================================================================
                      HEADER TRANG CỘNG ĐỒNG: TÊN TRANG NỔI BẬT & THANH ĐIỀU HƯỚNG
                      ========================================================================= -->
-                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4 pb-1">
+                <div class="comm-header-wrapper d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4">
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-1.5">
                             <span class="community-hero-badge">
@@ -362,19 +229,19 @@
 
                     <!-- SUB NAV TABS + CTA ACTIONS -->
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <div class="d-inline-flex p-1 rounded-pill border" style="background: var(--comm-card-bg);">
+                        <div class="nav-segment-control d-inline-flex p-1 rounded-pill">
                             <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm px-3 py-1.5 rounded-pill text-secondary fw-semibold">
                                 <i class="fa-solid fa-heart-pulse me-1 text-danger"></i> Theo dõi Thể chất
                             </a>
                             <a href="{{ route('bao-cao-tap-luyen.index') }}" class="btn btn-sm px-3 py-1.5 rounded-pill text-secondary fw-semibold">
                                 <i class="fa-solid fa-chart-column me-1 text-primary"></i> Báo cáo
                             </a>
-                            <a href="{{ route('workout.community') }}" class="btn btn-sm px-3 py-1.5 rounded-pill btn-primary text-white fw-semibold shadow-xs">
+                            <a href="{{ route('workout.community') }}" class="btn btn-sm px-3 py-1.5 rounded-pill btn-primary text-white fw-semibold">
                                 <i class="fa-solid fa-users me-1"></i> Cộng đồng
                             </a>
                         </div>
 
-                        <button type="button" class="btn btn-comm-primary btn-sm px-3.5 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs"
+                        <button type="button" class="btn btn-comm-primary btn-sm px-3.5 py-1.5 d-inline-flex align-items-center gap-1.5"
                                 data-bs-toggle="modal" data-bs-target="#shareMyPlanModal" id="btnOpenShareModal">
                             <i class="fa-solid fa-share-nodes"></i>
                             <span>Chia sẻ kế hoạch</span>
@@ -405,13 +272,13 @@
                             <form method="GET" action="{{ route('workout.community') }}" class="mt-3" id="codeSearchForm">
                                 <div class="d-flex flex-column flex-sm-row gap-2">
                                     <div class="input-group">
-                                        <span class="input-group-text border-end-0 bg-transparent text-secondary">
+                                        <span class="input-group-text border-0 text-secondary" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); border-top-left-radius: 9999px; border-bottom-left-radius: 9999px;">
                                             <i class="fa-solid fa-hashtag"></i>
                                         </span>
                                         <input type="text" name="code" value="{{ $searchCode ?? '' }}" 
                                                id="searchCodeInput"
-                                               class="form-control rounded-end-pill border-start-0 font-monospace text-uppercase" 
-                                               style="background: var(--comm-surface); color: var(--comm-text-main); font-weight: 600; letter-spacing: 1px;"
+                                               class="form-control rounded-end-pill border-0 font-monospace text-uppercase" 
+                                               style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); color: var(--nm-text-main); font-weight: 600; letter-spacing: 1px;"
                                                placeholder="VD: PPL-8CTX5" required autocomplete="off">
                                     </div>
                                     <button type="submit" class="btn btn-comm-primary px-4 py-2 flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-1.5">
@@ -439,7 +306,7 @@
                         <div class="comm-action-card h-100 d-flex flex-column justify-content-between">
                             <div>
                                 <div class="d-flex align-items-center gap-2.5 mb-2">
-                                    <div class="comm-icon-box text-success" style="background: rgba(34, 197, 94, 0.12); color: #22C55E;">
+                                    <div class="comm-icon-box text-success">
                                         <i class="fa-solid fa-share-nodes"></i>
                                     </div>
                                     <div>
@@ -453,7 +320,7 @@
                                 @if(isset($myPlans) && $myPlans->count() > 0)
                                     <div class="row g-2 align-items-center">
                                         <div class="col-12 col-sm-7">
-                                            <select class="form-select form-select-sm rounded-pill fw-semibold" id="quickPlanSelect" style="background: var(--comm-surface); color: var(--comm-text-main);">
+                                            <select class="form-select form-select-sm rounded-pill fw-semibold border-0" id="quickPlanSelect" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); color: var(--nm-text-main);">
                                                 @foreach($myPlans as $mp)
                                                     <option value="{{ $mp->id }}" 
                                                             data-is-shared="{{ $mp->is_shared ? '1' : '0' }}" 
@@ -475,7 +342,7 @@
                                     </div>
 
                                     <!-- Khu vực hiển thị mã code nhanh sau khi chọn/tạo -->
-                                    <div class="mt-2.5 p-2 px-3 rounded-3 d-flex align-items-center justify-content-between" id="quickCodeDisplayBox" style="background: var(--comm-surface); font-size: 0.8rem;">
+                                    <div class="mt-2.5 p-2 px-3 rounded-pill d-flex align-items-center justify-content-between" id="quickCodeDisplayBox" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); font-size: 0.8rem;">
                                         <span class="text-secondary">Mã chia sẻ:</span>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="font-monospace fw-bold text-primary fs-7" id="quickDisplayCodeText">
@@ -487,7 +354,7 @@
                                         </div>
                                     </div>
                                 @else
-                                    <div class="p-2.5 rounded-3 text-center fs-8 text-secondary" style="background: var(--comm-surface);">
+                                    <div class="p-2.5 rounded-pill text-center fs-8 text-secondary" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset);">
                                         Bạn chưa có kế hoạch rèn luyện nào. 
                                         <a href="{{ route('tap-luyen.index') }}" class="text-primary fw-semibold text-decoration-none ms-1">
                                             Tạo kế hoạch ngay &rarr;
@@ -508,7 +375,7 @@
                         <h5 class="fw-bold mb-0 text-dark-emphasis fs-6 d-flex align-items-center gap-2">
                             <span>Lịch tập cộng đồng chia sẻ</span>
                         </h5>
-                        <span class="badge rounded-pill fw-semibold" style="background: var(--comm-primary-subtle); color: var(--comm-primary);">
+                        <span class="badge rounded-pill fw-semibold bg-primary-subtle text-primary">
                             {{ $sharedPlans->count() }} kế hoạch
                         </span>
                     </div>
@@ -575,7 +442,7 @@
                                 </div>
 
                                 <!-- Action Buttons: Xem chi tiết & Sao chép plan -->
-                                <div class="mt-auto pt-2 border-top d-flex align-items-center gap-2" style="border-color: var(--comm-card-border) !important;">
+                                <div class="mt-auto pt-2.5 border-top d-flex align-items-center gap-2" style="border-color: var(--nm-divider) !important;">
                                     <!-- Xem chi tiết mở Modal -->
                                     <button type="button" 
                                             class="btn btn-sm btn-comm-outline w-50 py-1.5 d-inline-flex align-items-center justify-content-center gap-1.5 btn-view-plan-detail"
@@ -625,10 +492,10 @@
          ========================================================================= -->
     <div class="modal fade" id="planDetailModal" tabindex="-1" aria-labelledby="planDetailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header border-0 py-3 px-4" style="background: var(--comm-surface);">
+            <div class="modal-content overflow-hidden">
+                <div class="modal-header py-3 px-4">
                     <div class="d-flex align-items-center gap-2.5">
-                        <div class="comm-icon-box" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                        <div class="comm-icon-box" style="width: 34px; height: 34px; font-size: 0.95rem;">
                             <i class="fa-solid fa-dumbbell"></i>
                         </div>
                         <h6 class="modal-title fw-bold text-dark-emphasis fs-6" id="planDetailModalLabel">
@@ -640,8 +507,8 @@
 
                 <div class="modal-body p-4">
                     <!-- Header Info Box -->
-                    <div class="p-3 rounded-4 mb-4" style="background: var(--comm-surface);">
-                        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 pb-2 mb-2 border-bottom" style="border-color: var(--comm-card-border) !important;">
+                    <div class="comm-modal-info-box">
+                        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 pb-2 mb-2 border-bottom" style="border-color: var(--nm-divider) !important;">
                             <div>
                                 <h5 class="fw-bold text-dark-emphasis mb-0" id="detailPlanTitle">Kế hoạch rèn luyện</h5>
                                 <div class="text-secondary fs-8 mt-1">
@@ -650,7 +517,7 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge font-monospace fs-8 px-2.5 py-1.5 fw-bold" style="background: var(--comm-primary-subtle); color: var(--comm-primary);" id="detailPlanCode">
+                                <span class="comm-code-badge" id="detailPlanCode">
                                     PPL-CODE
                                 </span>
                                 <button type="button" class="btn btn-sm btn-comm-outline px-2.5 py-1 fs-8" id="btnDetailCopyCode" title="Sao chép mã">
@@ -674,7 +541,7 @@
                     </div>
                 </div>
 
-                <div class="modal-footer border-0 px-4 py-3" style="background: var(--comm-surface);">
+                <div class="modal-footer px-4 py-3">
                     <button type="button" class="btn btn-comm-outline btn-sm px-3.5" data-bs-dismiss="modal">Đóng</button>
                     <button type="button" class="btn btn-comm-primary btn-sm px-4 d-inline-flex align-items-center gap-1.5" id="btnDetailCopyPlanAction">
                         <i class="fa-solid fa-clone"></i>
@@ -690,10 +557,10 @@
          ========================================================================= -->
     <div class="modal fade" id="shareMyPlanModal" tabindex="-1" aria-labelledby="shareMyPlanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header border-0 py-3 px-4" style="background: var(--comm-surface);">
+            <div class="modal-content overflow-hidden">
+                <div class="modal-header py-3 px-4">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="comm-icon-box text-success" style="width: 32px; height: 32px; font-size: 0.95rem; background: rgba(34, 197, 94, 0.12); color: #22C55E;">
+                        <div class="comm-icon-box text-success" style="width: 34px; height: 34px; font-size: 0.95rem;">
                             <i class="fa-solid fa-share-nodes"></i>
                         </div>
                         <h6 class="modal-title fw-bold text-dark-emphasis fs-6" id="shareMyPlanModalLabel">
@@ -706,15 +573,15 @@
                 <div class="modal-body p-4">
                     <p class="text-secondary fs-8 mb-3">Chọn kế hoạch của bạn để lấy Mã code chia sẻ cho bạn bè hoặc cộng đồng Gymer:</p>
 
-                    <div class="list-group rounded-3 mb-3">
+                    <div class="list-group rounded-3 mb-3 border-0">
                         @forelse($myPlans as $mp)
-                            <div class="list-group-item p-3 d-flex align-items-center justify-content-between gap-2" id="myPlanItem-{{ $mp->id }}">
+                            <div class="comm-list-group-item p-3 d-flex align-items-center justify-content-between gap-2" id="myPlanItem-{{ $mp->id }}">
                                 <div class="min-w-0">
                                     <div class="fw-bold text-dark-emphasis fs-7 text-truncate">{{ $mp->ten_ke_hoach }}</div>
                                     <small class="text-secondary fs-8">{{ $mp->buoiTaps->count() }} buổi tập</small>
                                     @if($mp->is_shared && $mp->share_code)
                                         <div class="mt-1 d-flex align-items-center gap-1.5">
-                                            <span class="badge rounded-pill font-monospace fs-8" style="background: rgba(34, 197, 94, 0.15); color: #22C55E;">
+                                            <span class="badge rounded-pill font-monospace fs-8 bg-success-subtle text-success">
                                                 Mã: {{ $mp->share_code }}
                                             </span>
                                             <button type="button" class="btn btn-sm btn-link p-0 text-primary btn-copy-code fs-8" data-code="{{ $mp->share_code }}" title="Sao chép">
@@ -737,14 +604,14 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="p-4 text-center text-secondary fs-8 rounded-3" style="background: var(--comm-surface);">
+                            <div class="p-4 text-center text-secondary fs-8 rounded-4" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset);">
                                 Bạn chưa có kế hoạch rèn luyện nào. Hãy tạo kế hoạch trước khi chia sẻ.
                             </div>
                         @endforelse
                     </div>
 
-                    <div class="alert alert-info border-0 rounded-3 fs-8 mb-0 d-flex align-items-start gap-2" style="background: rgba(59, 130, 246, 0.1); color: var(--comm-primary);">
-                        <i class="fa-solid fa-shield-halved fs-6 flex-shrink-0 mt-0.5"></i>
+                    <div class="p-3 rounded-4 fs-8 mb-0 d-flex align-items-start gap-2" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); color: var(--nm-text-muted);">
+                        <i class="fa-solid fa-shield-halved fs-6 flex-shrink-0 mt-0.5 text-primary"></i>
                         <span>Người nhận chỉ có thể xem và sao chép lịch tập. Kế hoạch gốc của bạn hoàn toàn được bảo vệ và không bị sửa đổi.</span>
                     </div>
                 </div>
@@ -1114,16 +981,14 @@
                         if (plan.buoi_taps && plan.buoi_taps.length > 0) {
                             plan.buoi_taps.forEach((bt, idx) => {
                                 const sessionDiv = document.createElement('div');
-                                sessionDiv.className = 'p-3 rounded-3 border';
-                                sessionDiv.style.backgroundColor = 'var(--comm-card-bg)';
-                                sessionDiv.style.borderColor = 'var(--comm-card-border)';
+                                sessionDiv.className = 'comm-session-detail-card';
 
                                 const exercises = bt.chi_tiet_buoi_taps || [];
                                 let exercisesHtml = '';
 
                                 if (exercises.length > 0) {
                                     exercisesHtml = `
-                                        <div class="mt-2.5 pt-2 border-top d-flex flex-column gap-1.5" style="border-color: var(--comm-card-border) !important;">
+                                        <div class="mt-2.5 pt-2 border-top d-flex flex-column gap-1.5" style="border-color: var(--nm-divider) !important;">
                                             ${exercises.map((ct, exIdx) => {
                                                 const exName = ct.bai_tap_the_chat ? ct.bai_tap_the_chat.ten_bai_tap : 'Bài tập';
                                                 const exMuscle = ct.bai_tap_the_chat ? ct.bai_tap_the_chat.nhom_co : 'Thể chất';
@@ -1131,7 +996,7 @@
                                                 return `
                                                     <div class="d-flex align-items-center justify-content-between py-1 text-truncate">
                                                         <div class="d-flex align-items-center gap-2 min-w-0">
-                                                            <span class="badge rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; font-size: 10px; background: var(--comm-surface); color: var(--comm-text-muted);">
+                                                            <span class="badge rounded-circle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 10px; background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); color: var(--nm-text-muted);">
                                                                 ${exIdx + 1}
                                                             </span>
                                                             <div class="min-w-0">
@@ -1139,7 +1004,7 @@
                                                                 <small class="text-secondary fs-9">${exMuscle}</small>
                                                             </div>
                                                         </div>
-                                                        <span class="badge rounded-pill fs-9 fw-semibold flex-shrink-0" style="background: var(--comm-surface); color: var(--comm-primary);">
+                                                        <span class="badge rounded-pill fs-9 fw-semibold flex-shrink-0" style="background: var(--nm-surface-sunken); box-shadow: var(--nm-shadow-inset); color: var(--comm-primary);">
                                                             ${exSpecs}
                                                         </span>
                                                     </div>
@@ -1154,7 +1019,7 @@
                                 sessionDiv.innerHTML = `
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="badge rounded-pill fs-8 fw-semibold" style="background: var(--comm-primary-subtle); color: var(--comm-primary);">
+                                            <span class="badge rounded-pill fs-8 fw-semibold bg-primary-subtle text-primary">
                                                 ${bt.ten_thu || `Buổi ${idx + 1}`}
                                             </span>
                                             <span class="fw-bold text-dark-emphasis fs-7">${bt.ten_buoi_tap}</span>

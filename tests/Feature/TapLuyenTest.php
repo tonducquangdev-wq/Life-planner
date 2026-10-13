@@ -268,4 +268,23 @@ class TapLuyenTest extends TestCase
         $response->assertSee('workoutTypeChart');
         $response->assertSee('Nhật Ký Tập Luyện Mới Nhất');
     }
+
+    /**
+     * TEST: Trang Cộng đồng Gymer tải thành công với giao diện Soft Neumorphism và các tính năng chia sẻ
+     */
+    public function test_community_page_loads_successfully_with_neumorphic_layout(): void
+    {
+        $response = $this->actingAs($this->user)->get('/workout/community');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('tap_luyen.community');
+        $response->assertSee('Cộng đồng Gymer');
+        $response->assertSee('Chia sẻ kế hoạch');
+        $response->assertSee('Nhập mã lịch tập');
+        $response->assertSee('searchCodeInput');
+        $response->assertSee('Lịch tập cộng đồng chia sẻ');
+        $response->assertSee('planDetailModal');
+        $response->assertSee('shareMyPlanModal');
+        $response->assertSee('communityMessengerPopup');
+    }
 }
