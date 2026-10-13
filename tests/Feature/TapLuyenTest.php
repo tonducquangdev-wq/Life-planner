@@ -2,11 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\BaiTapTheChat;
-use App\Models\BuoiTap;
-use App\Models\ChiTietBuoiTap;
 use App\Models\KeHoachTapLuyen;
-use App\Models\LichSuTapLuyen;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,7 +20,7 @@ class TapLuyenTest extends TestCase
         // Tạo user với đúng trường ho_ten của bảng users
         $this->user = User::create([
             'ho_ten' => 'Nguyen Van A',
-            'email' => 'test_' . uniqid() . '@example.com',
+            'email' => 'test_'.uniqid().'@example.com',
             'password' => bcrypt('password123'),
         ]);
     }
@@ -236,14 +232,14 @@ class TapLuyenTest extends TestCase
         // Khởi tạo trang tập luyện để sinh kế hoạch mặc định nếu chưa có
         $this->actingAs($this->user)->get('/tap-luyen');
 
-        $activePlan = \App\Models\KeHoachTapLuyen::where('user_id', $this->user->id)->first();
+        $activePlan = KeHoachTapLuyen::where('user_id', $this->user->id)->first();
         $this->assertNotNull($activePlan);
 
         $pushSession = $activePlan->buoiTaps()->first();
         $this->assertNotNull($pushSession);
 
         // Truy cập với buoi_tap_id cụ thể
-        $response = $this->actingAs($this->user)->get('/tap-luyen?buoi_tap_id=' . $pushSession->id);
+        $response = $this->actingAs($this->user)->get('/tap-luyen?buoi_tap_id='.$pushSession->id);
 
         $response->assertStatus(200);
         $response->assertSee('Checklist bài tập');
@@ -252,5 +248,24 @@ class TapLuyenTest extends TestCase
         $response->assertSee('workout-exercise-checkbox');
         $response->assertSee('Bắt đầu tập');
     }
-}
 
+    /**
+     * TEST: Trang Báo cáo tập luyện tải thành công với giao diện Soft Neumorphism và các biểu đồ
+     */
+    public function test_bao_cao_tap_luyen_page_loads_successfully_with_neumorphic_report(): void
+    {
+        $response = $this->actingAs($this->user)->get('/bao-cao-tap-luyen');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('tap_luyen.bao_cao');
+        $response->assertSee('Báo Cáo Thể Chất');
+        $response->assertSee('Chuỗi Ngày Rèn Luyện');
+        $response->assertSee('Tổng Thời Gian Tập');
+        $response->assertSee('Tổng Số Buổi Tập');
+        $response->assertSee('Đánh Giá Phong Độ');
+        $response->assertSee('Heatmap');
+        $response->assertSee('workoutDayOfWeekChart');
+        $response->assertSee('workoutTypeChart');
+        $response->assertSee('Nhật Ký Tập Luyện Mới Nhất');
+    }
+}

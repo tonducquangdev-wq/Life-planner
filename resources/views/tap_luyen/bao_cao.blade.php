@@ -39,45 +39,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- CSS Tùy chỉnh Dashboard & Tap luyen -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}">
-    <style>
-        .kpi-card {
-            transition: all 0.25s ease;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08) !important;
-        }
-        .streak-hero-card {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #ffffff;
-        }
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-        }
-        .heatmap-cell {
-            aspect-ratio: 1;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.15s ease;
-        }
-        .heatmap-cell:hover {
-            transform: scale(1.1);
-            z-index: 2;
-        }
-        .heatmap-lvl-0 { background-color: #f1f5f9; color: #94a3b8; }
-        .heatmap-lvl-1 { background-color: #d1fae5; color: #047857; }
-        .heatmap-lvl-2 { background-color: #6ee7b7; color: #065f46; }
-        .heatmap-lvl-3 { background-color: #10b981; color: #ffffff; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ time() }}">
 </head>
 
 <body>
@@ -86,27 +49,32 @@
     <div class="main-wrapper main-wrapper-full">
 
         <!-- TOPBAR TRÊN CÙNG COMPACT 58PX -->
-        @include('layouts.topbar', ['title' => 'Báo Cáo Tập Luyện'])
+        @include('layouts.topbar', ['title' => 'Báo Cáo Thể Chất'])
 
         <!-- NỘI DUNG CHÍNH (CONTENT BODY) -->
         <main class="content-body p-3 p-lg-4">
 
             <!-- SUB NAV SWITCHER (THEO DÕI / BÁO CÁO) -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2.5 mb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="workout-title-icon"><i class="bi bi-bar-chart-fill text-primary"></i></span>
+            <div class="report-page-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="workout-title-icon">
+                        <i class="bi bi-bar-chart-fill text-primary"></i>
+                    </div>
                     <div>
-                        <h4 class="workout-page-title mb-0">Báo Cáo Rèn Luyện</h4>
-                        <p class="workout-page-subtitle mb-0">Thống kê tần suất, thời gian và phân tích tiến độ</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="workout-page-title mb-0">Báo Cáo Thể Chất</h4>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-0.5 fs-8 fw-bold">Phân tích</span>
+                        </div>
+                        <p class="workout-page-subtitle mb-0 mt-0.5">Thống kê tần suất, thời gian và phân tích tiến độ rèn luyện</p>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <div class="nav-segment-control d-inline-flex p-1 rounded-pill shadow-2xs">
+                <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                    <div class="nav-segment-control d-inline-flex p-1 rounded-pill">
                         <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm px-3 rounded-pill text-secondary fw-semibold">
-                            <i class="bi bi-lightning-charge-fill me-1"></i>Buổi tập
+                            <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Buổi tập
                         </a>
-                        <a href="{{ route('bao-cao-tap-luyen.index') }}" class="btn btn-sm px-3 rounded-pill btn-primary fw-semibold shadow-xs">
+                        <a href="{{ route('bao-cao-tap-luyen.index') }}" class="btn btn-sm px-3 rounded-pill btn-primary fw-semibold">
                             <i class="bi bi-bar-chart-fill me-1"></i>Báo cáo
                         </a>
                     </div>
@@ -121,65 +89,65 @@
                 
                 <!-- CARD HERO: CHUỖI TẬP STREAK -->
                 <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card border-0 rounded-4 p-4 streak-hero-card shadow-sm h-100 position-relative overflow-hidden">
+                    <div class="report-kpi-card streak-hero-card">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-white-50 fw-medium fs-7">Chuỗi Ngày Rèn Luyện</span>
-                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1 fs-8 fw-semibold">
-                                <i class="bi bi-fire me-1 text-warning"></i>Streak
-                            </span>
+                            <span class="text-muted fw-semibold fs-7">Chuỗi Ngày Rèn Luyện</span>
+                            <div class="streak-icon-box" title="Chuỗi ngày rèn luyện liên tục">
+                                <i class="bi bi-fire"></i>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-baseline gap-2 mb-1">
-                            <h2 class="fw-bold mb-0 text-white display-6">{{ $chuoiNgayTap }}</h2>
-                            <span class="text-white-50 fs-6">ngày liên tiếp 🔥</span>
+                        <div class="d-flex align-items-baseline gap-2 mb-2">
+                            <h2 class="fw-bold mb-0 text-dark display-6">{{ $chuoiNgayTap }}</h2>
+                            <span class="text-muted fs-6">ngày liên tiếp 🔥</span>
                         </div>
-                        <div class="text-white-50 fs-8 d-flex align-items-center gap-1">
+                        <div class="text-muted fs-8 d-flex align-items-center gap-1">
                             <span>Kế hoạch:</span>
-                            <strong class="text-white">{{ $activePlan ? $activePlan->ten_ke_hoach : 'Kế hoạch cá nhân' }}</strong>
+                            <strong class="text-dark">{{ $activePlan ? $activePlan->ten_ke_hoach : 'Kế hoạch cá nhân' }}</strong>
                         </div>
                     </div>
                 </div>
 
                 <!-- CARD 2: TỔNG THỜI GIAN TẬP -->
                 <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card border-0 rounded-4 p-4 bg-white shadow-sm h-100 kpi-card">
+                    <div class="report-kpi-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="text-muted fw-semibold fs-7">Tổng Thời Gian Tập</span>
-                            <div class="p-2.5 rounded-circle bg-success-subtle text-success">
-                                <i class="bi bi-clock-history fs-5"></i>
+                            <div class="kpi-icon-container text-success">
+                                <i class="bi bi-clock-history"></i>
                             </div>
                         </div>
-                        <h3 class="fw-bold text-dark mb-1">{{ $tongThoiGianHour }} <span class="fs-6 text-muted font-normal">Giờ</span></h3>
+                        <h3 class="fw-bold text-dark mb-1">{{ $tongThoiGianHour }} <span class="fs-6 text-muted fw-normal">Giờ</span></h3>
                         <small class="text-muted fs-8 mt-2 d-block">Tương đương {{ $tongThoiGianMinute }} phút vận động tích lũy</small>
                     </div>
                 </div>
 
                 <!-- CARD 3: TỔNG SỐ BUỔI TẬP -->
                 <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card border-0 rounded-4 p-4 bg-white shadow-sm h-100 kpi-card">
+                    <div class="report-kpi-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="text-muted fw-semibold fs-7">Tổng Số Buổi Tập</span>
-                            <div class="p-2.5 rounded-circle bg-primary-subtle text-primary">
-                                <i class="bi bi-check-circle-fill fs-5"></i>
+                            <div class="kpi-icon-container text-primary">
+                                <i class="bi bi-check-circle-fill"></i>
                             </div>
                         </div>
-                        <h3 class="fw-bold text-dark mb-1">{{ $tongBuoiTap }} <span class="fs-6 text-muted font-normal">Buổi</span></h3>
+                        <h3 class="fw-bold text-dark mb-1">{{ $tongBuoiTap }} <span class="fs-6 text-muted fw-normal">Buổi</span></h3>
                         <small class="text-muted fs-8 mt-2 d-block">Trung bình {{ $thoiGianTrungBinhBuoi }} phút / buổi tập</small>
                     </div>
                 </div>
 
                 <!-- CARD 4: PHONG ĐỘ TẬP LUYỆN -->
                 <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card border-0 rounded-4 p-4 bg-white shadow-sm h-100 kpi-card">
+                    <div class="report-kpi-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="text-muted fw-semibold fs-7">Đánh Giá Phong Độ</span>
-                            <div class="p-2.5 rounded-circle bg-warning-subtle text-warning">
-                                <i class="bi bi-trophy-fill fs-5"></i>
+                            <div class="kpi-icon-container text-warning">
+                                <i class="bi bi-trophy-fill"></i>
                             </div>
                         </div>
-                        <h3 class="fw-bold text-dark mb-1">Xuất sắc</h3>
+                        <h3 class="fw-bold text-dark mb-1">{{ $tongBuoiTap >= 5 ? 'Xuất sắc' : ($tongBuoiTap >= 1 ? 'Khởi sắc' : 'Bắt đầu') }}</h3>
                         <div class="d-flex align-items-center gap-1 mt-2">
                             <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-8">
-                                <i class="bi bi-arrow-up-right me-1"></i>Tăng 15% tuần này
+                                <i class="bi bi-arrow-up-right me-1"></i>Duy trì phong độ đều đặn
                             </span>
                         </div>
                     </div>
@@ -192,16 +160,19 @@
                 
                 <!-- HEATMAP TẦN SUẤT TẬP TRONG THÁNG -->
                 <div class="col-12 col-lg-5 col-xl-4">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <div class="report-heatmap-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h6 class="fw-bold text-dark mb-1">Heatmap Tháng {{ $currentMonth }}/{{ $currentYear }}</h6>
                                 <p class="text-muted fs-8 mb-0">Tần suất và mức độ chăm chỉ tập luyện</p>
                             </div>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 fs-8 fw-semibold">
+                                Tháng {{ $currentMonth }}
+                            </span>
                         </div>
 
                         <!-- Lưới 7 Cột Thứ 2 -> Chủ Nhật -->
-                        <div class="d-flex justify-content-between text-muted fs-8 fw-semibold text-center mb-2">
+                        <div class="heatmap-day-labels">
                             <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
                         </div>
 
@@ -213,7 +184,7 @@
 
                             <!-- Ô trống đầu tháng -->
                             @for ($i = 1; $i < $firstDayIso; $i++)
-                                <div class="heatmap-cell bg-transparent"></div>
+                                <div class="heatmap-cell bg-transparent" style="cursor: default;"></div>
                             @endfor
 
                             <!-- Các ngày trong tháng -->
@@ -237,12 +208,12 @@
                         </div>
 
                         <!-- Legend chú giải màu -->
-                        <div class="d-flex align-items-center justify-content-center gap-2 fs-8 text-muted pt-2 border-top">
+                        <div class="heatmap-legend">
                             <span>Ít</span>
-                            <span class="d-inline-block rounded" style="width: 12px; height: 12px; background: #f1f5f9;"></span>
-                            <span class="d-inline-block rounded" style="width: 12px; height: 12px; background: #d1fae5;"></span>
-                            <span class="d-inline-block rounded" style="width: 12px; height: 12px; background: #6ee7b7;"></span>
-                            <span class="d-inline-block rounded" style="width: 12px; height: 12px; background: #10b981;"></span>
+                            <span class="heatmap-legend-cell heatmap-lvl-0" title="Chưa tập"></span>
+                            <span class="heatmap-legend-cell heatmap-lvl-1" title="Dưới 30 phút"></span>
+                            <span class="heatmap-legend-cell heatmap-lvl-2" title="30-59 phút"></span>
+                            <span class="heatmap-legend-cell heatmap-lvl-3" title="Từ 60 phút trở lên"></span>
                             <span>Nhiều</span>
                         </div>
                     </div>
@@ -250,13 +221,13 @@
 
                 <!-- BIỂU ĐỒ TẦN SUẤT TẬP THEO THỨ TRONG TUẦN -->
                 <div class="col-12 col-lg-7 col-xl-8">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <div class="report-chart-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h6 class="fw-bold text-dark mb-1">Tần Suất Tập Theo Thứ Trong Tuần</h6>
                                 <p class="text-muted fs-8 mb-0">Thống kê số buổi tập tích lũy từ Thứ 2 đến Chủ Nhật</p>
                             </div>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fs-8">Toàn thời gian</span>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1.5 fs-8 fw-semibold">Toàn thời gian</span>
                         </div>
                         <div style="position: relative; height: 260px; width: 100%;">
                             <canvas id="workoutDayOfWeekChart"></canvas>
@@ -271,12 +242,15 @@
 
                 <!-- BIỂU ĐỒ DOUGHNUT LOẠI BUỔI TẬP -->
                 <div class="col-12 col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <div class="report-chart-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h6 class="fw-bold text-dark mb-0">Phân Bổ Nhóm Bài Tập</h6>
-                            <span class="badge bg-light text-dark rounded-pill fs-8">{{ $tongBuoiTap }} Buổi</span>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Phân Bổ Nhóm Bài Tập</h6>
+                                <p class="text-muted fs-8 mb-0">Tỉ lệ phân bố theo dạng bài rèn luyện</p>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 fs-8 fw-semibold">{{ $tongBuoiTap }} Buổi</span>
                         </div>
-                        <div class="d-flex align-items-center justify-content-center" style="position: relative; height: 220px;">
+                        <div class="d-flex align-items-center justify-content-center" style="position: relative; height: 240px;">
                             <canvas id="workoutTypeChart"></canvas>
                         </div>
                     </div>
@@ -284,23 +258,25 @@
 
                 <!-- BẢNG NHẬT KÝ HOÀN THÀNH TẬP LUYỆN MỚI NHẤT -->
                 <div class="col-12 col-lg-8">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <div class="report-table-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h6 class="fw-bold text-dark mb-1">Nhật Ký Tập Luyện Mới Nhất</h6>
                                 <p class="text-muted fs-8 mb-0">Lịch sử ghi nhận các buổi tập đã hoàn thành</p>
                             </div>
-                            <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm btn-light rounded-pill px-3">Xem tất cả</a>
+                            <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-2xs">
+                                <i class="bi bi-calendar-check me-1"></i>Quản lý buổi tập
+                            </a>
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table align-middle mb-0">
-                                <thead class="bg-light rounded-3">
+                            <table class="table report-table align-middle">
+                                <thead>
                                     <tr>
-                                        <th class="border-0 text-secondary fs-8 uppercase ps-3 py-2.5">Thời Gian</th>
-                                        <th class="border-0 text-secondary fs-8 uppercase py-2.5">Tên Buổi Tập</th>
-                                        <th class="border-0 text-secondary fs-8 uppercase text-center py-2.5">Thời Lượng</th>
-                                        <th class="border-0 text-secondary fs-8 uppercase text-end pe-3 py-2.5">Trạng Thái</th>
+                                        <th class="ps-3">Thời Gian</th>
+                                        <th>Tên Buổi Tập</th>
+                                        <th class="text-center">Thời Lượng</th>
+                                        <th class="text-end pe-3">Trạng Thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -310,7 +286,7 @@
                                         @endphp
                                         <tr>
                                             <td class="ps-3">
-                                                <div class="fw-semibold text-dark fs-7">{{ $startedAt->format('d/m/Y') }}</div>
+                                                <div class="fw-bold text-dark fs-7">{{ $startedAt->format('d/m/Y') }}</div>
                                                 <div class="text-muted fs-8">{{ $startedAt->format('H:i') }}</div>
                                             </td>
                                             <td>
@@ -318,20 +294,30 @@
                                                 <div class="text-muted fs-8 text-truncate" style="max-width: 250px;">{{ $ls->ghi_chu }}</div>
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1 font-mono fs-7">
-                                                    <i class="bi bi-clock me-1 text-success"></i>{{ $ls->tong_thoi_luong ?: 0 }} phút
+                                                <span class="report-duration-pill">
+                                                    <i class="bi bi-clock-fill text-primary"></i>
+                                                    <span>{{ $ls->tong_thoi_luong ?: 0 }} phút</span>
                                                 </span>
                                             </td>
                                             <td class="text-end pe-3">
-                                                <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-8">
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 fs-8 fw-semibold">
                                                     <i class="bi bi-check-circle-fill me-1"></i>Hoàn thành
                                                 </span>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center py-4 text-muted fs-8">
-                                                Chưa có nhật ký tập luyện nào.
+                                            <td colspan="4" class="text-center py-5">
+                                                <div class="d-flex flex-column align-items-center justify-content-center text-muted">
+                                                    <div class="kpi-icon-container mb-2" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                                                        <i class="bi bi-clipboard2-x text-muted"></i>
+                                                    </div>
+                                                    <span class="fw-semibold fs-7 text-dark mb-1">Chưa có nhật ký tập luyện nào</span>
+                                                    <p class="fs-8 text-muted mb-3">Hãy hoàn thành buổi tập đầu tiên để ghi nhận số liệu</p>
+                                                    <a href="{{ route('tap-luyen.index') }}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
+                                                        <i class="bi bi-play-circle me-1"></i>Bắt đầu tập ngay
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforelse
@@ -352,6 +338,11 @@
     <!-- Chart.js Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Xác định màu chữ và đường lưới theo theme
+            const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(148, 163, 184, 0.12)';
+
             // 1. Render Biểu đồ Tần suất tập theo thứ trong tuần
             const dayStats = @json($dayOfWeekStats);
             const ctxDayOfWeek = document.getElementById('workoutDayOfWeekChart')?.getContext('2d');
@@ -371,23 +362,40 @@
                                 dayStats[6] || 0,
                                 dayStats[7] || 0,
                             ],
-                            backgroundColor: '#10b981',
+                            backgroundColor: '#6366f1',
+                            hoverBackgroundColor: '#4f46e5',
                             borderRadius: 8,
-                            barThickness: 24,
+                            barThickness: 26,
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
+                                bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                                padding: 10,
+                                cornerRadius: 8,
+                            }
                         },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { precision: 0 }
+                                ticks: {
+                                    precision: 0,
+                                    color: textColor,
+                                    font: { family: "'Plus Jakarta Sans', sans-serif" }
+                                },
+                                grid: { color: gridColor }
                             },
                             x: {
+                                ticks: {
+                                    color: textColor,
+                                    font: { family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+                                },
                                 grid: { display: false }
                             }
                         }
@@ -405,7 +413,8 @@
                         labels: Object.keys(typeData),
                         datasets: [{
                             data: Object.values(typeData),
-                            backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#06b6d4', '#6b7280'],
+                            backgroundColor: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#94a3b8'],
+                            hoverOffset: 4,
                             borderWidth: 0,
                         }]
                     },
@@ -416,7 +425,19 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { boxWidth: 12, padding: 12 }
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 14,
+                                    color: textColor,
+                                    font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '500' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
+                                bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                                padding: 10,
+                                cornerRadius: 8,
                             }
                         }
                     }
