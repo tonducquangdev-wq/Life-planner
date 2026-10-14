@@ -314,6 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
             renderMonthCalendarGrid();
         }
         renderTodaySchedule();
+        refreshUpcomingDeadlines();
     }
 
     /**
@@ -570,19 +571,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     agendaHtml += `
                         <div class="mobile-agenda-item ${evt.type}">
-                            <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
                                 <div class="event-icon-badge flex-shrink-0">
                                     <i class="bi ${iconClass}"></i>
                                 </div>
                                 <div class="min-w-0 flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                                        <span class="fw-bold text-dark fs-6 text-truncate">${evt.title}</span>
-                                        ${repeatTag}
-                                        ${notifTag}
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 text-muted fs-7">
-                                        <span><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
-                                        <span class="text-truncate"><i class="bi bi-geo-alt me-1 text-secondary"></i>${evt.location || 'Chưa có vị trí'}</span>
+                                    <div class="fw-bold text-dark fs-6 mb-1 text-break" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">${evt.title}</div>
+                                    ${(repeatTag || notifTag) ? `<div class="d-flex align-items-center gap-2 flex-wrap mb-1.5">${repeatTag}${notifTag}</div>` : ''}
+                                    <div class="d-flex flex-wrap align-items-center gap-2 text-muted fs-7">
+                                        <span class="flex-shrink-0 text-nowrap"><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
+                                        <span class="text-break" style="word-break: break-word; overflow-wrap: anywhere;"><i class="bi bi-geo-alt me-1 text-secondary"></i>${evt.location || 'Chưa có vị trí'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -686,23 +684,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             html += `
                 <div class="day-event-detail-item ${evt.type}">
-                    <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
-                        <div class="event-icon-badge">
+                    <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+                        <div class="event-icon-badge flex-shrink-0">
                             <i class="bi ${iconClass}"></i>
                         </div>
-                        <div class="text-truncate">
-                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                                <span class="fw-bold text-dark fs-6 text-truncate">${evt.title}</span>
-                                ${repeatTag}
-                                ${notifTag}
-                            </div>
-                            <div class="d-flex align-items-center gap-3 text-muted fs-7">
-                                <span><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
-                                <span><i class="bi bi-geo-alt me-1 text-secondary"></i>${evt.location || 'Chưa có thông tin'}</span>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="fw-bold text-dark fs-6 text-break mb-1" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">${evt.title}</div>
+                            ${(repeatTag || notifTag) ? `<div class="d-flex align-items-center gap-2 flex-wrap mb-1.5">${repeatTag}${notifTag}</div>` : ''}
+                            <div class="d-flex flex-wrap align-items-center gap-3 text-muted fs-7">
+                                <span class="flex-shrink-0 text-nowrap"><i class="bi bi-clock me-1 text-primary"></i>${evt.time}</span>
+                                <span class="text-break" style="word-break: break-word; overflow-wrap: anywhere;"><i class="bi bi-geo-alt me-1 text-secondary"></i>${evt.location || 'Chưa có thông tin'}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-2">
                         <button type="button" class="btn-action btn-edit" data-edit-id="${evt.id}" title="Sửa sự kiện">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
@@ -753,17 +748,94 @@ document.addEventListener('DOMContentLoaded', function () {
         todayEvents.slice(0, 4).forEach(evt => {
             html += `
                 <div class="schedule-item ${evt.type}" data-type="${evt.type}">
-                    <div class="d-flex align-items-center justify-content-between mb-1">
-                        <span class="fw-bold text-dark fs-7">${evt.time}</span>
-                        <span class="badge rounded-pill px-2 py-0 fs-8 legend-pill ${evt.type}">${typeLabelMap[evt.type] || 'Sự kiện'}</span>
+                    <div class="d-flex align-items-center justify-content-between mb-1 gap-2">
+                        <span class="fw-bold text-dark fs-7 flex-shrink-0">${evt.time}</span>
+                        <span class="badge rounded-pill px-2 py-0 fs-8 legend-pill ${evt.type} flex-shrink-0">${typeLabelMap[evt.type] || 'Sự kiện'}</span>
                     </div>
-                    <div class="fw-semibold text-dark fs-6 mb-1 text-truncate">${evt.title}</div>
-                    <small class="text-muted fs-7"><i class="bi bi-geo-alt me-1"></i>${evt.location || 'Chưa có vị trí'}</small>
+                    <div class="fw-semibold text-dark fs-6 mb-1 text-break" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">${evt.title}</div>
+                    <small class="text-muted fs-7 text-break d-flex align-items-center gap-1" style="word-break: break-word; overflow-wrap: anywhere;"><i class="bi bi-geo-alt flex-shrink-0"></i><span>${evt.location || 'Chưa có vị trí'}</span></small>
                 </div>
             `;
         });
 
         todayList.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    async function refreshUpcomingDeadlines() {
+        const listEl = document.getElementById('upcomingDeadlineList');
+        const countBadge = document.getElementById('upcomingDeadlineCountBadge');
+        if (!listEl) return;
+
+        try {
+            const res = await fetch('/calendar/deadlines', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+            if (!res.ok) return;
+            const resData = await res.json();
+            if (resData.success && Array.isArray(resData.data)) {
+                const deadlines = resData.data;
+                if (countBadge) countBadge.textContent = deadlines.length;
+
+                if (deadlines.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="empty-neu-card py-3">
+                            <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
+                            <p class="mb-0 fs-8 text-muted">Không có deadline sắp tới!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                deadlines.forEach(dl => {
+                    const conLaiText = dl.con_lai || '';
+                    const isUrgent = conLaiText.includes('Hôm nay') || conLaiText.includes('Còn 1') || conLaiText.includes('Còn 2') || conLaiText.includes('Quá hạn') || conLaiText.includes('h');
+                    const itemClass = isUrgent ? 'urgent' : 'upcoming';
+                    const tagClass = isUrgent ? 'badge-urgent' : 'badge-upcoming';
+
+                    html += `
+                        <div class="deadline-compact-item ${itemClass}">
+                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1.5">
+                                <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1">
+                                    <span class="deadline-dot ${itemClass} flex-shrink-0" aria-hidden="true"></span>
+                                    <span class="deadline-title fw-bold text-dark" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${escapeHtml(dl.tieu_de || '')}">
+                                        ${escapeHtml(dl.tieu_de || 'Nộp bài tập')}
+                                    </span>
+                                </div>
+                                <span class="deadline-tag badge ${tagClass} rounded-pill flex-shrink-0">
+                                    ${escapeHtml(conLaiText)}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between gap-2 deadline-meta" style="padding-left: 16px;">
+                                <span class="text-truncate text-secondary" title="${escapeHtml(dl.mon_hoc || '')}">
+                                    <i class="bi bi-mortarboard me-1 text-primary opacity-75"></i>${escapeHtml(dl.mon_hoc || 'Môn học')}
+                                </span>
+                                <span class="flex-shrink-0 text-secondary deadline-date">
+                                    <i class="bi bi-clock me-1 text-warning opacity-75"></i>${escapeHtml(dl.thoi_gian || '23:59')}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listEl.innerHTML = html;
+            }
+        } catch (e) {
+            console.warn('Lỗi cập nhật upcoming deadlines:', e);
+        }
     }
 
     // Toggle switch thông báo UI
@@ -837,9 +909,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (Array.isArray(result.conflicts)) {
                         result.conflicts.forEach(item => {
                             html += `
-                                <li class="p-2.5 rounded-3 bg-white border shadow-2xs d-flex align-items-center justify-content-between gap-2">
-                                    <div>
-                                        <div class="fw-bold text-dark fs-7">${item.title}</div>
+                                <li class="p-2.5 rounded-3 bg-white border shadow-2xs d-flex align-items-center justify-content-between gap-2 min-w-0">
+                                    <div class="min-w-0 flex-grow-1">
+                                        <div class="fw-bold text-dark fs-7 text-break" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">${item.title}</div>
                                         <div class="text-muted fs-8"><i class="bi bi-clock me-1"></i>${item.date}: <strong>${item.time}</strong></div>
                                     </div>
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fs-8 flex-shrink-0">Trùng lịch</span>

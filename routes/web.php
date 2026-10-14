@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PushNotificationController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CongViecController;
 use App\Http\Controllers\CongViecDashboardController;
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/calendar/events', [SuKienController::class, 'store'])->name('calendar.events.store');
     Route::put('/calendar/events/{id}', [SuKienController::class, 'update'])->name('calendar.events.update');
     Route::delete('/calendar/events/{id}', [SuKienController::class, 'destroy'])->name('calendar.events.destroy');
+    Route::get('/calendar/deadlines', [CalendarController::class, 'deadlines'])->name('calendar.deadlines');
 
     Route::get('/bao-cao-hoc-tap', [MonHocController::class, 'baoCaoHocTap'])->name('bao-cao-hoc-tap.index');
     Route::get('/study/tutors', [MonHocController::class, 'danhSachGiaSu'])->name('study.tutors');
@@ -83,6 +85,16 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    // WEB PUSH NOTIFICATIONS (PWA)
+    Route::get('/push/vapid-key', [PushNotificationController::class, 'getVapidPublicKey'])->name('push.vapid-key');
+    Route::post('/push/subscribe', [PushNotificationController::class, 'subscribe'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
+    Route::get('/push/status', [PushNotificationController::class, 'status'])->name('push.status');
+    Route::post('/push/test', [PushNotificationController::class, 'testPush'])->name('push.test');
 });
+
+// Route trang Offline dự phòng khi mất kết nối mạng
+Route::view('/offline', 'offline')->name('offline');
 
 require __DIR__.'/auth.php';

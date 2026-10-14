@@ -37,6 +37,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    @include('layouts.pwa-head')
 
     <style>
         /* ==========================================================================
@@ -191,15 +192,16 @@
             border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
             border-radius: 9999px !important;
             box-shadow: var(--nm-shadow-primary) !important;
-            padding: 0.55rem 1.4rem !important;
+            padding: 0.45rem 1.15rem !important;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.84rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+            white-space: nowrap;
         }
 
         .nm-btn-primary:hover {
@@ -221,15 +223,16 @@
             border: var(--nm-border) !important;
             border-radius: 9999px !important;
             box-shadow: var(--nm-shadow-btn) !important;
-            padding: 0.55rem 1.35rem !important;
+            padding: 0.45rem 1.1rem !important;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.84rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+            white-space: nowrap;
         }
 
         .nm-btn-secondary:hover {
@@ -241,6 +244,14 @@
         .nm-btn-secondary:active {
             transform: scale(0.97) translateY(0);
             box-shadow: var(--nm-shadow-inset) !important;
+        }
+
+        /* 2.1. NÚT COMPACT NHỎ GỌN (CHO THANH TÁC VỤ HEADER) */
+        .nm-btn-sm {
+            padding: 0.38rem 0.9rem !important;
+            font-size: 0.82rem !important;
+            gap: 0.38rem !important;
+            min-height: 36px;
         }
 
         /* 3. NÚT NGUY HIỂM (DANGER GRADIENT CHO THAO TÁC XÓA) */
@@ -1132,18 +1143,20 @@
                                             </button>
                                         </div>
 
-                                        <!-- Nút Tìm Gia Sư (Hành động phụ - Secondary Embossed) -->
-                                        <a href="{{ route('study.tutors') }}" class="nm-btn-secondary justify-content-center" title="Kết nối giảng viên và trợ giảng">
-                                            <i class="bi bi-person-video3 fs-6 text-primary"></i>
-                                            <span>Tìm Gia sư</span>
-                                        </a>
+                                        <div class="d-flex align-items-center gap-2 w-100 w-md-auto">
+                                            <!-- Nút Tìm Gia Sư (Hành động phụ - Secondary Embossed) -->
+                                            <a href="{{ route('study.tutors') }}" class="nm-btn-secondary nm-btn-sm flex-fill flex-md-grow-0 justify-content-center" title="Kết nối giảng viên và trợ giảng">
+                                                <i class="bi bi-person-video3 text-primary"></i>
+                                                <span>Tìm gia sư</span>
+                                            </a>
 
-                                        <!-- Nút Thêm Môn Học Mới (Hành động chính - Primary Gradient) -->
-                                        <button type="button" class="nm-btn-primary justify-content-center"
-                                                data-bs-toggle="modal" data-bs-target="#createMonHocModal" id="btnOpenCreateMonHoc">
-                                            <i class="bi bi-plus-circle-fill fs-6"></i>
-                                            <span>Thêm môn học mới</span>
-                                        </button>
+                                            <!-- Nút Thêm Môn Học Mới (Hành động chính - Primary Gradient) -->
+                                            <button type="button" class="nm-btn-primary nm-btn-sm flex-fill flex-md-grow-0 justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#createMonHocModal" id="btnOpenCreateMonHoc">
+                                                <i class="bi bi-plus-circle-fill"></i>
+                                                <span>Thêm môn học</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1655,6 +1668,12 @@
 
     <!-- FLOATING ACTION MENU -->
     <x-floating-menu />
+
+    <!-- Mobile Bottom Navigation Bar (Flutter Style) -->
+    @include('layouts.bottom-nav')
+
+    <!-- PWA Install Modal -->
+    <x-pwa-install-modal />
 
     <!-- =========================================================================
          JAVASCRIPT: ĐIỀU KHIỂN TÌM KIẾM, MODAL & AJAX FORM THÊM MÔN HỌC

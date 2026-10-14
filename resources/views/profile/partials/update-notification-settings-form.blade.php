@@ -17,6 +17,50 @@
         </div>
     @endif
 
+    <!-- 1. PWA & WEB PUSH NOTIFICATIONS ON CURRENT DEVICE -->
+    <div class="card border border-primary-subtle bg-primary-subtle bg-opacity-10 rounded-4 p-3 mb-4 shadow-xs">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-2.5 rounded-circle bg-primary text-white flex-shrink-0">
+                    <i class="bi bi-phone-vibrate-fill fs-5"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="fw-bold text-dark mb-0 fs-7">Thông báo đẩy trên thiết bị (Web Push)</h6>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-0.5 fs-9" id="pwa-push-status-badge">Đang kiểm tra...</span>
+                    </div>
+                    <small class="text-muted fs-8">Nhận chuông và popup nhắc lịch học, deadline ngay cả khi đã tắt trình duyệt</small>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 pt-1 border-top border-primary-subtle border-opacity-50">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold" id="pwa-push-toggle-btn" onclick="window.LifePlannerPWA && window.LifePlannerPWA.togglePush()">
+                <i class="bi bi-bell-fill me-1"></i> Bật thông báo đẩy
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold" id="pwa-push-test-btn" style="display: none;" onclick="window.LifePlannerPWA && window.LifePlannerPWA.sendTestPush()">
+                <i class="bi bi-send-fill me-1"></i> Gửi thử thông báo
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. CÀI ĐẶT ỨNG DỤNG PWA (ANDROID & IOS) -->
+    <div class="card border rounded-4 p-3 mb-4 bg-white shadow-xs">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-2.5 rounded-circle bg-dark-subtle text-dark flex-shrink-0">
+                    <i class="bi bi-cloud-arrow-down-fill fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-0 fs-7">Cài đặt Life Planner (PWA)</h6>
+                    <small class="text-muted fs-8">Cài đặt trực tiếp lên màn hình điện thoại hoặc máy tính, sử dụng toàn màn hình độc lập</small>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold flex-shrink-0" data-pwa-install="true">
+                <i class="bi bi-download me-1"></i> Cài đặt ứng dụng
+            </button>
+        </div>
+    </div>
+
     <form method="post" action="{{ route('profile.notifications.update') }}">
         @csrf
         @method('patch')

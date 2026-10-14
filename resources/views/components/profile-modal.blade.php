@@ -156,6 +156,42 @@
 
                     <!-- TAB 3: THÔNG BÁO -->
                     <div class="tab-pane fade" id="pm-tab-notif" role="tabpanel">
+                        <!-- PWA & WEB PUSH CARD TRÊN THIẾT BỊ NÀY -->
+                        <div class="p-3 bg-primary-subtle bg-opacity-25 rounded-3 border border-primary-subtle mb-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-phone-vibrate-fill text-primary fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark fs-8">Thông báo đẩy (Web Push)</div>
+                                        <div class="text-muted fs-9">Nhắc nhở qua chuông/banner khi tắt tab</div>
+                                    </div>
+                                </div>
+                                <span class="badge pwa-push-status-badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-0.5 fs-9">Đang kiểm tra...</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-primary-subtle border-opacity-50">
+                                <button type="button" class="btn btn-sm btn-primary pwa-push-toggle-btn rounded-pill px-3 fs-9 fw-semibold" onclick="window.LifePlannerPWA && window.LifePlannerPWA.togglePush()">
+                                    <i class="bi bi-bell-fill me-1"></i> Bật thông báo đẩy
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary pwa-push-test-btn rounded-pill px-3 fs-9 fw-semibold" style="display: none;" onclick="window.LifePlannerPWA && window.LifePlannerPWA.sendTestPush()">
+                                    <i class="bi bi-send-fill me-1"></i> Thử nghiệm
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CÀI ĐẶT ỨNG DỤNG PWA -->
+                        <div class="p-3 bg-light rounded-3 border mb-3 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-cloud-arrow-down-fill text-dark fs-5"></i>
+                                <div>
+                                    <div class="fw-bold text-dark fs-8">Cài đặt ứng dụng Life Planner</div>
+                                    <div class="text-muted fs-9">Trải nghiệm toàn màn hình độc lập như App</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fs-9 fw-semibold" data-pwa-install="true">
+                                <i class="bi bi-download me-1"></i> Cài đặt
+                            </button>
+                        </div>
+
                         <form id="formProfileNotif" action="{{ route('profile.notifications.update') }}" method="POST">
                             @csrf
                             @method('PATCH')

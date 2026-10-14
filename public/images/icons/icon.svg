@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#4f46e5" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <!-- Background squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#grad)" />
+  
+  <!-- Calendar Body -->
+  <g filter="url(#shadow)">
+    <!-- Calendar base (white) -->
+    <rect x="96" y="112" width="320" height="296" rx="36" fill="#ffffff" />
+    <!-- Calendar header strip (indigo) -->
+    <path d="M 96 148 Q 96 112 132 112 L 380 112 Q 416 112 416 148 L 416 192 L 96 192 Z" fill="#4338ca" />
+    <!-- Rings/Hangers -->
+    <rect x="156" y="80" width="28" height="56" rx="14" fill="#ffffff" />
+    <rect x="328" y="80" width="28" height="56" rx="14" fill="#ffffff" />
+    <circle cx="170" cy="108" r="7" fill="#4338ca" />
+    <circle cx="342" cy="108" r="7" fill="#4338ca" />
+    
+    <!-- Checkmark inside calendar (emerald green) -->
+    <path d="M 180 292 L 236 348 L 336 244" fill="none" stroke="#10b981" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

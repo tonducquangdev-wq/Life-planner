@@ -35,8 +35,9 @@
     <!-- Google Font: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard CSS -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
+    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ file_exists(public_path('css/calendar.css')) ? filemtime(public_path('css/calendar.css')) : '1.0' }}">
+    @include('layouts.pwa-head')
 
 
     <style>
@@ -415,6 +416,12 @@
 
     <!-- Floating Action Menu & Shared Profile Modal -->
     <x-floating-menu />
+
+    <!-- Mobile Bottom Navigation Bar (Flutter Style) -->
+    @include('layouts.bottom-nav')
+
+    <!-- PWA Install Modal -->
+    <x-pwa-install-modal />
 </body>
 
 </html>

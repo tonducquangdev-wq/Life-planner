@@ -39,8 +39,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- CSS Tùy chỉnh Dashboard & Tap luyen -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
+    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ file_exists(public_path('css/tap-luyen.css')) ? filemtime(public_path('css/tap-luyen.css')) : '1.0' }}">
 </head>
 
 <body>

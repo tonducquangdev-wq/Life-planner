@@ -68,7 +68,7 @@ class User extends Authenticatable
                 return null; // File missing -> fallback to initials!
             }
 
-            return asset('storage/' . $relativePath);
+            return asset('storage/'.$relativePath);
         } catch (\Throwable $e) {
             // Fail-safe: Any filesystem error will return null so page never crashes!
             return null;
@@ -91,7 +91,7 @@ class User extends Authenticatable
                 $first = mb_substr($words[0], 0, 1);
                 $last = mb_substr(end($words), 0, 1);
 
-                return mb_strtoupper($first . $last);
+                return mb_strtoupper($first.$last);
             }
 
             if (is_array($words) && count($words) === 1) {
@@ -142,5 +142,10 @@ class User extends Authenticatable
     public function congViecs()
     {
         return $this->hasMany(CongViec::class);
+    }
+
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 }

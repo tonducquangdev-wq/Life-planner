@@ -61,6 +61,19 @@
                     <span class="menu-item-label">👤 Hồ sơ</span>
                 </button>
             </li>
+
+            <!-- 5. Cài đặt App (PWA) -->
+            <li>
+                <button type="button" 
+                   class="floating-menu-item w-100 text-start border-0 bg-transparent cursor-pointer"
+                   data-pwa-install="true"
+                   title="Cài đặt ứng dụng Life Planner vào thiết bị">
+                    <span class="menu-item-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
+                        <i class="bi bi-cloud-arrow-down-fill"></i>
+                    </span>
+                    <span class="menu-item-label">📲 Cài App</span>
+                </button>
+            </li>
         </ul>
     </div>
 

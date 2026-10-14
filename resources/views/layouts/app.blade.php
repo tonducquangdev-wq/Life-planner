@@ -26,6 +26,7 @@
 
     <!-- CSS Dashboard dùng chung của hệ thống Student-Life -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    @include('layouts.pwa-head')
     @stack('styles')
 </head>
 
@@ -93,6 +94,9 @@
 
     <!-- Mobile Bottom Navigation Bar (Flutter Style) -->
     @include('layouts.bottom-nav')
+
+    <!-- PWA Install Modal -->
+    <x-pwa-install-modal />
 </body>
 
 </html>

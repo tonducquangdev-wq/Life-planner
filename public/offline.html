@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6366f1">
+    <title>Đang ngoại tuyến - Life Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --nm-bg: #e7ebf0;
+            --nm-surface: #e7ebf0;
+            --nm-shadow-flat: 6px 6px 14px rgba(163, 177, 198, 0.45), -6px -6px 14px rgba(255, 255, 255, 0.95);
+            --nm-shadow-card: 14px 14px 28px rgba(163, 177, 198, 0.48), -14px -14px 28px rgba(255, 255, 255, 0.98);
+            --nm-shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.42), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+            --nm-border: 1.5px solid rgba(255, 255, 255, 0.8);
+            --nm-text-main: #1e293b;
+            --nm-text-muted: #64748b;
+            --nm-primary: #6366f1;
+            --nm-primary-grad: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+
+        [data-bs-theme="dark"] {
+            --nm-bg: #151821;
+            --nm-surface: #1b1e2a;
+            --nm-shadow-flat: 6px 6px 14px rgba(0, 0, 0, 0.5), -4px -4px 12px rgba(255, 255, 255, 0.04);
+            --nm-shadow-card: 14px 14px 28px rgba(0, 0, 0, 0.55), -10px -10px 24px rgba(255, 255, 255, 0.04);
+            --nm-shadow-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.6), inset -3px -3px 6px rgba(255, 255, 255, 0.03);
+            --nm-border: 1.5px solid rgba(255, 255, 255, 0.07);
+            --nm-text-main: #f1f5f9;
+            --nm-text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--nm-bg);
+            color: var(--nm-text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .offline-card {
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 32px;
+            box-shadow: var(--nm-shadow-card);
+            padding: 44px 32px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .offline-icon-box {
+            width: 88px;
+            height: 88px;
+            border-radius: 28px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            box-shadow: var(--nm-shadow-flat);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #ef4444;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            color: var(--nm-text-main);
+        }
+
+        p {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--nm-text-muted);
+            margin-bottom: 28px;
+        }
+
+        .btn-retry {
+            background: var(--nm-primary-grad);
+            color: #ffffff;
+            border: none;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+            transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(79, 70, 229, 0.45);
+        }
+
+        .btn-retry:active {
+            transform: scale(0.97);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            margin-bottom: 16px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-card">
+        <div class="status-pill">
+            <span class="status-dot"></span>
+            <span>Mất kết nối mạng</span>
+        </div>
+        <br>
+        <div class="offline-icon-box">
+            <i class="bi bi-wifi-off"></i>
+        </div>
+        <h1>Bạn đang ngoại tuyến</h1>
+        <p>
+            Không thể tải trang lúc này do kết nối mạng gián đoạn. Dữ liệu của bạn được lưu an toàn trên hệ thống. Hãy kiểm tra kết nối WiFi hoặc 4G/5G và thử lại.
+        </p>
+        <button class="btn-retry" id="btnRetry">
+            <i class="bi bi-arrow-clockwise" id="retryIcon"></i>
+            <span>Thử kết nối lại</span>
+        </button>
+    </div>
+
+    <script>
+        const btnRetry = document.getElementById('btnRetry');
+        const retryIcon = document.getElementById('retryIcon');
+
+        btnRetry.addEventListener('click', function() {
+            retryIcon.style.animation = 'spin 0.8s linear infinite';
+            btnRetry.disabled = true;
+            setTimeout(() => {
+                window.location.reload();
+            }, 300);
+        });
+
+        // Tự động tải lại trang khi phát hiện có mạng trở lại
+        window.addEventListener('online', function() {
+            window.location.reload();
+        });
+
+        // Áp dụng theme theo hệ thống
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+    </script>
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

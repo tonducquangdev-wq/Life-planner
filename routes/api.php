@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LichHocApiController;
 use App\Http\Controllers\Api\MonHocApiController;
 use App\Http\Controllers\Api\NotificationApiController;
 use App\Http\Controllers\Api\ProfileApiController;
+use App\Http\Controllers\Api\PushNotificationController;
 use App\Http\Controllers\Api\SuKienApiController;
 use App\Http\Controllers\Api\TapLuyenApiController;
 use App\Http\Controllers\Api\WorkoutPlanApiController;
@@ -40,10 +41,15 @@ Route::as('api.')->group(function () {
         Route::delete('/me/avatar', [ProfileApiController::class, 'deleteAvatar'])->name('me.avatar.delete');
         Route::get('/user', [AuthApiController::class, 'user'])->name('user');
 
-        // MODULE 7: THÔNG BÁO API
+        // MODULE 7: THÔNG BÁO API & WEB PUSH (PWA)
         Route::get('/thong-bao', [NotificationApiController::class, 'index'])->name('thong-bao.index');
         Route::patch('/thong-bao/read-all', [NotificationApiController::class, 'readAll'])->name('thong-bao.read-all');
         Route::patch('/thong-bao/{id}/read', [NotificationApiController::class, 'markAsRead'])->name('thong-bao.read');
+        Route::get('/push/vapid-key', [PushNotificationController::class, 'getVapidPublicKey'])->name('push.vapid-key');
+        Route::post('/push/subscribe', [PushNotificationController::class, 'subscribe'])->name('push.subscribe');
+        Route::post('/push/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
+        Route::get('/push/status', [PushNotificationController::class, 'status'])->name('push.status');
+        Route::post('/push/test', [PushNotificationController::class, 'testPush'])->name('push.test');
 
         // MODULE 6: DASHBOARD / BÁO CÁO API
         Route::get('/dashboard', [DashboardApiController::class, 'index'])->name('dashboard');

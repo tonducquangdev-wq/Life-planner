@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\BaiTap;
+use App\Models\CongViec;
+use App\Models\MonHoc;
 use App\Models\SuKien;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -124,6 +127,72 @@ class CalendarViewTest extends TestCase
 
         $this->assertSoftDeleted('su_kien', [
             'id' => $event->id,
+        ]);
+    }
+
+    public function test_calendar_page_displays_real_deadlines_from_database(): void
+    {
+        $user = User::factory()->create();
+
+        // 1. Deadline trong bảng su_kien
+        SuKien::create([
+            'user_id' => $user->id,
+            'tieu_de' => 'Nộp đồ án Laravel 13',
+            'loai_su_kien' => 'deadline',
+            'thoi_gian_bat_dau' => Carbon::tomorrow()->setHour(23)->setMinute(59),
+        ]);
+
+        // 2. Bài tập có hạn nộp trong bảng bai_tap
+        $monHoc = MonHoc::create([
+            'user_id' => $user->id,
+            'ten_mon' => 'Hệ điều hành Linux',
+            'ma_mon' => 'OS101',
+            'so_tin_chi' => 3,
+        ]);
+        BaiTap::create([
+            'mon_hoc_id' => $monHoc->id,
+            'tieu_de' => 'Báo cáo Kernel Linux',
+            'han_nop' => Carbon::now()->addDays(2),
+            'muc_do_uu_tien' => 'cao',
+            'trang_thai' => 'chua_hoan_thanh',
+        ]);
+
+        // 3. Công việc có deadline
+        CongViec::create([
+            'user_id' => $user->id,
+            'ten_cong_viec' => 'Hoàn thiện giao diện PWA',
+            'deadline' => Carbon::now()->addDays(3),
+            'trang_thai' => 'dang_lam',
+        ]);
+
+        $response = $this->actingAs($user)->get('/calendar');
+
+        $response->assertStatus(200);
+        $response->assertSee('Nộp đồ án Laravel 13');
+        $response->assertSee('Báo cáo Kernel Linux');
+        $response->assertSee('Hoàn thiện giao diện PWA');
+        $response->assertDontSee('Thi giữa kỳ Kiến trúc Phần mềm'); // Không còn dữ liệu mẫu cũ
+    }
+
+    public function test_calendar_deadlines_api_returns_real_deadlines(): void
+    {
+        $user = User::factory()->create();
+
+        SuKien::create([
+            'user_id' => $user->id,
+            'tieu_de' => 'Deadline kiểm thử API',
+            'loai_su_kien' => 'deadline',
+            'thoi_gian_bat_dau' => Carbon::tomorrow()->setHour(23)->setMinute(59),
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/calendar/deadlines');
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $response->assertJsonFragment([
+            'tieu_de' => 'Deadline kiểm thử API',
         ]);
     }
 }

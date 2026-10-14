@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\BaiTap;
+use App\Models\CongViec;
+use App\Models\SuKien;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,161 +16,27 @@ class CalendarController extends Controller
      */
     public function index()
     {
-        // 1. Thông tin ngày tháng hiện tại
+        $userId = (int) Auth::id();
         $currentMonthYear = date('d/m/Y');
 
-        // 2. Dữ liệu mẫu các sự kiện hiển thị trên Lưới Lịch (Calendar Grid 35 ô đại diện Tháng 9/2026)
-        // Tháng 9/2026 bắt đầu từ Thứ 3 (ngày 1/9). Ô 0 (Chủ nhật) là ngày 31/08.
+        // 1. Lấy danh sách Deadline sắp tới thực tế từ CSDL
+        $sapDenHan = $this->getUpcomingDeadlines($userId);
+
+        // 2. Lịch trình hôm nay thực tế
+        $lichTrinhHomNay = $this->getTodaySchedule($userId);
+
+        // 3. Khởi tạo mảng tương thích cho view
         $calendarDays = [];
-
-        // Hàng 1 (Ngày 31/8 -> 6/9)
-        $calendarDays[] = ['day' => 31, 'is_current_month' => false, 'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 1,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '08:00 Lập trình Web', 'type' => 'hoc-tap', 'time' => '08:00'],
-        ]];
-        $calendarDays[] = ['day' => 2,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => 'Nghỉ lễ Quốc Khánh', 'type' => 'ca-nhan', 'time' => 'Cả ngày'],
-        ]];
-        $calendarDays[] = ['day' => 3,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '14:00 Thảo luận CSDL', 'type' => 'hoc-tap', 'time' => '14:00'],
-            ['title' => '18:00 Tập Gym (Legs)', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 4,  'is_current_month' => true,  'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 5,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '09:00 Chạy bộ 5km', 'type' => 'tap-luyen', 'time' => '09:00'],
-        ]];
-        $calendarDays[] = ['day' => 6,  'is_current_month' => true,  'is_today' => false, 'events' => []];
-
-        // Hàng 2 (Ngày 7/9 -> 13/9)
-        $calendarDays[] = ['day' => 7,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '08:00 Lập trình Web', 'type' => 'hoc-tap', 'time' => '08:00'],
-        ]];
-        $calendarDays[] = ['day' => 8,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '18:00 Tập Gym (Chest)', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 9,  'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '23:59 Nộp Bài tập 1', 'type' => 'deadline', 'time' => '23:59'],
-        ]];
-        $calendarDays[] = ['day' => 10, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '13:30 Kiểm thử phần mềm', 'type' => 'hoc-tap', 'time' => '13:30'],
-        ]];
-        $calendarDays[] = ['day' => 11, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '18:00 Tập Gym (Back)', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 12, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '19:00 Sinh hoạt CLB', 'type' => 'ca-nhan', 'time' => '19:00'],
-        ]];
-        $calendarDays[] = ['day' => 13, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-
-        // Hàng 3 (Ngày 14/9 -> 20/9) - Ngày 14 là HÔM NAY (is_today = true)
-        $calendarDays[] = ['day' => 14, 'is_current_month' => true,  'is_today' => true,  'events' => [
-            ['title' => '08:00 Lập trình Web', 'type' => 'hoc-tap', 'time' => '08:00'],
-            ['title' => '14:00 Họp nhóm Đồ án', 'type' => 'ca-nhan', 'time' => '14:00'],
-            ['title' => '18:00 Tập Gym (Legs)', 'type' => 'tap-luyen', 'time' => '18:00'],
-            ['title' => '23:59 Nộp Báo cáo Lab', 'type' => 'deadline', 'time' => '23:59'],
-            ['title' => '21:00 Đọc sách Clean Code', 'type' => 'ca-nhan', 'time' => '21:00'],
-        ]]; // Ô này có 5 sự kiện -> hiển thị 3 sự kiện + "+2 khác"
-        $calendarDays[] = ['day' => 15, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '10:00 Học Tiếng Anh', 'type' => 'hoc-tap', 'time' => '10:00'],
-        ]];
-        $calendarDays[] = ['day' => 16, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '23:59 Nộp đồ án PHP', 'type' => 'deadline', 'time' => '23:59'],
-            ['title' => '18:00 Tập Cardio', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 17, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '08:00 CSDL Nâng cao', 'type' => 'hoc-tap', 'time' => '08:00'],
-        ]];
-        $calendarDays[] = ['day' => 18, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '23:59 Báo cáo CSDL', 'type' => 'deadline', 'time' => '23:59'],
-        ]];
-        $calendarDays[] = ['day' => 19, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '17:00 Đá bóng giao hữu', 'type' => 'tap-luyen', 'time' => '17:00'],
-        ]];
-        $calendarDays[] = ['day' => 20, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-
-        // Hàng 4 (Ngày 21/9 -> 27/9)
-        $calendarDays[] = ['day' => 21, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '08:00 Thi giữa kỳ KTPM', 'type' => 'deadline', 'time' => '08:00'],
-        ]];
-        $calendarDays[] = ['day' => 22, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '18:00 Tập Gym (FullBody)', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 23, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 24, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '14:00 Workshop AI', 'type' => 'hoc-tap', 'time' => '14:00'],
-        ]];
-        $calendarDays[] = ['day' => 25, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '18:00 Tập Yoga', 'type' => 'tap-luyen', 'time' => '18:00'],
-        ]];
-        $calendarDays[] = ['day' => 26, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 27, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-
-        // Hàng 5 (Ngày 28/9 -> 4/10)
-        $calendarDays[] = ['day' => 28, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => '08:00 Thuyết trình Web', 'type' => 'hoc-tap', 'time' => '08:00'],
-        ]];
-        $calendarDays[] = ['day' => 29, 'is_current_month' => true,  'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 30, 'is_current_month' => true,  'is_today' => false, 'events' => [
-            ['title' => 'Tổng kết Tháng 9', 'type' => 'ca-nhan', 'time' => '20:00'],
-        ]];
-        $calendarDays[] = ['day' => 1,  'is_current_month' => false, 'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 2,  'is_current_month' => false, 'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 3,  'is_current_month' => false, 'is_today' => false, 'events' => []];
-        $calendarDays[] = ['day' => 4,  'is_current_month' => false, 'is_today' => false, 'events' => []];
-
-        // 3. Dữ liệu Card bên phải (Column Right 25%)
-        // Card 1: Lịch trình hôm nay
-        $lichTrinhHomNay = [
-            [
-                'thoi_gian' => '08:00 - 10:30',
-                'tieu_de' => 'Lập trình Web & Laravel 13',
-                'dia_diem' => 'Phòng B2.04',
-                'badge' => 'Học tập',
-                'badge_class' => 'bg-primary-subtle text-primary border border-primary-subtle'
-            ],
-            [
-                'thoi_gian' => '14:00 - 15:30',
-                'tieu_de' => 'Họp nhóm Đồ án Life Planner',
-                'dia_diem' => 'Google Meet',
-                'badge' => 'Cá nhân',
-                'badge_class' => 'bg-purple-subtle text-purple border border-purple-subtle'
-            ],
-            [
-                'thoi_gian' => '18:00 - 19:30',
-                'tieu_de' => 'Tập Gym - Buổi tập Chân & Vai',
-                'dia_diem' => 'Fitness Center',
-                'badge' => 'Tập luyện',
-                'badge_class' => 'bg-success-subtle text-success border border-success-subtle'
-            ]
-        ];
-
-        // Card 2: Sắp đến hạn
-        $sapDenHan = [
-            [
-                'tieu_de' => 'Nộp Đồ án PHP & Laravel 13',
-                'mon_hoc' => 'Lập trình Web nâng cao',
-                'con_lai' => 'Còn 2 ngày',
-                'badge_class' => 'bg-danger-subtle text-danger border border-danger-subtle'
-            ],
-            [
-                'tieu_de' => 'Báo cáo CSDL MySQL',
-                'mon_hoc' => 'Cơ sở dữ liệu',
-                'con_lai' => 'Còn 4 ngày',
-                'badge_class' => 'bg-warning-subtle text-warning border border-warning-subtle'
-            ],
-            [
-                'tieu_de' => 'Thi giữa kỳ Kiến trúc Phần mềm',
-                'mon_hoc' => 'Kiến trúc PM',
-                'con_lai' => 'Còn 7 ngày',
-                'badge_class' => 'bg-primary-subtle text-primary border border-primary-subtle'
-            ]
-        ];
-
-        // Card 3: Thống kê nhanh
         $thongKeNhanh = [
-            'mon_hoc_tuan_nay' => 5,
-            'buoi_tap_tuan_nay' => 4,
-            'deadline_chua_nop' => 3
+            'mon_hoc_tuan_nay' => SuKien::where('user_id', $userId)
+                ->whereIn('loai_su_kien', ['hoc_tap', 'hoc-tap'])
+                ->whereBetween('thoi_gian_bat_dau', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count(),
+            'buoi_tap_tuan_nay' => SuKien::where('user_id', $userId)
+                ->whereIn('loai_su_kien', ['tap_luyen', 'tap-luyen'])
+                ->whereBetween('thoi_gian_bat_dau', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count(),
+            'deadline_chua_nop' => count($sapDenHan),
         ];
 
         return view('calendar', compact(
@@ -177,5 +46,194 @@ class CalendarController extends Controller
             'sapDenHan',
             'thongKeNhanh'
         ));
+    }
+
+    /**
+     * API JSON lấy danh sách deadline sắp tới thực tế (phục vụ cập nhật real-time trên client)
+     */
+    public function deadlines(): JsonResponse
+    {
+        $userId = (int) Auth::id();
+        $deadlines = $this->getUpcomingDeadlines($userId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $deadlines,
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Lấy danh sách Deadline sắp tới từ CSDL thực tế (SuKien, BaiTap, CongViec)
+     *
+     * @return array<int, array{
+     *     id: string,
+     *     tieu_de: string,
+     *     mon_hoc: string,
+     *     con_lai: string,
+     *     thoi_gian: string,
+     *     badge_class: string
+     * }>
+     */
+    public function getUpcomingDeadlines(int $userId): array
+    {
+        $now = Carbon::now();
+        $thresholdPast = $now->copy()->subDays(7)->startOfDay();
+        $deadlines = collect();
+
+        // 1. Sự kiện loại deadline trong bảng su_kien
+        $suKienDeadlines = SuKien::with(['monHoc', 'congViec.duAn'])
+            ->where('user_id', $userId)
+            ->whereIn('loai_su_kien', ['deadline', 'han_chot'])
+            ->where('thoi_gian_bat_dau', '>=', $thresholdPast)
+            ->orderBy('thoi_gian_bat_dau', 'asc')
+            ->get();
+
+        foreach ($suKienDeadlines as $sk) {
+            $dueTime = $sk->thoi_gian_bat_dau;
+            if (! $dueTime) {
+                continue;
+            }
+
+            $monHocName = $sk->monHoc?->ten_mon
+                ?? $sk->congViec?->duAn?->ten_du_an
+                ?? (! empty($sk->mo_ta) ? $sk->mo_ta : 'Deadline');
+
+            $deadlines->push([
+                'id' => 'sk-'.$sk->id,
+                'tieu_de' => $sk->tieu_de,
+                'mon_hoc' => $monHocName,
+                'due_time' => $dueTime,
+            ]);
+        }
+
+        // 2. Bài tập môn học chưa hoàn thành (bảng bai_tap)
+        $baiTapDeadlines = BaiTap::with('monHoc')
+            ->whereHas('monHoc', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->where('trang_thai', '!=', 'da_hoan_thanh')
+            ->whereNotNull('han_nop')
+            ->where('han_nop', '>=', $thresholdPast)
+            ->orderBy('han_nop', 'asc')
+            ->get();
+
+        foreach ($baiTapDeadlines as $bt) {
+            $dueTime = Carbon::parse($bt->han_nop);
+            $deadlines->push([
+                'id' => 'bt-'.$bt->id,
+                'tieu_de' => $bt->tieu_de,
+                'mon_hoc' => $bt->monHoc?->ten_mon ?? 'Môn học',
+                'due_time' => $dueTime,
+            ]);
+        }
+
+        // 3. Công việc có deadline chưa hoàn thành (bảng cong_viec)
+        $syncedCongViecIds = $suKienDeadlines->pluck('cong_viec_id')->filter()->toArray();
+
+        $congViecDeadlines = CongViec::with('duAn')
+            ->where('user_id', $userId)
+            ->where('trang_thai', '!=', 'hoan_thanh')
+            ->whereNotNull('deadline')
+            ->where('deadline', '>=', $thresholdPast)
+            ->whereNotIn('id', $syncedCongViecIds)
+            ->orderBy('deadline', 'asc')
+            ->get();
+
+        foreach ($congViecDeadlines as $cv) {
+            $dueTime = $cv->deadline;
+            if (! $dueTime) {
+                continue;
+            }
+
+            $deadlines->push([
+                'id' => 'cv-'.$cv->id,
+                'tieu_de' => $cv->ten_cong_viec,
+                'mon_hoc' => $cv->duAn?->ten_du_an ?? 'Công việc',
+                'due_time' => $dueTime,
+            ]);
+        }
+
+        // Sắp xếp tăng dần theo thời hạn (Quá hạn -> Hôm nay -> Ngày mai -> Tương lai)
+        return $deadlines->sortBy('due_time')->values()->take(10)->map(function ($item) use ($now) {
+            /** @var Carbon $dueTime */
+            $dueTime = $item['due_time'];
+
+            if ($dueTime->lt($now) && ! $dueTime->isToday()) {
+                $conLai = 'Quá hạn';
+                $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+            } elseif ($dueTime->isToday()) {
+                $hoursLeft = (int) $now->diffInHours($dueTime, false);
+                $conLai = $hoursLeft > 0 ? "Còn {$hoursLeft}h" : 'Hôm nay';
+                $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+            } elseif ($dueTime->isTomorrow()) {
+                $conLai = 'Ngày mai';
+                $badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+            } else {
+                $days = max(1, (int) ceil($now->floatDiffInDays($dueTime, false)));
+                $conLai = "Còn {$days} ngày";
+                $badgeClass = $days <= 3
+                    ? 'bg-warning-subtle text-warning border border-warning-subtle'
+                    : 'bg-primary-subtle text-primary border border-primary-subtle';
+            }
+
+            return [
+                'id' => $item['id'],
+                'tieu_de' => $item['tieu_de'],
+                'mon_hoc' => $item['mon_hoc'],
+                'con_lai' => $conLai,
+                'thoi_gian' => $dueTime->format('H:i d/m'),
+                'badge_class' => $badgeClass,
+            ];
+        })->all();
+    }
+
+    /**
+     * Lấy danh sách lịch trình hôm nay từ CSDL
+     *
+     * @return array<int, array{
+     *     thoi_gian: string,
+     *     tieu_de: string,
+     *     dia_diem: string,
+     *     badge: string,
+     *     badge_class: string
+     * }>
+     */
+    protected function getTodaySchedule(int $userId): array
+    {
+        $today = Carbon::today();
+
+        return SuKien::where('user_id', $userId)
+            ->whereDate('thoi_gian_bat_dau', $today->toDateString())
+            ->orderBy('thoi_gian_bat_dau', 'asc')
+            ->take(6)
+            ->get()
+            ->map(function ($evt) {
+                $start = $evt->thoi_gian_bat_dau ? $evt->thoi_gian_bat_dau->format('H:i') : '08:00';
+                $end = $evt->thoi_gian_ket_thuc ? $evt->thoi_gian_ket_thuc->format('H:i') : null;
+                $timeStr = $end ? "{$start} - {$end}" : $start;
+
+                $type = str_replace('_', '-', $evt->loai_su_kien ?? '');
+
+                return [
+                    'thoi_gian' => $timeStr,
+                    'tieu_de' => $evt->tieu_de,
+                    'dia_diem' => $evt->mo_ta ?: 'Chưa có địa điểm',
+                    'badge' => match ($type) {
+                        'hoc-tap' => 'Học tập',
+                        'tap-luyen' => 'Tập luyện',
+                        'deadline' => 'Deadline',
+                        'cong-viec' => 'Công việc',
+                        default => 'Cá nhân',
+                    },
+                    'badge_class' => match ($type) {
+                        'hoc-tap' => 'bg-primary-subtle text-primary border border-primary-subtle',
+                        'tap-luyen' => 'bg-success-subtle text-success border border-success-subtle',
+                        'deadline' => 'bg-danger-subtle text-danger border border-danger-subtle',
+                        'cong-viec' => 'bg-warning-subtle text-warning border border-warning-subtle',
+                        default => 'bg-purple-subtle text-purple border border-purple-subtle',
+                    },
+                ];
+            })
+            ->all();
     }
 }

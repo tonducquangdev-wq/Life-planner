@@ -24,8 +24,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Tùy chỉnh Dashboard & Calendar -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
+    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ file_exists(public_path('css/calendar.css')) ? filemtime(public_path('css/calendar.css')) : '1.0' }}">
+    @include('layouts.pwa-head')
 
 </head>
 
@@ -223,13 +224,13 @@
                                 @forelse($sapDenHan ?? [] as $deadline)
                                 @php
                                 $conLaiText = $deadline['con_lai'] ?? '';
-                                $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2');
+                                $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2') || str_contains($conLaiText, 'Quá hạn') || str_contains($conLaiText, 'h');
                                 @endphp
                                 <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }}">
                                     <div class="d-flex align-items-center justify-content-between gap-2 mb-1.5">
                                         <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1">
                                             <span class="deadline-dot {{ $isUrgent ? 'urgent' : 'upcoming' }} flex-shrink-0" aria-hidden="true"></span>
-                                            <span class="deadline-title fw-bold text-truncate text-dark" title="{{ $deadline['tieu_de'] ?? '' }}">
+                                            <span class="deadline-title fw-bold text-dark" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{{ $deadline['tieu_de'] ?? '' }}">
                                                 {{ $deadline['tieu_de'] ?? 'Nộp bài tập' }}
                                             </span>
                                         </div>
@@ -242,7 +243,7 @@
                                             <i class="bi bi-mortarboard me-1 text-primary opacity-75"></i>{{ $deadline['mon_hoc'] ?? 'Môn học' }}
                                         </span>
                                         <span class="flex-shrink-0 text-secondary deadline-date">
-                                            <i class="bi bi-clock me-1 text-warning opacity-75"></i>23:59
+                                            <i class="bi bi-clock me-1 text-warning opacity-75"></i>{{ $deadline['thoi_gian'] ?? '23:59' }}
                                         </span>
                                     </div>
                                 </div>
@@ -1022,11 +1023,14 @@
         </div>
     </div>
 
-    <!-- Floating Action Menu (Góc phải bên dưới) -->
+    <!-- Floating Action Menu (Góc phải bên dưới, đã tích hợp bottom-nav & profile-modal) -->
     <x-floating-menu />
 
+    <!-- PWA Install Modal -->
+    <x-pwa-install-modal />
+
     <!-- Custom Calendar JS Engine -->
-    <script src="{{ asset('js/calendar.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/calendar.js') }}?v={{ file_exists(public_path('js/calendar.js')) ? filemtime(public_path('js/calendar.js')) : '1.0' }}"></script>
 </body>
 
 

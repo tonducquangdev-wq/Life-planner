@@ -37,9 +37,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Dashboard dùng chung của hệ thống -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
     <!-- CSS riêng của Module Thể Chất & Tập Luyện -->
-    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ file_exists(public_path('css/tap-luyen.css')) ? filemtime(public_path('css/tap-luyen.css')) : '1.0' }}">
+    @include('layouts.pwa-head')
 </head>
 
 <body>
@@ -2768,6 +2769,12 @@
 
     <!-- Floating Action Menu (Góc phải bên dưới) -->
     <x-floating-menu />
+
+    <!-- Mobile Bottom Navigation Bar (Flutter Style) -->
+    @include('layouts.bottom-nav')
+
+    <!-- PWA Install Modal -->
+    <x-pwa-install-modal />
 </body>
 
 </html>

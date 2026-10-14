@@ -37,7 +37,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS Tùy chỉnh Dashboard -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
+
+    <!-- CẤU HÌNH PWA & WEB PUSH (MANIFEST, ICONS, SERVICE WORKER) -->
+    @include('layouts.pwa-head')
 
     <style>
         .profile-cover-banner {
@@ -450,6 +453,9 @@
 
     <!-- Floating Action Menu & Mobile Bottom Navigation Bar -->
     <x-floating-menu />
+
+    <!-- MODAL HƯỚNG DẪN CÀI ĐẶT PWA CHO ANDROID & IOS -->
+    @include('components.pwa-install-modal')
 </body>
 </html>
 

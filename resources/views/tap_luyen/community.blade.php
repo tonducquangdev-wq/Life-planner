@@ -38,8 +38,8 @@
     <!-- Google Font: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard & Workout CSS -->
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
+    <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ file_exists(public_path('css/tap-luyen.css')) ? filemtime(public_path('css/tap-luyen.css')) : '1.0' }}">
 
     <style>
         :root {
