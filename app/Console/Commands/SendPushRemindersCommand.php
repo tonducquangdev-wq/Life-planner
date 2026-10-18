@@ -54,7 +54,8 @@ class SendPushRemindersCommand extends Command
             // Kiểm tra tùy chọn loại thông báo của người dùng
             $shouldNotify = match ($suKien->loai_su_kien) {
                 'hoc_tap' => (bool) $user->thong_bao_lich_hoc,
-                'deadline', 'cong_viec' => (bool) $user->thong_bao_deadline,
+                'deadline' => (bool) $user->thong_bao_deadline,
+                'cong_viec' => (bool) $user->thong_bao_cong_viec,
                 'tap_luyen' => (bool) $user->thong_bao_tap_luyen,
                 default => true,
             };
@@ -90,7 +91,8 @@ class SendPushRemindersCommand extends Command
                 'noi_dung' => $body,
                 'loai_thong_bao' => match ($suKien->loai_su_kien) {
                     'hoc_tap' => 'lich_hoc',
-                    'deadline', 'cong_viec' => 'deadline',
+                    'deadline' => 'deadline',
+                    'cong_viec' => 'cong_viec',
                     'tap_luyen' => 'tap_luyen',
                     default => 'he_thong',
                 },
@@ -124,7 +126,7 @@ class SendPushRemindersCommand extends Command
 
         foreach ($congViecs as $cv) {
             $user = $cv->user;
-            if (! $user || ! $user->thong_bao_enabled || ! $user->thong_bao_deadline) {
+            if (! $user || ! $user->thong_bao_enabled || ! $user->thong_bao_cong_viec) {
                 continue;
             }
 
@@ -142,7 +144,7 @@ class SendPushRemindersCommand extends Command
                 'user_id' => $user->id,
                 'tieu_de' => $title,
                 'noi_dung' => $body,
-                'loai_thong_bao' => 'deadline',
+                'loai_thong_bao' => 'cong_viec',
                 'da_doc' => false,
             ]);
 

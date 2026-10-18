@@ -3,18 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Life Planner - Lịch Cá Nhân (Calendar First)</title>
 
-    <!-- Khởi tạo Giao diện Sáng (Light Theme Only) -->
-    <script>
-        (function() {
-            document.documentElement.setAttribute('data-bs-theme', 'light');
-            document.documentElement.classList.remove('dark-theme');
-            localStorage.setItem('theme', 'light');
-        })();
-    </script>
 
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -59,8 +51,14 @@
                 </div>
             </div>
 
-            <!-- Khu vực người dùng -->
-            <div class="header-actions d-flex align-items-center gap-3">
+            <!-- Khu vực người dùng & Toggle Theme -->
+            <div class="header-actions d-flex align-items-center gap-2 gap-sm-3">
+
+                <!-- Nút Chuyển Giao Diện Sáng / Tối (Dark Mode Toggle) -->
+                <button type="button" class="btn btn-light rounded-circle p-2 topbar-theme-toggle border-0 shadow-2xs d-flex align-items-center justify-content-center cursor-pointer" id="calendarThemeToggle" title="Chuyển chế độ Sáng / Tối" onclick="window.LifePlannerTheme && window.LifePlannerTheme.toggle()" style="width: 40px; height: 40px;">
+                    <i class="bi bi-moon-stars-fill theme-icon-dark text-warning fs-6"></i>
+                    <i class="bi bi-sun-fill theme-icon-light text-warning fs-6 d-none"></i>
+                </button>
 
                 <!-- Avatar người dùng & dropdown -->
                 <div class="user-profile dropdown">
@@ -213,20 +211,38 @@
                     <!-- CARD 2: DEADLINE SẮP ĐẾN HẠN (COMPACT TASK/DEADLINE LIST) -->
                     <div class="side-card mb-4 mb-lg-0">
                         <div class="side-card-header d-flex align-items-center justify-content-between py-3 px-3.5">
-                            <h6 class="side-card-title fs-7 mb-0">
+                            <h6 class="side-card-title fs-7 mb-0 d-flex align-items-center gap-2">
                                 <i class="bi bi-hourglass-split text-warning"></i>
                                 <span>Deadline sắp tới</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1" title="Tự động đồng bộ thời gian thực" id="realtimeDeadlineBadge">
+                                    <span class="spinner-grow spinner-grow-sm text-success" style="width: 6px; height: 6px;" role="status" aria-hidden="true"></span>
+                                    <span>Live</span>
+                                </span>
                             </h6>
-                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">{{ count($sapDenHan ?? []) }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1 fs-8 fw-semibold" id="upcomingDeadlineCountBadge">{{ count($sapDenHan ?? []) }}</span>
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" id="btnManualRefreshDeadlines" title="Cập nhật deadline ngay" style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: transform 0.3s ease;">
+                                    <i class="bi bi-arrow-clockwise fs-6"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body p-3">
                             <div class="deadline-compact-list" id="upcomingDeadlineList">
                                 @forelse($sapDenHan ?? [] as $deadline)
                                 @php
                                 $conLaiText = $deadline['con_lai'] ?? '';
-                                $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2') || str_contains($conLaiText, 'Quá hạn') || str_contains($conLaiText, 'h');
+                                $isUrgent = str_contains($conLaiText, 'Hôm nay') || str_contains($conLaiText, 'Còn 1') || str_contains($conLaiText, 'Còn 2') || str_contains($conLaiText, 'Quá hạn') || str_contains($conLaiText, 'h') || str_contains($conLaiText, 'p');
+                                $dueTimeRaw = $deadline['due_time_raw'] ?? '';
+                                $rawId = $deadline['raw_id'] ?? '';
+                                $sourceType = $deadline['source_type'] ?? 'su_kien';
                                 @endphp
-                                <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }}">
+                                <div class="deadline-compact-item {{ $isUrgent ? 'urgent' : 'upcoming' }} cursor-pointer"
+                                     data-id="{{ $deadline['id'] ?? '' }}"
+                                     data-raw-id="{{ $rawId }}"
+                                     data-source="{{ $sourceType }}"
+                                     data-due-time="{{ $dueTimeRaw }}"
+                                     style="cursor: pointer;"
+                                     title="Nhấn để xem / thao tác sự kiện">
                                     <div class="d-flex align-items-center justify-content-between gap-2 mb-1.5">
                                         <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1">
                                             <span class="deadline-dot {{ $isUrgent ? 'urgent' : 'upcoming' }} flex-shrink-0" aria-hidden="true"></span>
@@ -234,7 +250,7 @@
                                                 {{ $deadline['tieu_de'] ?? 'Nộp bài tập' }}
                                             </span>
                                         </div>
-                                        <span class="deadline-tag badge {{ $isUrgent ? 'badge-urgent' : 'badge-upcoming' }} rounded-pill flex-shrink-0">
+                                        <span class="deadline-tag badge {{ $isUrgent ? 'badge-urgent' : 'badge-upcoming' }} rounded-pill flex-shrink-0" data-role="badge-con-lai">
                                             {{ $conLaiText }}
                                         </span>
                                     </div>

@@ -771,10 +771,205 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/'/g, '&#039;');
     }
 
-    async function refreshUpcomingDeadlines() {
+    // ==========================================================================
+    // REAL-TIME DEADLINE ENGINE & MULTI-TAB SYNCHRONIZATION
+    // ==========================================================================
+    const calendarSyncChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('life_planner_sync') : null;
+
+    function broadcastCalendarSync() {
+        try {
+            if (calendarSyncChannel) {
+                calendarSyncChannel.postMessage({ type: 'CALENDAR_UPDATED', time: Date.now() });
+            }
+            localStorage.setItem('life_planner_calendar_sync', String(Date.now()));
+        } catch (err) {}
+    }
+
+    if (calendarSyncChannel) {
+        calendarSyncChannel.onmessage = function (e) {
+            if (e.data && e.data.type === 'CALENDAR_UPDATED') {
+                refreshUpcomingDeadlines();
+                loadEventsFromDatabase();
+            }
+        };
+    }
+
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'life_planner_calendar_sync') {
+            refreshUpcomingDeadlines();
+            loadEventsFromDatabase();
+        }
+    });
+
+    function computeDeadlineToNow(dueTimeStr) {
+        if (!dueTimeStr) {
+            return { text: '', isUrgent: false, isOverdue: false, tagClass: 'badge-upcoming', itemClass: 'upcoming' };
+        }
+        const target = new Date(dueTimeStr);
+        if (isNaN(target.getTime())) {
+            return { text: '', isUrgent: false, isOverdue: false, tagClass: 'badge-upcoming', itemClass: 'upcoming' };
+        }
+
+        const now = new Date();
+        const diffMs = target.getTime() - now.getTime();
+
+        // Nếu đã quá hạn so với thời gian thực -> đánh dấu isOverdue để loại bỏ
+        if (diffMs < 0) {
+            return {
+                text: '',
+                isUrgent: false,
+                isOverdue: true,
+                tagClass: 'badge-urgent',
+                itemClass: 'urgent'
+            };
+        }
+
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        const isToday = (target.getDate() === now.getDate() &&
+                         target.getMonth() === now.getMonth() &&
+                         target.getFullYear() === now.getFullYear());
+
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+        const isTomorrow = (target.getDate() === tomorrow.getDate() &&
+                            target.getMonth() === tomorrow.getMonth() &&
+                            target.getFullYear() === tomorrow.getFullYear());
+
+        let label = '';
+        let isUrgent = false;
+
+        if (diffMins <= 0) {
+            label = 'Đến hạn ngay';
+            isUrgent = true;
+        } else if (diffMins < 60) {
+            label = `Còn ${diffMins}p`;
+            isUrgent = true;
+        } else if (isToday) {
+            const remainMins = diffMins % 60;
+            label = remainMins > 0 ? `Còn ${diffHours}h ${remainMins}p` : `Còn ${diffHours}h`;
+            isUrgent = true;
+        } else if (isTomorrow) {
+            label = 'Ngày mai';
+            isUrgent = true;
+        } else if (diffDays <= 3) {
+            label = `Còn ${Math.max(1, diffDays)} ngày`;
+            isUrgent = true;
+        } else {
+            label = `Còn ${diffDays} ngày`;
+            isUrgent = false;
+        }
+
+        return {
+            text: label,
+            isUrgent: isUrgent,
+            isOverdue: false,
+            tagClass: isUrgent ? 'badge-urgent' : 'badge-upcoming',
+            itemClass: isUrgent ? 'urgent' : 'upcoming'
+        };
+    }
+
+    function updateDeadlineCountdowns() {
         const listEl = document.getElementById('upcomingDeadlineList');
         const countBadge = document.getElementById('upcomingDeadlineCountBadge');
         if (!listEl) return;
+
+        const items = listEl.querySelectorAll('.deadline-compact-item');
+        if (!items || items.length === 0) return;
+
+        const now = new Date();
+        let hasRemoved = false;
+
+        items.forEach(item => {
+            const dueTime = item.getAttribute('data-due-time');
+            if (!dueTime) return;
+
+            const target = new Date(dueTime);
+            if (!isNaN(target.getTime()) && target < now) {
+                // Đã quá hạn so với thời gian thực -> tự động xóa khỏi danh sách deadline sắp tới
+                item.remove();
+                hasRemoved = true;
+                return;
+            }
+
+            const computed = computeDeadlineToNow(dueTime);
+            if (!computed.text || computed.isOverdue) {
+                item.remove();
+                hasRemoved = true;
+                return;
+            }
+
+            const badge = item.querySelector('[data-role="badge-con-lai"]') || item.querySelector('.deadline-tag');
+            if (badge) {
+                badge.textContent = computed.text;
+                badge.className = `deadline-tag badge ${computed.tagClass} rounded-pill flex-shrink-0`;
+            }
+
+            if (computed.itemClass === 'urgent') {
+                item.classList.add('urgent');
+                item.classList.remove('upcoming');
+            } else {
+                item.classList.remove('urgent');
+                item.classList.add('upcoming');
+            }
+
+            const dot = item.querySelector('.deadline-dot');
+            if (dot) {
+                dot.className = `deadline-dot ${computed.itemClass} flex-shrink-0`;
+            }
+        });
+
+        if (hasRemoved) {
+            const remainingItems = listEl.querySelectorAll('.deadline-compact-item');
+            if (countBadge) countBadge.textContent = remainingItems.length;
+
+            if (remainingItems.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-neu-card py-3">
+                        <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
+                        <p class="mb-0 fs-8 text-muted">Không có deadline sắp tới!</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    function attachDeadlinesClickHandlers() {
+        document.querySelectorAll('#upcomingDeadlineList .deadline-compact-item').forEach(item => {
+            if (item.getAttribute('data-has-click-handler') === 'true') return;
+            item.setAttribute('data-has-click-handler', 'true');
+
+            item.addEventListener('click', function () {
+                const source = this.getAttribute('data-source');
+                const rawId = parseInt(this.getAttribute('data-raw-id'));
+
+                if (source === 'su_kien' && rawId) {
+                    openEditModal(rawId);
+                } else if (source === 'cong_viec') {
+                    window.location.href = '/cong-viec';
+                } else if (source === 'bai_tap') {
+                    window.location.href = '/mon-hoc';
+                }
+            });
+        });
+    }
+
+    let isRefreshingDeadlines = false;
+
+    async function refreshUpcomingDeadlines(isManual = false) {
+        const listEl = document.getElementById('upcomingDeadlineList');
+        const countBadge = document.getElementById('upcomingDeadlineCountBadge');
+        const refreshBtn = document.getElementById('btnManualRefreshDeadlines');
+        if (!listEl) return;
+
+        if (isRefreshingDeadlines) return;
+        isRefreshingDeadlines = true;
+
+        if (isManual && refreshBtn) {
+            refreshBtn.querySelector('i')?.classList.add('spin-animation');
+        }
 
         try {
             const res = await fetch('/calendar/deadlines', {
@@ -786,7 +981,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!res.ok) return;
             const resData = await res.json();
             if (resData.success && Array.isArray(resData.data)) {
-                const deadlines = resData.data;
+                const now = new Date();
+                // Chỉ lấy những deadline từ thời điểm hiện tại trở đi (loại bỏ mọi deadline quá hạn)
+                const deadlines = resData.data.filter(dl => {
+                    if (!dl.due_time_raw) return false;
+                    const target = new Date(dl.due_time_raw);
+                    return !isNaN(target.getTime()) && target >= now;
+                });
+
                 if (countBadge) countBadge.textContent = deadlines.length;
 
                 if (deadlines.length === 0) {
@@ -801,13 +1003,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 let html = '';
                 deadlines.forEach(dl => {
-                    const conLaiText = dl.con_lai || '';
-                    const isUrgent = conLaiText.includes('Hôm nay') || conLaiText.includes('Còn 1') || conLaiText.includes('Còn 2') || conLaiText.includes('Quá hạn') || conLaiText.includes('h');
-                    const itemClass = isUrgent ? 'urgent' : 'upcoming';
-                    const tagClass = isUrgent ? 'badge-urgent' : 'badge-upcoming';
+                    const dueTimeRaw = dl.due_time_raw || '';
+                    const rawId = dl.raw_id || '';
+                    const sourceType = dl.source_type || 'su_kien';
+                    const computed = computeDeadlineToNow(dueTimeRaw);
+                    const conLaiText = computed.text || dl.con_lai || 'Sắp tới';
+                    const itemClass = computed.itemClass || 'upcoming';
+                    const tagClass = computed.tagClass || (itemClass === 'urgent' ? 'badge-urgent' : 'badge-upcoming');
 
                     html += `
-                        <div class="deadline-compact-item ${itemClass}">
+                        <div class="deadline-compact-item ${itemClass} cursor-pointer"
+                             data-id="${escapeHtml(dl.id || '')}"
+                             data-raw-id="${escapeHtml(rawId)}"
+                             data-source="${escapeHtml(sourceType)}"
+                             data-due-time="${escapeHtml(dueTimeRaw)}"
+                             style="cursor: pointer;"
+                             title="Nhấn để xem / thao tác sự kiện">
                             <div class="d-flex align-items-center justify-content-between gap-2 mb-1.5">
                                 <div class="d-flex align-items-center gap-2 min-w-0 flex-grow-1">
                                     <span class="deadline-dot ${itemClass} flex-shrink-0" aria-hidden="true"></span>
@@ -815,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         ${escapeHtml(dl.tieu_de || 'Nộp bài tập')}
                                     </span>
                                 </div>
-                                <span class="deadline-tag badge ${tagClass} rounded-pill flex-shrink-0">
+                                <span class="deadline-tag badge ${tagClass} rounded-pill flex-shrink-0" data-role="badge-con-lai">
                                     ${escapeHtml(conLaiText)}
                                 </span>
                             </div>
@@ -832,11 +1043,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 listEl.innerHTML = html;
+                attachDeadlinesClickHandlers();
             }
         } catch (e) {
             console.warn('Lỗi cập nhật upcoming deadlines:', e);
+        } finally {
+            isRefreshingDeadlines = false;
+            if (isManual && refreshBtn) {
+                setTimeout(() => {
+                    refreshBtn.querySelector('i')?.classList.remove('spin-animation');
+                }, 400);
+            }
         }
     }
+
+    // Gắn sự kiện click cho nút làm mới thủ công
+    document.getElementById('btnManualRefreshDeadlines')?.addEventListener('click', function () {
+        refreshUpcomingDeadlines(true);
+    });
+
+    // Đồng bộ thời gian thực: Tự động đếm lùi countdown mỗi 15 giây
+    setInterval(updateDeadlineCountdowns, 15000);
+
+    // Đồng bộ thời gian thực: Polling kiểm tra deadline mới từ server mỗi 25 giây
+    setInterval(function () {
+        if (!document.hidden) {
+            refreshUpcomingDeadlines();
+        }
+    }, 25000);
+
+    // Tự động làm mới khi người dùng quay lại tab
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            updateDeadlineCountdowns();
+            refreshUpcomingDeadlines();
+        }
+    });
+
+    window.addEventListener('focus', function () {
+        updateDeadlineCountdowns();
+        refreshUpcomingDeadlines();
+    });
 
     // Toggle switch thông báo UI
     document.querySelectorAll('.notif-toggle-switch').forEach(switchEl => {
@@ -937,7 +1184,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (response.ok && result.success) {
                 modalToHide?.hide();
                 showToast(result.message || 'Lưu sự kiện thành công!');
+                broadcastCalendarSync();
                 await loadEventsFromDatabase();
+                await refreshUpcomingDeadlines();
                 if (targetDay) {
                     openDayDetailModal(targetDay);
                 }
@@ -1299,7 +1548,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (response.ok && result.success) {
                 deleteChoiceModal?.hide();
                 showToast(result.message || 'Đã xóa sự kiện thành công!');
+                broadcastCalendarSync();
                 await loadEventsFromDatabase();
+                await refreshUpcomingDeadlines();
                 openDayDetailModal(day);
             } else {
                 showToast(result.message || 'Không thể xóa sự kiện này.', false);
@@ -1459,10 +1710,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. Vẽ lưới lịch ban đầu lập tức khi vừa mở trang
     renderCalendarGrid();
 
-    // 2. Nạp dữ liệu sự kiện thực từ Database
+    // 2. Kích hoạt đếm ngược và bắt sự kiện click cho các thẻ deadline ban đầu từ Server
+    attachDeadlinesClickHandlers();
+    updateDeadlineCountdowns();
+
+    // 3. Nạp dữ liệu sự kiện thực từ Database
     loadEventsFromDatabase();
 
-    // 3. Kiểm tra tham số ?action=create trên URL để mở modal Thêm sự kiện
+    // 4. Kiểm tra tham số ?action=create trên URL để mở modal Thêm sự kiện
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'create') {
         setTimeout(() => {

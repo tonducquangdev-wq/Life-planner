@@ -67,8 +67,12 @@ class CalendarController extends Controller
      *
      * @return array<int, array{
      *     id: string,
+     *     raw_id: int|null,
+     *     source_type: string,
      *     tieu_de: string,
      *     mon_hoc: string,
+     *     due_time_raw: string,
+     *     due_timestamp: int,
      *     con_lai: string,
      *     thoi_gian: string,
      *     badge_class: string
@@ -77,20 +81,19 @@ class CalendarController extends Controller
     public function getUpcomingDeadlines(int $userId): array
     {
         $now = Carbon::now();
-        $thresholdPast = $now->copy()->subDays(7)->startOfDay();
         $deadlines = collect();
 
-        // 1. Sự kiện loại deadline trong bảng su_kien
+        // 1. Sự kiện loại deadline trong bảng su_kien (từ thời điểm hiện tại trở đi)
         $suKienDeadlines = SuKien::with(['monHoc', 'congViec.duAn'])
             ->where('user_id', $userId)
             ->whereIn('loai_su_kien', ['deadline', 'han_chot'])
-            ->where('thoi_gian_bat_dau', '>=', $thresholdPast)
+            ->where('thoi_gian_bat_dau', '>=', $now)
             ->orderBy('thoi_gian_bat_dau', 'asc')
             ->get();
 
         foreach ($suKienDeadlines as $sk) {
             $dueTime = $sk->thoi_gian_bat_dau;
-            if (! $dueTime) {
+            if (! $dueTime || $dueTime->lt($now)) {
                 continue;
             }
 
@@ -100,91 +103,113 @@ class CalendarController extends Controller
 
             $deadlines->push([
                 'id' => 'sk-'.$sk->id,
+                'raw_id' => $sk->id,
+                'source_type' => 'su_kien',
                 'tieu_de' => $sk->tieu_de,
                 'mon_hoc' => $monHocName,
                 'due_time' => $dueTime,
             ]);
         }
 
-        // 2. Bài tập môn học chưa hoàn thành (bảng bai_tap)
+        // 2. Bài tập môn học chưa hoàn thành có hạn nộp từ hiện tại trở đi (bảng bai_tap)
         $baiTapDeadlines = BaiTap::with('monHoc')
             ->whereHas('monHoc', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
             ->where('trang_thai', '!=', 'da_hoan_thanh')
             ->whereNotNull('han_nop')
-            ->where('han_nop', '>=', $thresholdPast)
+            ->where('han_nop', '>=', $now)
             ->orderBy('han_nop', 'asc')
             ->get();
 
         foreach ($baiTapDeadlines as $bt) {
             $dueTime = Carbon::parse($bt->han_nop);
+            if ($dueTime->lt($now)) {
+                continue;
+            }
+
             $deadlines->push([
                 'id' => 'bt-'.$bt->id,
+                'raw_id' => $bt->id,
+                'source_type' => 'bai_tap',
                 'tieu_de' => $bt->tieu_de,
                 'mon_hoc' => $bt->monHoc?->ten_mon ?? 'Môn học',
                 'due_time' => $dueTime,
             ]);
         }
 
-        // 3. Công việc có deadline chưa hoàn thành (bảng cong_viec)
+        // 3. Công việc có deadline chưa hoàn thành từ hiện tại trở đi (bảng cong_viec)
         $syncedCongViecIds = $suKienDeadlines->pluck('cong_viec_id')->filter()->toArray();
 
         $congViecDeadlines = CongViec::with('duAn')
             ->where('user_id', $userId)
             ->where('trang_thai', '!=', 'hoan_thanh')
             ->whereNotNull('deadline')
-            ->where('deadline', '>=', $thresholdPast)
+            ->where('deadline', '>=', $now)
             ->whereNotIn('id', $syncedCongViecIds)
             ->orderBy('deadline', 'asc')
             ->get();
 
         foreach ($congViecDeadlines as $cv) {
             $dueTime = $cv->deadline;
-            if (! $dueTime) {
+            if (! $dueTime || $dueTime->lt($now)) {
                 continue;
             }
 
             $deadlines->push([
                 'id' => 'cv-'.$cv->id,
+                'raw_id' => $cv->id,
+                'source_type' => 'cong_viec',
                 'tieu_de' => $cv->ten_cong_viec,
                 'mon_hoc' => $cv->duAn?->ten_du_an ?? 'Công việc',
                 'due_time' => $dueTime,
             ]);
         }
 
-        // Sắp xếp tăng dần theo thời hạn (Quá hạn -> Hôm nay -> Ngày mai -> Tương lai)
-        return $deadlines->sortBy('due_time')->values()->take(10)->map(function ($item) use ($now) {
-            /** @var Carbon $dueTime */
-            $dueTime = $item['due_time'];
+        // Sắp xếp tăng dần theo thời hạn sắp tới (Hôm nay -> Ngày mai -> Tương lai)
+        return $deadlines->filter(fn ($item) => $item['due_time']->gte($now))
+            ->sortBy('due_time')
+            ->values()
+            ->take(10)
+            ->map(function ($item) use ($now) {
+                /** @var Carbon $dueTime */
+                $dueTime = $item['due_time'];
 
-            if ($dueTime->lt($now) && ! $dueTime->isToday()) {
-                $conLai = 'Quá hạn';
-                $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
-            } elseif ($dueTime->isToday()) {
-                $hoursLeft = (int) $now->diffInHours($dueTime, false);
-                $conLai = $hoursLeft > 0 ? "Còn {$hoursLeft}h" : 'Hôm nay';
-                $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
-            } elseif ($dueTime->isTomorrow()) {
-                $conLai = 'Ngày mai';
-                $badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
-            } else {
-                $days = max(1, (int) ceil($now->floatDiffInDays($dueTime, false)));
-                $conLai = "Còn {$days} ngày";
-                $badgeClass = $days <= 3
-                    ? 'bg-warning-subtle text-warning border border-warning-subtle'
-                    : 'bg-primary-subtle text-primary border border-primary-subtle';
-            }
+                if ($dueTime->isToday()) {
+                    $hoursLeft = (int) $now->diffInHours($dueTime, false);
+                    $minutesLeft = (int) $now->diffInMinutes($dueTime, false);
+                    if ($hoursLeft > 0) {
+                        $conLai = "Còn {$hoursLeft}h";
+                    } elseif ($minutesLeft > 0) {
+                        $conLai = "Còn {$minutesLeft}p";
+                    } else {
+                        $conLai = 'Đến hạn ngay';
+                    }
+                    $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+                } elseif ($dueTime->isTomorrow()) {
+                    $conLai = 'Ngày mai';
+                    $badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                } else {
+                    $days = max(1, (int) ceil($now->floatDiffInDays($dueTime, false)));
+                    $conLai = "Còn {$days} ngày";
+                    $badgeClass = $days <= 3
+                        ? 'bg-warning-subtle text-warning border border-warning-subtle'
+                        : 'bg-primary-subtle text-primary border border-primary-subtle';
+                }
 
-            return [
-                'id' => $item['id'],
-                'tieu_de' => $item['tieu_de'],
-                'mon_hoc' => $item['mon_hoc'],
-                'con_lai' => $conLai,
-                'thoi_gian' => $dueTime->format('H:i d/m'),
-                'badge_class' => $badgeClass,
-            ];
-        })->all();
+                return [
+                    'id' => $item['id'],
+                    'raw_id' => $item['raw_id'] ?? null,
+                    'source_type' => $item['source_type'] ?? 'su_kien',
+                    'tieu_de' => $item['tieu_de'],
+                    'mon_hoc' => $item['mon_hoc'],
+                    'due_time_raw' => $dueTime->toIso8601String(),
+                    'due_timestamp' => $dueTime->timestamp,
+                    'con_lai' => $conLai,
+                    'thoi_gian' => $dueTime->format('H:i d/m'),
+                    'badge_class' => $badgeClass,
+                ];
+            })->all();
     }
 
     /**

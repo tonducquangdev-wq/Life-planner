@@ -74,6 +74,20 @@
                     <span class="menu-item-label">📲 Cài App</span>
                 </button>
             </li>
+
+            <!-- 6. Chuyển Đổi Giao Diện Sáng / Tối (Dark Mode) -->
+            <li>
+                <button type="button" 
+                   class="floating-menu-item w-100 text-start border-0 bg-transparent cursor-pointer"
+                   onclick="window.LifePlannerTheme && window.LifePlannerTheme.toggle()"
+                   title="Chuyển đổi giao diện Sáng / Tối nhanh">
+                    <span class="menu-item-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                        <i class="bi bi-moon-stars-fill theme-icon-dark"></i>
+                        <i class="bi bi-sun-fill theme-icon-light d-none"></i>
+                    </span>
+                    <span class="menu-item-label theme-label-text">🌙 Giao diện Tối</span>
+                </button>
+            </li>
         </ul>
     </div>
 

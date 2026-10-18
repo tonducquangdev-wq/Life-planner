@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\PushSubscription;
 use App\Models\User;
+use App\Services\WebPushService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -240,5 +241,75 @@ class PwaAndPushNotificationTest extends TestCase
         $response->assertJson([
             'success' => false,
         ]);
+    }
+
+    /**
+     * Người dùng có thiết bị đăng ký có thể gửi thông báo thử nghiệm với kịch bản tùy chọn.
+     */
+    public function test_user_with_subscription_can_send_test_push_with_scenarios(): void
+    {
+        $user = User::factory()->create(['ho_ten' => 'Nguyễn Văn Test']);
+
+        PushSubscription::create([
+            'user_id' => $user->id,
+            'endpoint' => 'https://fcm.googleapis.com/test-endpoint-'.uniqid(),
+            'public_key' => 'sample_p256dh_key',
+            'auth_token' => 'sample_auth_token',
+        ]);
+
+        $mockWebPush = $this->mock(WebPushService::class);
+        $mockWebPush->shouldReceive('sendToUser')
+            ->once()
+            ->andReturn([
+                'sent' => 1,
+                'failed' => 0,
+                'deleted_expired' => 0,
+            ]);
+
+        $response = $this->actingAs($user)->postJson('/push/test', [
+            'type' => 'deadline',
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringContainsString('Deadline', $response->json('title'));
+
+        $this->assertDatabaseHas('thong_bao', [
+            'user_id' => $user->id,
+            'loai_thong_bao' => 'deadline',
+        ]);
+    }
+
+    /**
+     * Người dùng có thể cập nhật cấu hình thông báo công việc & kiểm tra qua status.
+     */
+    public function test_authenticated_user_can_update_task_notification_setting_and_see_status(): void
+    {
+        $user = User::factory()->create([
+            'thong_bao_enabled' => true,
+            'thong_bao_cong_viec' => true,
+        ]);
+
+        // Tắt thông báo công việc qua route profile.notifications.update
+        $response = $this->actingAs($user)->patch(route('profile.notifications.update'), [
+            'thong_bao_enabled' => 'on',
+            'thong_bao_lich_hoc' => 'on',
+            'thong_bao_deadline' => 'on',
+            // 'thong_bao_cong_viec' unchecked
+            'thong_bao_tap_luyen' => 'on',
+            'am_thanh_thong_bao' => 'on',
+        ]);
+
+        $response->assertRedirect(route('profile.edit'));
+
+        $user->refresh();
+        $this->assertFalse((bool) $user->thong_bao_cong_viec);
+
+        // Kiểm tra endpoint push/status phản hồi đúng trạng thái
+        $statusResponse = $this->actingAs($user)->getJson('/push/status');
+        $statusResponse->assertOk();
+        $this->assertFalse($statusResponse->json('data.preferences.cong_viec'));
     }
 }

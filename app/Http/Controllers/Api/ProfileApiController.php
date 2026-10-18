@@ -17,19 +17,20 @@ class ProfileApiController extends Controller
     private function formatUser(User $user): array
     {
         return [
-            'id'                  => $user->id,
-            'ho_ten'              => $user->ho_ten,
-            'email'               => $user->email,
-            'anh_dai_dien'        => $user->anh_dai_dien,
-            'avatar_url'          => $user->avatar_url,
-            'initials'            => $user->initials,
-            'ngon_ngu'            => $user->ngon_ngu ?? 'vi',
-            'giao_dien'           => $user->giao_dien ?? 'system',
-            'thong_bao_enabled'   => (bool) $user->thong_bao_enabled,
-            'thong_bao_lich_hoc'  => (bool) $user->thong_bao_lich_hoc,
-            'thong_bao_deadline'  => (bool) $user->thong_bao_deadline,
+            'id' => $user->id,
+            'ho_ten' => $user->ho_ten,
+            'email' => $user->email,
+            'anh_dai_dien' => $user->anh_dai_dien,
+            'avatar_url' => $user->avatar_url,
+            'initials' => $user->initials,
+            'ngon_ngu' => $user->ngon_ngu ?? 'vi',
+            'giao_dien' => $user->giao_dien ?? 'system',
+            'thong_bao_enabled' => (bool) $user->thong_bao_enabled,
+            'thong_bao_lich_hoc' => (bool) $user->thong_bao_lich_hoc,
+            'thong_bao_deadline' => (bool) $user->thong_bao_deadline,
+            'thong_bao_cong_viec' => (bool) $user->thong_bao_cong_viec,
             'thong_bao_tap_luyen' => (bool) $user->thong_bao_tap_luyen,
-            'am_thanh_thong_bao'  => (bool) $user->am_thanh_thong_bao,
+            'am_thanh_thong_bao' => (bool) $user->am_thanh_thong_bao,
         ];
     }
 
@@ -43,15 +44,16 @@ class ProfileApiController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'ho_ten'              => 'sometimes|required|string|max:255',
-            'email'               => 'sometimes|required|email|max:255|unique:users,email,' . $user->id,
-            'ngon_ngu'            => 'sometimes|in:vi,en',
-            'giao_dien'           => 'sometimes|in:light,dark,system',
-            'thong_bao_enabled'   => 'sometimes|boolean',
-            'thong_bao_lich_hoc'  => 'sometimes|boolean',
-            'thong_bao_deadline'  => 'sometimes|boolean',
+            'ho_ten' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|max:255|unique:users,email,'.$user->id,
+            'ngon_ngu' => 'sometimes|in:vi,en',
+            'giao_dien' => 'sometimes|in:light,dark,system',
+            'thong_bao_enabled' => 'sometimes|boolean',
+            'thong_bao_lich_hoc' => 'sometimes|boolean',
+            'thong_bao_deadline' => 'sometimes|boolean',
+            'thong_bao_cong_viec' => 'sometimes|boolean',
             'thong_bao_tap_luyen' => 'sometimes|boolean',
-            'am_thanh_thong_bao'  => 'sometimes|boolean',
+            'am_thanh_thong_bao' => 'sometimes|boolean',
         ]);
 
         $user->update($validated);
@@ -59,7 +61,7 @@ class ProfileApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật thông tin trang cá nhân thành công!',
-            'data'    => $this->formatUser($user->fresh()),
+            'data' => $this->formatUser($user->fresh()),
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
@@ -73,9 +75,9 @@ class ProfileApiController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
             'avatar.required' => 'Vui lòng chọn một tệp hình ảnh.',
-            'avatar.image'    => 'Tệp tải lên phải là hình ảnh hợp lệ.',
-            'avatar.mimes'    => 'Ảnh đại diện phải là file JPG, JPEG, PNG hoặc WEBP.',
-            'avatar.max'      => 'Ảnh đại diện không được vượt quá 2MB.',
+            'avatar.image' => 'Tệp tải lên phải là hình ảnh hợp lệ.',
+            'avatar.mimes' => 'Ảnh đại diện phải là file JPG, JPEG, PNG hoặc WEBP.',
+            'avatar.max' => 'Ảnh đại diện không được vượt quá 2MB.',
         ]);
 
         /** @var User $user */
@@ -99,9 +101,9 @@ class ProfileApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật ảnh đại diện thành công!',
-            'data'    => [
+            'data' => [
                 'anh_dai_dien' => $user->anh_dai_dien,
-                'avatar_url'   => $user->avatar_url,
+                'avatar_url' => $user->avatar_url,
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
@@ -129,10 +131,10 @@ class ProfileApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Đã xóa ảnh đại diện!',
-            'data'    => [
+            'data' => [
                 'anh_dai_dien' => null,
-                'avatar_url'   => null,
-                'initials'     => $user->initials,
+                'avatar_url' => null,
+                'initials' => $user->initials,
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
@@ -145,13 +147,13 @@ class ProfileApiController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'string', 'current_password'],
-            'password'         => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'current_password.required'         => 'Vui lòng nhập mật khẩu hiện tại.',
+            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
             'current_password.current_password' => 'Mật khẩu hiện tại không chính xác.',
-            'password.required'                 => 'Vui lòng nhập mật khẩu mới.',
-            'password.min'                      => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
-            'password.confirmed'                => 'Mật khẩu xác nhận không khớp.',
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
         ]);
 
         /** @var User $user */

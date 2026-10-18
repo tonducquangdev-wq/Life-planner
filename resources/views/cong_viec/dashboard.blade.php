@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Công Việc & Dự Án - Life Planner</title>
 
@@ -37,6 +37,7 @@
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
     <link rel="stylesheet" href="{{ asset('css/calendar.css') }}?v={{ file_exists(public_path('css/calendar.css')) ? filemtime(public_path('css/calendar.css')) : '1.0' }}">
+    @include('layouts.pwa-head')
 
 </head>
 

@@ -73,17 +73,25 @@ class ProfileController extends Controller
     /**
      * Update notification settings.
      */
-    public function updateNotifications(Request $request): RedirectResponse
+    public function updateNotifications(Request $request): mixed
     {
         $user = $request->user();
 
         $user->thong_bao_enabled = $request->has('thong_bao_enabled');
         $user->thong_bao_lich_hoc = $request->has('thong_bao_lich_hoc');
         $user->thong_bao_deadline = $request->has('thong_bao_deadline');
+        $user->thong_bao_cong_viec = $request->has('thong_bao_cong_viec');
         $user->thong_bao_tap_luyen = $request->has('thong_bao_tap_luyen');
         $user->am_thanh_thong_bao = $request->has('am_thanh_thong_bao');
 
         $user->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cài đặt thông báo đã được lưu thành công!',
+            ]);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'notifications-updated');
     }

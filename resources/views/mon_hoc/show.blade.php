@@ -2,7 +2,7 @@
 <html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Chi Tiết Môn Học - {{ $monHoc->ten_mon }} | Life Planner</title>
     
@@ -36,65 +36,222 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    @include('layouts.pwa-head')
 
     <style>
         /* ==========================================================================
-           SUBJECT DETAIL DESIGN SYSTEM - LIFE PLANNER
+           HỆ THỐNG BIẾN NEUMORPHISM CHUẨN LIFE PLANNER (SOFT UI DESIGN SYSTEM)
            ========================================================================== */
         :root {
-            --sd-bg: #F8FAFC;
-            --sd-card-bg: #FFFFFF;
-            --sd-card-border: #E2E8F0;
-            --sd-text-main: #0F172A;
-            --sd-text-muted: #64748B;
-            --sd-surface: #F8FAFC;
-            --sd-surface-border: #E2E8F0;
-            --sd-surface-hover: #F1F5F9;
-            --sd-primary: #4F46E5;
-            --sd-primary-hover: #4338CA;
-            --sd-primary-subtle: rgba(79, 70, 229, 0.08);
-            --sd-danger: #EF4444;
-            --sd-danger-hover: #DC2626;
-            --sd-danger-subtle: rgba(239, 68, 68, 0.08);
-            --sd-radius-card: 16px;
-            --sd-radius-btn: 12px;
-            --sd-radius-tile: 12px;
-            --sd-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-            --sd-shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+            /* Tone màu nền chủ đạo xám xanh nhạt dịu mắt chuẩn Neumorphic */
+            --nm-bg: #e7ebf0;
+            --nm-surface: #e7ebf0;
+            --nm-surface-hover: #edf1f6;
+            --nm-surface-subtle: #edf2f7;
+
+            /* Đổ bóng kép mềm mại (Soft Dual Shadows) */
+            --nm-shadow-flat: 6px 6px 14px rgba(163, 177, 198, 0.45), -6px -6px 14px rgba(255, 255, 255, 0.95);
+            --nm-shadow-card: 14px 14px 28px rgba(163, 177, 198, 0.48), -14px -14px 28px rgba(255, 255, 255, 0.98);
+            --nm-shadow-card-hover: 18px 18px 36px rgba(163, 177, 198, 0.58), -18px -18px 36px rgba(255, 255, 255, 1);
+            --nm-shadow-btn: 5px 5px 12px rgba(163, 177, 198, 0.45), -5px -5px 12px rgba(255, 255, 255, 0.95);
+            --nm-shadow-btn-hover: 7px 7px 16px rgba(163, 177, 198, 0.52), -7px -7px 16px rgba(255, 255, 255, 1);
+            --nm-shadow-primary: 6px 6px 16px rgba(79, 70, 229, 0.35), -4px -4px 12px rgba(255, 255, 255, 0.85);
+            --nm-shadow-danger: 6px 6px 16px rgba(239, 68, 68, 0.32), -4px -4px 12px rgba(255, 255, 255, 0.85);
+
+            /* Đổ bóng dập lõm (Concave / Inset Shadows) cho inputs và thẻ sunken */
+            --nm-shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.42), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+            --nm-shadow-inset-deep: inset 4px 4px 8px rgba(163, 177, 198, 0.5), inset -4px -4px 8px rgba(255, 255, 255, 0.95);
+
+            /* Viền tinh tế tạo gờ ánh sáng vi tế */
+            --nm-border: 1.5px solid rgba(255, 255, 255, 0.8);
+            --nm-border-subtle: 1px solid rgba(163, 177, 198, 0.28);
+            --nm-divider: rgba(163, 177, 198, 0.35);
+
+            /* Màu văn bản phân cấp rõ ràng */
+            --nm-text-main: #1e293b;
+            --nm-text-muted: #64748b;
+            --nm-text-light: #94a3b8;
+
+            /* Màu nhấn (Primary Indigo & Accent Gradients) */
+            --nm-primary: #4f46e5;
+            --nm-primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            --nm-primary-hover-gradient: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+            --nm-danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --nm-danger-hover-gradient: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+
+            /* Ánh xạ biến tương thích */
+            --sd-bg: var(--nm-bg);
+            --sd-card-bg: var(--nm-surface);
+            --sd-card-border: rgba(255, 255, 255, 0.8);
+            --sd-text-main: var(--nm-text-main);
+            --sd-text-muted: var(--nm-text-muted);
+            --sd-surface: var(--nm-surface);
+            --sd-surface-border: var(--nm-border-subtle);
+            --sd-surface-hover: var(--nm-surface-hover);
+            --sd-primary: var(--nm-primary);
+            --sd-primary-hover: #4338ca;
+            --sd-primary-subtle: rgba(79, 70, 229, 0.12);
+            --sd-danger: #ef4444;
+            --sd-danger-hover: #dc2626;
+            --sd-danger-subtle: rgba(239, 68, 68, 0.12);
+            --sd-radius-card: 26px;
+            --sd-radius-btn: 9999px;
+            --sd-radius-tile: 20px;
+            --sd-shadow-sm: var(--nm-shadow-btn);
+            --sd-shadow-card: var(--nm-shadow-card);
         }
 
+        /* GIAO DIỆN TỐI (DARK MODE NEUMORPHISM / SOFT UI) */
         [data-bs-theme="dark"] {
-            --sd-bg: #121212;
-            --sd-card-bg: #1E1E22;
-            --sd-card-border: #2E2E34;
-            --sd-text-main: #E8E8EA;
-            --sd-text-muted: #A0A0A8;
-            --sd-surface: #26262B;
-            --sd-surface-border: #33333A;
-            --sd-surface-hover: #2E2E35;
-            --sd-primary: #6C8CFF;
-            --sd-primary-hover: #8AA3FF;
-            --sd-primary-subtle: rgba(108, 140, 255, 0.15);
-            --sd-danger: #F87171;
-            --sd-danger-hover: #FCA5A5;
-            --sd-danger-subtle: rgba(248, 113, 113, 0.15);
-            --sd-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-            --sd-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+            --nm-bg: #151821;
+            --nm-surface: #1b1e2a;
+            --nm-surface-hover: #222634;
+            --nm-surface-subtle: #202432;
+
+            --nm-shadow-flat: 6px 6px 14px rgba(0, 0, 0, 0.5), -4px -4px 12px rgba(255, 255, 255, 0.04);
+            --nm-shadow-card: 14px 14px 28px rgba(0, 0, 0, 0.55), -10px -10px 24px rgba(255, 255, 255, 0.04);
+            --nm-shadow-card-hover: 18px 18px 36px rgba(0, 0, 0, 0.65), -12px -12px 28px rgba(255, 255, 255, 0.06);
+            --nm-shadow-btn: 5px 5px 12px rgba(0, 0, 0, 0.45), -4px -4px 10px rgba(255, 255, 255, 0.04);
+            --nm-shadow-btn-hover: 7px 7px 16px rgba(0, 0, 0, 0.55), -5px -5px 14px rgba(255, 255, 255, 0.06);
+            --nm-shadow-primary: 6px 6px 18px rgba(99, 102, 241, 0.35), -3px -3px 10px rgba(255, 255, 255, 0.05);
+            --nm-shadow-danger: 6px 6px 18px rgba(239, 68, 68, 0.35), -3px -3px 10px rgba(255, 255, 255, 0.05);
+
+            --nm-shadow-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.6), inset -3px -3px 6px rgba(255, 255, 255, 0.03);
+            --nm-shadow-inset-deep: inset 4px 4px 8px rgba(0, 0, 0, 0.7), inset -4px -4px 8px rgba(255, 255, 255, 0.04);
+
+            --nm-border: 1.5px solid rgba(255, 255, 255, 0.07);
+            --nm-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+            --nm-divider: rgba(255, 255, 255, 0.08);
+
+            --nm-text-main: #f1f5f9;
+            --nm-text-muted: #94a3b8;
+            --nm-text-light: #64748b;
+
+            --nm-primary: #6366f1;
+            --nm-primary-gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+            --nm-primary-hover-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+
+            --sd-card-border: rgba(255, 255, 255, 0.07);
         }
 
         body {
-            background-color: var(--sd-bg) !important;
-            color: var(--sd-text-main) !important;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--nm-bg) !important;
+            color: var(--nm-text-main) !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow-x: hidden;
         }
 
         .subject-detail-wrapper {
-            background-color: var(--sd-bg);
+            background-color: var(--nm-bg);
             min-height: calc(100vh - 58px);
         }
 
-        /* 1. Header Navigation Bar */
+        /* Đồng bộ Topbar chuẩn phong cách Neumorphism của toàn web */
+        .top-header {
+            background-color: var(--nm-surface) !important;
+            border-bottom: 1px solid rgba(163, 177, 198, 0.25) !important;
+            box-shadow: 0 4px 20px rgba(163, 177, 198, 0.2) !important;
+            transition: all 0.25s ease;
+        }
+
+        [data-bs-theme="dark"] .top-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+        }
+
+        .top-header .btn-back-to-calendar {
+            background: var(--nm-surface) !important;
+            border: var(--nm-border) !important;
+            box-shadow: var(--nm-shadow-btn) !important;
+            color: var(--nm-text-main) !important;
+            font-weight: 600;
+            border-radius: 9999px !important;
+            padding: 0.45rem 1.1rem !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+
+        .top-header .btn-back-to-calendar:hover {
+            box-shadow: var(--nm-shadow-btn-hover) !important;
+            color: var(--nm-primary) !important;
+            transform: translateX(-3px) translateY(-1px);
+        }
+
+        .top-header .btn-back-to-calendar:active {
+            box-shadow: var(--nm-shadow-inset) !important;
+            transform: translateX(-1px) scale(0.98);
+        }
+
+        .top-header .search-box input {
+            background: var(--nm-surface) !important;
+            border: var(--nm-border-subtle) !important;
+            box-shadow: var(--nm-shadow-inset) !important;
+            color: var(--nm-text-main) !important;
+            border-radius: 9999px !important;
+            height: 38px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .top-header .search-box input:focus {
+            border-color: rgba(99, 102, 241, 0.5) !important;
+            box-shadow: var(--nm-shadow-inset), 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+        }
+
+        .top-header .user-avatar {
+            box-shadow: var(--nm-shadow-btn) !important;
+            border: 2px solid rgba(255, 255, 255, 0.8) !important;
+        }
+
+        [data-bs-theme="dark"] .top-header .user-avatar {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .topbar-theme-toggle {
+            background: var(--nm-surface) !important;
+            border: var(--nm-border) !important;
+            box-shadow: var(--nm-shadow-btn) !important;
+            color: var(--nm-text-main) !important;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+
+        .topbar-theme-toggle:hover {
+            transform: scale(1.08);
+            box-shadow: var(--nm-shadow-btn-hover) !important;
+        }
+
+        .topbar-theme-toggle:active {
+            box-shadow: var(--nm-shadow-inset) !important;
+            transform: scale(0.96);
+        }
+
+        .dropdown-menu {
+            background: var(--nm-surface) !important;
+            border: var(--nm-border) !important;
+            border-radius: 20px !important;
+            box-shadow: var(--nm-shadow-card) !important;
+            color: var(--nm-text-main) !important;
+            overflow: hidden;
+        }
+
+        .dropdown-item {
+            color: var(--nm-text-main) !important;
+            transition: all 0.18s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--nm-surface-hover) !important;
+            color: var(--nm-primary) !important;
+        }
+
+        .dropdown-divider {
+            border-color: var(--nm-divider) !important;
+        }
+
+        /* 1. Thanh điều hướng & Thao tác Header */
         .subject-top-nav {
             display: flex;
             align-items: center;
@@ -109,30 +266,35 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            height: 40px;
-            padding: 0 16px;
-            border-radius: var(--sd-radius-btn);
-            background: var(--sd-card-bg);
-            border: 1px solid var(--sd-card-border);
-            color: var(--sd-text-main);
+            height: 42px;
+            padding: 0 20px;
+            border-radius: 9999px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            color: var(--nm-text-main);
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--sd-shadow-sm);
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+            box-shadow: var(--nm-shadow-btn);
         }
 
         .subject-btn-back:hover {
-            background: var(--sd-surface);
-            border-color: var(--sd-primary);
-            color: var(--sd-primary);
-            transform: translateX(-2px);
+            background: var(--nm-surface-hover);
+            color: var(--nm-primary);
+            box-shadow: var(--nm-shadow-btn-hover);
+            transform: translateX(-3px) translateY(-1px);
+        }
+
+        .subject-btn-back:active {
+            box-shadow: var(--nm-shadow-inset);
+            transform: translateX(-1px) scale(0.98);
         }
 
         .subject-action-group {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -140,71 +302,86 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
-            height: 40px;
-            padding: 0 16px;
-            border-radius: var(--sd-radius-btn);
+            gap: 8px;
+            height: 42px;
+            padding: 0 20px;
+            border-radius: 9999px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: var(--nm-border);
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
             white-space: nowrap;
         }
 
-        .subject-action-btn.btn-edit {
-            background-color: var(--sd-primary);
-            color: #0B1020;
-            border-color: var(--sd-primary);
-        }
-
-        [data-bs-theme="light"] .subject-action-btn.btn-edit {
-            background-color: var(--sd-primary);
-            color: #FFFFFF;
-        }
-
-        .subject-action-btn.btn-edit:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-        }
-
-        .subject-action-btn.btn-delete {
-            background-color: var(--sd-danger-subtle);
-            color: var(--sd-danger);
-            border-color: rgba(239, 68, 68, 0.25);
-        }
-
-        .subject-action-btn.btn-delete:hover {
-            background-color: var(--sd-danger);
-            color: #FFFFFF;
-            border-color: var(--sd-danger);
-            transform: translateY(-1px);
-        }
-
         .subject-action-btn.btn-calendar {
-            background-color: var(--sd-card-bg);
-            color: var(--sd-text-main);
-            border-color: var(--sd-card-border);
+            background: var(--nm-surface);
+            color: var(--nm-text-main);
+            box-shadow: var(--nm-shadow-btn);
         }
 
         .subject-action-btn.btn-calendar:hover {
-            background-color: var(--sd-surface);
-            border-color: var(--sd-primary);
-            color: var(--sd-primary);
-            transform: translateY(-1px);
+            color: var(--nm-primary);
+            box-shadow: var(--nm-shadow-btn-hover);
+            transform: translateY(-2px);
         }
 
-        /* 2. Hero Subject Card */
+        .subject-action-btn.btn-calendar:active {
+            box-shadow: var(--nm-shadow-inset);
+            transform: scale(0.98);
+        }
+
+        .subject-action-btn.btn-edit {
+            background: var(--nm-primary-gradient) !important;
+            color: #ffffff !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+            box-shadow: var(--nm-shadow-primary) !important;
+        }
+
+        .subject-action-btn.btn-edit:hover {
+            background: var(--nm-primary-hover-gradient) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 8px 8px 22px rgba(79, 70, 229, 0.45), -4px -4px 14px rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .subject-action-btn.btn-edit:active {
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25) !important;
+            transform: scale(0.98);
+        }
+
+        .subject-action-btn.btn-delete {
+            background: var(--nm-surface) !important;
+            color: #ef4444 !important;
+            border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
+            box-shadow: var(--nm-shadow-btn) !important;
+        }
+
+        .subject-action-btn.btn-delete:hover {
+            background: var(--nm-danger-gradient) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            transform: translateY(-2px);
+            box-shadow: var(--nm-shadow-danger) !important;
+        }
+
+        .subject-action-btn.btn-delete:active {
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25) !important;
+            transform: scale(0.98);
+        }
+
+        /* 2. Thẻ Hero Môn Học (Neumorphic Course Hero) */
         .subject-hero-card {
-            background-color: var(--sd-card-bg);
-            border: 1px solid var(--sd-card-border);
-            border-radius: var(--sd-radius-card);
-            padding: 24px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 28px;
+            padding: 26px 28px;
             margin-bottom: 24px;
-            box-shadow: var(--sd-shadow-card);
+            box-shadow: var(--nm-shadow-card);
             position: relative;
             overflow: hidden;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
         }
 
         .subject-hero-card::before {
@@ -213,8 +390,10 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 5px;
-            background-color: {{ $monHoc->mau_sac ?? '#6C8CFF' }};
+            width: 6px;
+            border-top-left-radius: 28px;
+            border-bottom-left-radius: 28px;
+            background-color: {{ $monHoc->mau_sac ?? '#6366f1' }};
         }
 
         .subject-hero-inner {
@@ -228,22 +407,23 @@
         .subject-hero-main {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 20px;
             min-width: 0;
         }
 
         .subject-hero-icon {
-            width: 58px;
-            height: 58px;
-            border-radius: 14px;
-            background-color: {{ $monHoc->mau_sac ?? '#6C8CFF' }};
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background-color: {{ $monHoc->mau_sac ?? '#6366f1' }};
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #FFFFFF;
-            font-size: 26px;
+            color: #ffffff;
+            font-size: 28px;
             flex-shrink: 0;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.35);
+            border: 2px solid rgba(255, 255, 255, 0.25);
         }
 
         .subject-hero-meta {
@@ -255,56 +435,67 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .subject-code-tag {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 12px;
             font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 6px;
-            background-color: var(--sd-surface);
-            border: 1px solid var(--sd-surface-border);
-            color: var(--sd-text-main);
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: var(--nm-surface);
+            border: var(--nm-border-subtle);
+            box-shadow: var(--nm-shadow-inset);
+            color: var(--nm-text-muted);
             letter-spacing: 0.04em;
         }
 
         .subject-status-pill {
             font-size: 12px;
-            font-weight: 600;
-            padding: 3px 10px;
+            font-weight: 700;
+            padding: 4px 12px;
             border-radius: 9999px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            box-shadow: var(--nm-shadow-flat);
         }
 
         .status-dang_hoc {
-            background-color: rgba(74, 222, 128, 0.15);
-            color: #4ADE80;
-            border: 1px solid rgba(74, 222, 128, 0.3);
+            background-color: rgba(34, 197, 94, 0.12);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        [data-bs-theme="dark"] .status-dang_hoc {
+            color: #4ade80;
         }
 
         .status-da_hoan_thanh {
-            background-color: rgba(108, 140, 255, 0.15);
-            color: #6C8CFF;
-            border: 1px solid rgba(108, 140, 255, 0.3);
+            background-color: rgba(99, 102, 241, 0.12);
+            color: #4f46e5;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        [data-bs-theme="dark"] .status-da_hoan_thanh {
+            color: #818cf8;
         }
 
         .status-tam_dung {
-            background-color: rgba(251, 191, 36, 0.15);
-            color: #FBBF24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
+            background-color: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        [data-bs-theme="dark"] .status-tam_dung {
+            color: #fbbf24;
         }
 
         .subject-hero-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--sd-text-main);
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--nm-text-main);
             margin: 0;
             line-height: 1.3;
-            letter-spacing: -0.015em;
+            letter-spacing: -0.02em;
             word-break: break-word;
         }
 
@@ -318,31 +509,33 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
-            background-color: var(--sd-surface);
-            border: 1px solid var(--sd-surface-border);
-            border-radius: 10px;
+            padding: 6px 14px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 9999px;
+            box-shadow: var(--nm-shadow-flat);
             font-size: 13px;
-            font-weight: 600;
-            color: var(--sd-text-main);
+            font-weight: 700;
+            color: var(--nm-text-main);
         }
 
         .subject-color-dot {
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background-color: {{ $monHoc->mau_sac ?? '#6C8CFF' }};
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+            background-color: {{ $monHoc->mau_sac ?? '#6366f1' }};
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
         }
 
-        /* 3. Section Cards */
+        /* 3. Khung Nội Dung Card Neumorphic */
         .subject-card {
-            background-color: var(--sd-card-bg);
-            border: 1px solid var(--sd-card-border);
-            border-radius: var(--sd-radius-card);
-            padding: 24px;
-            box-shadow: var(--sd-shadow-card);
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 28px;
+            padding: 26px 28px;
+            box-shadow: var(--nm-shadow-card);
             margin-bottom: 24px;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
         }
 
         .subject-card-header {
@@ -352,13 +545,13 @@
             gap: 12px;
             padding-bottom: 16px;
             margin-bottom: 20px;
-            border-bottom: 1px solid var(--sd-card-border);
+            border-bottom: 1px solid var(--nm-divider);
         }
 
         .subject-card-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
-            color: var(--sd-text-main);
+            color: var(--nm-text-main);
             margin: 0;
             display: flex;
             align-items: center;
@@ -367,17 +560,17 @@
         }
 
         .subject-card-title i {
-            color: var(--sd-primary);
-            font-size: 18px;
+            color: var(--nm-primary);
+            font-size: 20px;
         }
 
         .subject-card-subtitle {
             font-size: 13px;
-            color: var(--sd-text-muted);
-            margin: 2px 0 0 0;
+            color: var(--nm-text-muted);
+            margin: 4px 0 0 0;
         }
 
-        /* 4. Info Tiles (2x2 Grid) */
+        /* 4. Thẻ Chi Tiết Thông Tin (2x2 Grid) */
         .subject-info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -385,47 +578,47 @@
         }
 
         .subject-info-tile {
-            background-color: var(--sd-surface);
-            border: 1px solid var(--sd-surface-border);
-            border-radius: var(--sd-radius-tile);
-            padding: 16px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 20px;
+            box-shadow: var(--nm-shadow-flat);
+            padding: 18px 20px;
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            transition: border-color 0.2s ease, background-color 0.2s ease;
+            gap: 16px;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         .subject-info-tile:hover {
-            background-color: var(--sd-surface-hover);
-            border-color: rgba(108, 140, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: var(--nm-shadow-btn-hover);
+            border-color: rgba(99, 102, 241, 0.4);
         }
 
         .subject-tile-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background-color: var(--sd-primary-subtle);
-            color: var(--sd-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--nm-surface);
+            box-shadow: var(--nm-shadow-btn);
+            color: var(--nm-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             flex-shrink: 0;
         }
 
         .subject-tile-icon.icon-geo {
-            background-color: rgba(248, 113, 113, 0.12);
-            color: #F87171;
+            color: #ef4444;
         }
 
         .subject-tile-icon.icon-status {
-            background-color: rgba(74, 222, 128, 0.12);
-            color: #4ADE80;
+            color: #22c55e;
         }
 
         .subject-tile-icon.icon-term {
-            background-color: rgba(251, 191, 36, 0.12);
-            color: #FBBF24;
+            color: #f59e0b;
         }
 
         .subject-tile-content {
@@ -435,17 +628,17 @@
 
         .subject-tile-label {
             font-size: 12px;
-            font-weight: 500;
-            color: var(--sd-text-muted);
+            font-weight: 600;
+            color: var(--nm-text-muted);
             margin-bottom: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .subject-tile-value {
             font-size: 15px;
-            font-weight: 600;
-            color: var(--sd-text-main);
+            font-weight: 700;
+            color: var(--nm-text-main);
             margin: 0;
             line-height: 1.35;
             word-break: break-word;
@@ -453,11 +646,11 @@
 
         .subject-tile-sub {
             font-size: 12px;
-            color: var(--sd-text-muted);
+            color: var(--nm-text-muted);
             margin-top: 3px;
         }
 
-        /* 5. Date Cards (Timeline) */
+        /* 5. Khung Ngày Tháng Đào Tạo (Timeline) */
         .subject-date-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -465,31 +658,38 @@
         }
 
         .subject-date-card {
-            background-color: var(--sd-surface);
-            border: 1px solid var(--sd-surface-border);
-            border-radius: var(--sd-radius-tile);
-            padding: 16px 18px;
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 20px;
+            box-shadow: var(--nm-shadow-flat);
+            padding: 18px 20px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+
+        .subject-date-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--nm-shadow-btn-hover);
         }
 
         .subject-date-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background-color: var(--sd-primary-subtle);
-            color: var(--sd-primary);
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--nm-surface);
+            box-shadow: var(--nm-shadow-btn);
+            color: var(--nm-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             flex-shrink: 0;
         }
 
         .subject-date-icon.icon-end {
-            background-color: rgba(74, 222, 128, 0.12);
-            color: #4ADE80;
+            color: #22c55e;
         }
 
         .subject-date-meta {
@@ -499,50 +699,51 @@
         .subject-date-label {
             font-size: 12px;
             font-weight: 600;
-            color: var(--sd-text-muted);
+            color: var(--nm-text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
             margin-bottom: 2px;
         }
 
         .subject-date-val {
             font-size: 16px;
             font-weight: 700;
-            color: var(--sd-text-main);
+            color: var(--nm-text-main);
             margin: 0;
         }
 
         .subject-date-desc {
             font-size: 12px;
-            color: var(--sd-text-muted);
+            color: var(--nm-text-muted);
             margin-top: 2px;
         }
 
-        /* 6. Right Column Widgets */
+        /* 6. Widget Cột Phải (Color & Calendar Navigation) */
         .subject-color-preview-box {
-            background-color: var(--sd-surface);
-            border: 1px solid var(--sd-surface-border);
-            border-radius: var(--sd-radius-tile);
-            padding: 16px;
+            background: var(--nm-surface);
+            box-shadow: var(--nm-shadow-inset);
+            border: var(--nm-border-subtle);
+            border-radius: 20px;
+            padding: 22px 18px;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .subject-color-large-bubble {
-            width: 52px;
-            height: 52px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
-            margin: 0 auto 10px;
-            background-color: {{ $monHoc->mau_sac ?? '#6C8CFF' }};
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            border: 3px solid var(--sd-card-bg);
+            margin: 0 auto 12px;
+            background-color: {{ $monHoc->mau_sac ?? '#6366f1' }};
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22), inset 0 2px 5px rgba(255, 255, 255, 0.4);
+            border: 3px solid var(--nm-surface);
         }
 
         .subject-color-code {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
-            color: var(--sd-text-main);
+            color: var(--nm-text-main);
             letter-spacing: 0.05em;
         }
 
@@ -552,81 +753,164 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
-            height: 42px;
-            border-radius: var(--sd-radius-btn);
-            background-color: var(--sd-primary);
-            color: #0B1020;
+            height: 44px;
+            border-radius: 9999px;
+            background: var(--nm-primary-gradient) !important;
+            color: #ffffff !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.45);
+            box-shadow: var(--nm-shadow-primary);
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-bs-theme="light"] .subject-calendar-nav-btn {
-            background-color: var(--sd-primary);
-            color: #FFFFFF;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         .subject-calendar-nav-btn:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
+            background: var(--nm-primary-hover-gradient) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 8px 8px 22px rgba(79, 70, 229, 0.45), -4px -4px 14px rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .subject-calendar-nav-btn:active {
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25) !important;
+            transform: scale(0.98);
+        }
+
+        /* Lịch học tuần */
+        .subject-schedule-item {
+            background: var(--nm-surface);
+            border: var(--nm-border);
+            border-radius: 18px;
+            box-shadow: var(--nm-shadow-flat);
+            padding: 14px 18px;
+            transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+
+        .subject-schedule-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--nm-shadow-btn-hover);
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+
+        .subject-schedule-dow {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--nm-primary);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .subject-schedule-time {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+            background: var(--nm-surface);
+            border: var(--nm-border-subtle);
+            box-shadow: var(--nm-shadow-inset);
+            color: var(--nm-text-main);
+            letter-spacing: 0.03em;
+        }
+
+        .subject-schedule-note {
+            font-size: 12px;
+            color: var(--nm-text-muted);
+            display: flex;
+            align-items: center;
+            line-height: 1.4;
         }
 
         /* Empty state for weekly schedule */
         .subject-schedule-empty {
             text-align: center;
-            padding: 24px 16px;
-            background-color: var(--sd-surface);
-            border: 1px dashed var(--sd-surface-border);
-            border-radius: var(--sd-radius-tile);
+            padding: 26px 18px;
+            background: var(--nm-surface);
+            border: var(--nm-border-subtle);
+            box-shadow: var(--nm-shadow-inset);
+            border-radius: 20px;
         }
 
         .subject-schedule-empty i {
-            font-size: 32px;
-            color: var(--sd-text-muted);
-            margin-bottom: 8px;
+            font-size: 36px;
+            color: var(--nm-text-muted);
+            margin-bottom: 10px;
             display: inline-block;
         }
 
         .subject-schedule-empty-title {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--sd-text-main);
+            font-weight: 700;
+            color: var(--nm-text-main);
             margin-bottom: 4px;
         }
 
         .subject-schedule-empty-desc {
             font-size: 12px;
-            color: var(--sd-text-muted);
+            color: var(--nm-text-muted);
             margin: 0;
-            line-height: 1.45;
+            line-height: 1.5;
         }
 
-        /* 7. Modal Dark Mode Polish */
+        /* 7. Modal Neumorphism Polish */
         .subject-modal .modal-content {
-            background-color: var(--sd-surface) !important;
-            border: 1px solid var(--sd-surface-border) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
-            color: var(--sd-text-main) !important;
+            background-color: var(--nm-surface) !important;
+            border: var(--nm-border) !important;
+            border-radius: 28px !important;
+            box-shadow: var(--nm-shadow-card) !important;
+            color: var(--nm-text-main) !important;
         }
 
         .subject-modal .modal-header,
         .subject-modal .modal-footer {
-            border-color: var(--sd-surface-border) !important;
+            border-color: var(--nm-divider) !important;
         }
 
         .subject-modal .modal-icon-warning {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background-color: var(--sd-danger-subtle);
-            color: var(--sd-danger);
+            background: var(--nm-surface);
+            box-shadow: var(--nm-shadow-inset);
+            border: var(--nm-border-subtle);
+            color: #ef4444;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin: 0 auto 12px;
+            font-size: 26px;
+            margin: 0 auto 14px;
+        }
+
+        .subject-action-btn.btn-modal-cancel {
+            background: var(--nm-surface) !important;
+            color: var(--nm-text-main) !important;
+            border: var(--nm-border) !important;
+            box-shadow: var(--nm-shadow-btn) !important;
+        }
+
+        .subject-action-btn.btn-modal-cancel:hover {
+            background: var(--nm-surface-hover) !important;
+            box-shadow: var(--nm-shadow-btn-hover) !important;
+            transform: translateY(-2px);
+        }
+
+        .subject-action-btn.btn-modal-cancel:active {
+            box-shadow: var(--nm-shadow-inset) !important;
+            transform: scale(0.98);
+        }
+
+        .subject-modal .btn-delete {
+            background: var(--nm-danger-gradient) !important;
+            color: #ffffff !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: var(--nm-shadow-danger) !important;
+        }
+
+        .subject-modal .btn-delete:hover {
+            background: var(--nm-danger-hover-gradient) !important;
+            box-shadow: 8px 8px 22px rgba(239, 68, 68, 0.45), -4px -4px 14px rgba(255, 255, 255, 0.9) !important;
+            transform: translateY(-2px);
         }
 
         /* ==========================================================================
@@ -639,7 +923,6 @@
             }
         }
 
-        /* Tablet (576px - 991px): Keep header navigation on one neat horizontal line */
         @media (min-width: 576px) and (max-width: 991.98px) {
             .subject-top-nav {
                 flex-direction: row;
@@ -656,19 +939,18 @@
                 width: auto;
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
+                gap: 10px;
             }
 
             .subject-hero-card {
-                padding: 20px 18px;
+                padding: 22px 20px;
             }
 
             .subject-card {
-                padding: 20px 18px;
+                padding: 22px 20px;
             }
         }
 
-        /* Mobile (< 576px): Stack header and equalize buttons */
         @media (max-width: 575.98px) {
             .subject-top-nav {
                 flex-direction: column;
@@ -694,7 +976,7 @@
             }
 
             .subject-hero-card {
-                padding: 18px 16px;
+                padding: 20px 18px;
             }
 
             .subject-hero-title {
@@ -702,25 +984,25 @@
             }
 
             .subject-hero-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 22px;
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
             }
 
             .subject-hero-aside {
                 width: 100%;
                 justify-content: flex-start;
-                margin-top: 4px;
+                margin-top: 6px;
             }
 
             .subject-card {
-                padding: 18px 16px;
+                padding: 20px 18px;
             }
         }
 
         @media (max-width: 390px) {
             .subject-hero-main {
-                gap: 12px;
+                gap: 14px;
             }
 
             .subject-hero-title {
@@ -728,7 +1010,7 @@
             }
 
             .subject-action-btn {
-                padding: 0 10px;
+                padding: 0 12px;
                 font-size: 13px;
             }
         }
@@ -1002,21 +1284,25 @@
                             </div>
 
                             @if($monHoc->lichHocs && $monHoc->lichHocs->isNotEmpty())
-                                <div class="d-flex flex-column gap-2.5">
+                                <div class="d-flex flex-column gap-3">
                                     @foreach($monHoc->lichHocs as $lich)
-                                        <div class="p-3 rounded-3" style="background: var(--sd-surface); border: 1px solid var(--sd-surface-border);">
+                                        <div class="subject-schedule-item">
                                             @php
                                                 $dowMap = [1 => 'Thứ 2', 2 => 'Thứ 3', 3 => 'Thứ 4', 4 => 'Thứ 5', 5 => 'Thứ 6', 6 => 'Thứ 7', 7 => 'Chủ Nhật'];
                                                 $tenThu = $dowMap[$lich->ngay_trong_tuan] ?? ('Thứ ' . $lich->ngay_trong_tuan);
                                             @endphp
-                                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                                <span class="fw-bold fs-7 text-primary">{{ $tenThu }}</span>
-                                                <span class="badge bg-secondary-subtle text-secondary small">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <span class="subject-schedule-dow">
+                                                    <i class="bi bi-clock-fill me-1.5 fs-7"></i>{{ $tenThu }}
+                                                </span>
+                                                <span class="subject-schedule-time">
                                                     {{ substr($lich->gio_bat_dau, 0, 5) }} - {{ substr($lich->gio_ket_thuc, 0, 5) }}
                                                 </span>
                                             </div>
                                             @if($lich->ghi_chu)
-                                                <p class="text-muted small mb-0">{{ $lich->ghi_chu }}</p>
+                                                <p class="subject-schedule-note mb-0 mt-1">
+                                                    <i class="bi bi-info-circle me-1"></i>{{ $lich->ghi_chu }}
+                                                </p>
                                             @endif
                                         </div>
                                     @endforeach
@@ -1054,7 +1340,7 @@
                     </p>
                 </div>
                 <div class="modal-footer border-0 d-flex justify-content-center gap-2 pt-2 pb-1">
-                    <button type="button" class="subject-action-btn" style="background: var(--sd-surface); color: var(--sd-text-main); border: 1px solid var(--sd-surface-border);" data-bs-dismiss="modal">
+                    <button type="button" class="subject-action-btn btn-modal-cancel" data-bs-dismiss="modal">
                         Hủy bỏ
                     </button>
                     <form action="{{ route('mon-hoc.destroy', $monHoc) }}" method="POST" class="m-0">
@@ -1076,51 +1362,6 @@
         document.getElementById('sidebarToggle')?.addEventListener('click', function() {
             document.getElementById('sidebar')?.classList.toggle('show');
         });
-
-        // Quick Theme Toggle Hook
-        const quickThemeBtn = document.getElementById('quickThemeBtn');
-        const quickThemeIcon = document.getElementById('quickThemeIcon');
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        function syncThemeIcon(theme) {
-            if (!quickThemeIcon) return;
-            if (theme === 'dark') {
-                quickThemeIcon.className = 'bi bi-sun-fill text-warning fs-6';
-            } else {
-                quickThemeIcon.className = 'bi bi-moon-stars-fill text-primary fs-6';
-            }
-        }
-
-        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-        syncThemeIcon(currentTheme);
-
-        if (quickThemeBtn) {
-            quickThemeBtn.addEventListener('click', function () {
-                const activeTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-                const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
-
-                document.documentElement.setAttribute('data-bs-theme', newTheme);
-                if (newTheme === 'dark') {
-                    document.documentElement.classList.add('dark-theme');
-                } else {
-                    document.documentElement.classList.remove('dark-theme');
-                }
-                localStorage.setItem('theme', newTheme);
-                syncThemeIcon(newTheme);
-
-                if (csrfToken) {
-                    fetch("{{ route('profile.theme.quick-toggle') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({ theme: newTheme })
-                    }).catch(() => {});
-                }
-            });
-        }
     </script>
     <!-- Floating Action Menu (Góc phải bên dưới) -->
     <x-floating-menu />

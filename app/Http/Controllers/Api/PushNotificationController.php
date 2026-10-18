@@ -104,6 +104,7 @@ class PushNotificationController extends Controller
                 'preferences' => [
                     'lich_hoc' => (bool) $user->thong_bao_lich_hoc,
                     'deadline' => (bool) $user->thong_bao_deadline,
+                    'cong_viec' => (bool) $user->thong_bao_cong_viec,
                     'tap_luyen' => (bool) $user->thong_bao_tap_luyen,
                     'am_thanh' => (bool) $user->am_thanh_thong_bao,
                 ],
@@ -125,16 +126,48 @@ class PushNotificationController extends Controller
             ], 400, [], JSON_UNESCAPED_UNICODE);
         }
 
-        $title = 'Life Planner — Thông báo thử nghiệm';
-        $body = 'Xin chào '.($user->ho_ten ?? 'bạn').'! Hệ thống Web Push trên PWA Life Planner đang hoạt động chính xác.';
-        $url = route('calendar.index');
+        $type = $request->input('type', 'test');
+        $userName = $user->ho_ten ?? 'bạn';
 
-        // Ghi vào bảng thong_bao của ứng dụng để đồng bộ
+        [$title, $body, $loaiThongBao, $url] = match ($type) {
+            'deadline' => [
+                '⏰ Life Planner — Nhắc nhở Deadline',
+                "Chào {$userName}! Bạn có hạn chót bài tập/công việc quan trọng cần hoàn thành hôm nay. Hãy kiểm tra ngay nhé!",
+                'deadline',
+                route('calendar.index'),
+            ],
+            'lich_hoc' => [
+                '🎓 Life Planner — Nhắc nhở Lịch học',
+                "Chào {$userName}! Lớp học theo thời khóa biểu của bạn sẽ bắt đầu sau 30 phút nữa. Chuẩn bị vào lớp nhé!",
+                'lich_hoc',
+                route('mon-hoc.index'),
+            ],
+            'cong_viec' => [
+                '💼 Life Planner — Nhắc nhở Công việc & Dự án',
+                "Chào {$userName}! Bạn có công việc quan trọng cần thực hiện trong hôm nay. Đừng quên kiểm tra và cập nhật tiến độ nhé!",
+                'cong_viec',
+                route('cong-viec.index'),
+            ],
+            'tap_luyen' => [
+                '💪 Life Planner — Giờ rèn luyện thể chất',
+                "Chào {$userName}! Đã đến giờ tập luyện theo kế hoạch rèn luyện. Khởi động và bắt đầu buổi tập hôm nay thôi nào!",
+                'tap_luyen',
+                route('tap-luyen.index'),
+            ],
+            default => [
+                '🔔 Life Planner — Thông báo đẩy PWA',
+                "Xin chào {$userName}! Hệ thống Web Push PWA đang hoạt động hoàn hảo trên thiết bị của bạn.",
+                'he_thong',
+                route('calendar.index'),
+            ],
+        };
+
+        // Ghi vào bảng thong_bao của ứng dụng để đồng bộ lịch sử
         ThongBao::create([
             'user_id' => $user->id,
             'tieu_de' => $title,
             'noi_dung' => $body,
-            'loai_thong_bao' => 'he_thong',
+            'loai_thong_bao' => $loaiThongBao,
             'da_doc' => false,
         ]);
 
@@ -144,8 +177,8 @@ class PushNotificationController extends Controller
             $body,
             $url,
             asset('images/icons/icon-192x192.png'),
-            'test-notification',
-            ['type' => 'test']
+            'test-notification-'.time(),
+            ['type' => $type]
         );
 
         if ($results['sent'] === 0 && $results['failed'] > 0) {
@@ -158,7 +191,9 @@ class PushNotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Đã gửi thông báo đẩy: thành công {$results['sent']}, thất bại {$results['failed']}.",
+            'message' => "Đã gửi thông báo đẩy thành công ({$results['sent']} thiết bị nhận được).",
+            'title' => $title,
+            'body' => $body,
             'results' => $results,
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }

@@ -113,8 +113,8 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-3 pt-2">
-            <button type="submit" class="btn btn-primary rounded-pill px-4">
+        <div class="d-flex align-items-center gap-2 pt-2">
+            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3.5 py-2 fw-semibold fs-7 shadow-xs">
                 <i class="bi bi-check-lg me-1"></i>Lưu giao diện & ngôn ngữ
             </button>
         </div>

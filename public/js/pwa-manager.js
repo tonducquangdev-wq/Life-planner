@@ -379,45 +379,107 @@
             }
         },
 
+        // Hiển thị thông báo Toast hiện đại trên giao diện
+        showToast: function (type, message, title = 'Life Planner PWA') {
+            let container = document.getElementById('pwaToastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'pwaToastContainer';
+                container.style.cssText = 'position: fixed; top: 18px; right: 18px; z-index: 10999; display: flex; flex-direction: column; gap: 10px; max-width: calc(100vw - 36px); width: 360px; pointer-events: none;';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'pwa-modern-toast shadow-lg border';
+            toast.style.cssText = 'pointer-events: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; transform: translateY(-12px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);';
+
+            const iconMap = {
+                success: { icon: 'bi-check-circle-fill', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
+                info: { icon: 'bi-info-circle-fill', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.12)' },
+                warning: { icon: 'bi-exclamation-triangle-fill', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
+                danger: { icon: 'bi-x-circle-fill', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' }
+            };
+
+            const cfg = iconMap[type] || iconMap.info;
+
+            toast.innerHTML = `
+                <div style="width: 34px; height: 34px; border-radius: 10px; background: ${cfg.bg}; color: ${cfg.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem;">
+                    <i class="bi ${cfg.icon}"></i>
+                </div>
+                <div style="flex-grow: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 0.85rem; color: #1e293b; margin-bottom: 2px;">${title}</div>
+                    <div style="font-size: 0.8rem; color: #64748b; line-height: 1.35; word-break: break-word;">${message}</div>
+                </div>
+                <button type="button" style="border: none; background: none; color: #94a3b8; font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0;" aria-label="Close">&times;</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Kích hoạt hiệu ứng trượt vào
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            });
+
+            const closeToast = () => {
+                toast.style.transform = 'translateY(-12px)';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            };
+
+            toast.querySelector('button')?.addEventListener('click', closeToast);
+            setTimeout(closeToast, 4500);
+        },
+
         // Đồng bộ giao diện trạng thái Push Notification
         syncPushUI: async function () {
             const status = await this.getPushStatus();
             const badges = document.querySelectorAll('.pwa-push-status-badge, #pwa-push-status-badge');
             const toggleBtns = document.querySelectorAll('.pwa-push-toggle-btn, #pwa-push-toggle-btn');
             const testBtns = document.querySelectorAll('.pwa-push-test-btn, #pwa-push-test-btn');
+            const quickTestCards = document.querySelectorAll('.pwa-quick-test-section');
 
             if (!status.supported) {
                 badges.forEach(badge => {
                     badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1';
-                    badge.textContent = 'Trình duyệt không hỗ trợ';
+                    badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Trình duyệt chưa hỗ trợ';
                 });
                 toggleBtns.forEach(btn => btn.disabled = true);
-                testBtns.forEach(btn => btn.style.display = 'none');
                 return;
             }
 
             if (status.subscribed) {
                 badges.forEach(badge => {
                     badge.className = 'badge bg-success-subtle text-success rounded-pill px-2.5 py-1';
-                    badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Đã bật trên thiết bị';
+                    badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Đã kích hoạt trên thiết bị này';
                 });
                 toggleBtns.forEach(btn => {
                     btn.disabled = false;
                     btn.className = 'btn btn-sm btn-outline-danger rounded-pill px-3';
                     btn.innerHTML = '<i class="bi bi-bell-slash-fill me-1"></i> Tắt thông báo';
                 });
-                testBtns.forEach(btn => btn.style.display = 'inline-flex');
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
+                quickTestCards.forEach(c => c.classList.remove('opacity-75'));
             } else {
                 badges.forEach(badge => {
                     badge.className = 'badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1';
-                    badge.innerHTML = '<i class="bi bi-bell-slash me-1"></i>Chưa kích hoạt';
+                    badge.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Chưa kích hoạt trên máy';
                 });
                 toggleBtns.forEach(btn => {
                     btn.disabled = false;
                     btn.className = 'btn btn-sm btn-primary rounded-pill px-3';
                     btn.innerHTML = '<i class="bi bi-bell-fill me-1"></i> Bật thông báo đẩy';
                 });
-                testBtns.forEach(btn => btn.style.display = 'none');
+                // Vẫn giữ nút test hiển thị để người dùng bấm 1 chạm là tự kích hoạt và bắn test luôn!
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
             }
         },
 
@@ -425,7 +487,7 @@
         togglePush: async function () {
             const status = await this.getPushStatus();
             if (!status.supported) {
-                alert('Trình duyệt hoặc môi trường hiện tại không hỗ trợ Web Push Notification.');
+                this.showToast('danger', 'Trình duyệt hoặc môi trường hiện tại không hỗ trợ Web Push Notification.', 'Không hỗ trợ');
                 return;
             }
 
@@ -441,13 +503,13 @@
                     const confirmed = confirm('Bạn có chắc muốn tắt nhận thông báo đẩy trên thiết bị này?');
                     if (!confirmed) return;
                     await this.unsubscribeFromPush();
-                    alert('Đã tắt nhận thông báo đẩy trên thiết bị.');
+                    this.showToast('info', 'Đã tắt nhận thông báo đẩy trên thiết bị này.', 'Đã tắt thông báo');
                 } else {
                     await this.subscribeToPush();
-                    alert('🎉 Tuyệt vời! Đã bật thông báo đẩy thành công cho thiết bị này.');
+                    this.showToast('success', 'Đã kích hoạt thông báo đẩy thành công trên thiết bị này!', 'Bật thông báo thành công');
                 }
             } catch (err) {
-                alert('Không thể thay đổi trạng thái thông báo: ' + err.message);
+                this.showToast('danger', err.message, 'Lỗi thiết lập thông báo');
             } finally {
                 await this.syncPushUI();
                 if (toggleBtn && originalHtml) {
@@ -456,16 +518,40 @@
             }
         },
 
-        // Gửi thử nghiệm một thông báo đẩy đến thiết bị
-        sendTestPush: async function () {
-            const testBtn = document.getElementById('pwa-push-test-btn') || document.querySelector('.pwa-push-test-btn');
-            const originalHtml = testBtn ? testBtn.innerHTML : null;
-            if (testBtn) {
-                testBtn.disabled = true;
-                testBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang gửi...';
+        // Gửi thử nghiệm một thông báo đẩy đến thiết bị (Hỗ trợ kịch bản: test, deadline, lich_hoc, tap_luyen)
+        sendTestPush: async function (type = 'test', clickedBtn = null) {
+            let activeBtn = clickedBtn;
+            if (!activeBtn) {
+                activeBtn = document.getElementById('pwa-push-test-btn') || document.querySelector('.pwa-push-test-btn');
+            }
+
+            const originalHtml = activeBtn ? activeBtn.innerHTML : null;
+            if (activeBtn) {
+                activeBtn.disabled = true;
+                activeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang gửi...';
             }
 
             try {
+                // 1. Kiểm tra trạng thái hỗ trợ
+                const status = await this.getPushStatus();
+                if (!status.supported) {
+                    this.showToast('danger', 'Trình duyệt hoặc môi trường hiện tại không hỗ trợ Web Push (Cần HTTPS hoặc cài đặt PWA).', 'Không hỗ trợ');
+                    return;
+                }
+
+                // 2. Nếu thiết bị chưa đăng ký Push, tự động kích hoạt quyền trước (1-Click Experience)
+                if (!status.subscribed) {
+                    this.showToast('info', 'Đang yêu cầu cấp quyền thông báo đẩy trên thiết bị của bạn...', 'Cấp quyền thông báo');
+                    try {
+                        await this.subscribeToPush();
+                        await this.syncPushUI();
+                    } catch (subErr) {
+                        this.showToast('warning', subErr.message || 'Bạn chưa cấp quyền nhận thông báo.', 'Chưa cấp quyền');
+                        return;
+                    }
+                }
+
+                // 3. Gửi lệnh Test Push lên máy chủ
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 const res = await fetch('/push/test', {
                     method: 'POST',
@@ -473,22 +559,26 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken || '',
                         'Accept': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ type: type })
                 });
 
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alert('🎉 Đã gửi thông báo thử nghiệm thành công! Vui lòng kiểm tra màn hình thông báo của thiết bị.');
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+                    }
+                    this.showToast('success', data.body || 'Đã bắn thông báo đẩy đến thiết bị! Hãy nhìn lên thanh thông báo / màn hình khóa.', data.title || 'Đã gửi thông báo đẩy');
                 } else {
-                    alert('Gửi thông báo thử thất bại: ' + (data.message || 'Lỗi không xác định'));
+                    this.showToast('danger', data.message || 'Gửi thông báo thử thất bại.', 'Lỗi gửi thông báo');
                 }
                 return data;
             } catch (err) {
-                alert('Lỗi kết nối khi gửi thử thông báo: ' + err.message);
+                this.showToast('danger', 'Lỗi kết nối máy chủ: ' + err.message, 'Lỗi kết nối');
             } finally {
-                if (testBtn && originalHtml) {
-                    testBtn.disabled = false;
-                    testBtn.innerHTML = originalHtml;
+                if (activeBtn && originalHtml) {
+                    activeBtn.disabled = false;
+                    activeBtn.innerHTML = originalHtml;
                 }
             }
         }

@@ -1399,97 +1399,115 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!toggleBtn || !popup) return;
 
         let isCommunityOpen = false;
-        const STORAGE_KEY = 'life_planner_world_chat_v1';
+        let lastMessageId = 0;
+        let worldChatPollTimer = null;
+        let isSending = false;
 
-        // Dữ liệu tin nhắn mẫu mặc định trên Kênh Thế Giới
-        const DEFAULT_WORLD_MESSAGES = [
-            {
-                isMe: false,
-                author: 'Hoàng Lâm',
-                avatar: 'HL',
-                text: 'Chào cả nhà gymer! Hôm nay ai tập ngực (Push Day) không? 💪',
-                time: '08:15 AM'
-            },
-            {
-                isMe: false,
-                author: 'Nguyễn Văn Hùng (HLV)',
-                avatar: 'VH',
-                text: 'Chào buổi sáng anh em! Nhớ khởi động xoay khớp vai kỹ trước khi đẩy tạ nặng nhé các bro!',
-                time: '08:24 AM'
-            },
-            {
-                isMe: false,
-                author: 'Tôn Đức Quang',
-                avatar: 'TQ',
-                text: 'Sáng nay vừa hoàn thành 4 sets Squat 110kg, chân mỏi nhừ nhưng phê quá anh em ơi! 🔥',
-                time: '08:50 AM'
-            },
-            {
-                isMe: false,
-                author: 'Trần Hoàng Nam',
-                avatar: 'HN',
-                text: 'Hôm nay ngày nghỉ (Rest Day) nạp đủ dinh dưỡng để mai vào việc tiếp. Chúc anh em tập cháy nhé!',
-                time: '09:10 AM'
-            }
-        ];
-
-        function loadWorldMessages() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) {}
-            return [...DEFAULT_WORLD_MESSAGES];
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
-        function saveWorldMessages(messages) {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-            } catch (e) {}
-        }
+        function createMessageElement(msg) {
+            const row = document.createElement('div');
+            row.className = `world-msg-row ${msg.is_me ? 'sent-by-me' : ''}`;
+            row.setAttribute('data-msg-id', msg.id);
 
-        function renderWorldMessages() {
-            if (!messagesArea) return;
-            const messages = loadWorldMessages();
+            const safeText = escapeHtml(msg.text);
 
-            messagesArea.innerHTML = `
-                <div class="text-center my-1">
-                    <span class="badge bg-light text-muted border rounded-pill px-3 py-1 fs-9 fw-normal shadow-2xs">
-                        <i class="bi bi-broadcast me-1 text-primary"></i> Kênh Chat Thế Giới Gymer • Đang hoạt động
-                    </span>
-                </div>
-            `;
+            if (msg.is_me) {
+                row.innerHTML = `
+                    <div class="world-msg-bubble">
+                        <div>${safeText}</div>
+                        <span class="world-msg-time">${msg.time || ''}</span>
+                    </div>
+                `;
+            } else {
+                const avatarHtml = msg.avatar_url
+                    ? `<img src="${msg.avatar_url}" class="rounded-circle w-100 h-100 object-fit-cover" alt="${escapeHtml(msg.author)}">`
+                    : (msg.avatar || 'G');
 
-            messages.forEach(msg => {
-                const row = document.createElement('div');
-                row.className = `world-msg-row ${msg.isMe ? 'sent-by-me' : ''}`;
-
-                if (msg.isMe) {
-                    row.innerHTML = `
+                row.innerHTML = `
+                    <div class="world-msg-avatar">${avatarHtml}</div>
+                    <div class="min-w-0">
+                        <div class="world-msg-author">${escapeHtml(msg.author)}</div>
                         <div class="world-msg-bubble">
-                            <div>${msg.text}</div>
-                            <span class="world-msg-time">${msg.time}</span>
+                            <div>${safeText}</div>
+                            <span class="world-msg-time">${msg.time || ''}</span>
                         </div>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <div class="world-msg-avatar">${msg.avatar || 'G'}</div>
-                        <div class="min-w-0">
-                            <div class="world-msg-author">${msg.author}</div>
-                            <div class="world-msg-bubble">
-                                <div>${msg.text}</div>
-                                <span class="world-msg-time">${msg.time}</span>
-                            </div>
-                        </div>
-                    `;
+                    </div>
+                `;
+            }
+
+            return row;
+        }
+
+        async function fetchWorldMessages(isInitial = false) {
+            if (!messagesArea) return;
+
+            const url = isInitial || lastMessageId === 0
+                ? '/world-chat/messages'
+                : `/world-chat/messages?after_id=${lastMessageId}`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.success || !Array.isArray(data.messages)) return;
+
+                if (data.online_count) {
+                    const onlineEl = document.getElementById('worldOnlineCountText');
+                    if (onlineEl) onlineEl.textContent = `${data.online_count} Gymer đang online`;
                 }
 
-                messagesArea.appendChild(row);
-            });
+                if (isInitial) {
+                    messagesArea.innerHTML = `
+                        <div class="text-center my-1">
+                            <span class="badge bg-light text-muted border rounded-pill px-3 py-1 fs-9 fw-normal shadow-2xs">
+                                <i class="bi bi-broadcast me-1 text-primary"></i> Kênh Chat Thế Giới Gymer • Đang hoạt động
+                            </span>
+                        </div>
+                    `;
+                    lastMessageId = 0;
+                }
 
-            messagesArea.scrollTop = messagesArea.scrollHeight;
+                let hasNew = false;
+                data.messages.forEach(msg => {
+                    if (msg.id > lastMessageId) {
+                        lastMessageId = msg.id;
+                    }
+                    if (!messagesArea.querySelector(`[data-msg-id="${msg.id}"]`)) {
+                        messagesArea.appendChild(createMessageElement(msg));
+                        hasNew = true;
+                    }
+                });
+
+                if (hasNew || isInitial) {
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                }
+            } catch (err) {
+                console.warn('WorldChat fetch failed:', err);
+            }
+        }
+
+        function startPolling() {
+            stopPolling();
+            worldChatPollTimer = setInterval(() => {
+                if (isCommunityOpen) {
+                    fetchWorldMessages(false);
+                }
+            }, 3000);
+        }
+
+        function stopPolling() {
+            if (worldChatPollTimer) {
+                clearInterval(worldChatPollTimer);
+                worldChatPollTimer = null;
+            }
         }
 
         function isFloatingMenuOpenHelper() {
@@ -1520,7 +1538,8 @@ document.addEventListener('DOMContentLoaded', function () {
             toggleBtn.classList.add('active');
             if (iconOpen) iconOpen.classList.add('d-none');
             if (iconActive) iconActive.classList.remove('d-none');
-            renderWorldMessages();
+            fetchWorldMessages(true);
+            startPolling();
             setTimeout(() => {
                 if (chatInput) chatInput.focus();
             }, 100);
@@ -1532,6 +1551,7 @@ document.addEventListener('DOMContentLoaded', function () {
             toggleBtn.classList.remove('active');
             if (iconOpen) iconOpen.classList.remove('d-none');
             if (iconActive) iconActive.classList.add('d-none');
+            stopPolling();
         }
 
         // Cung cấp các helper toàn cục để đồng bộ trạng thái giữa Menu và Chat
@@ -1550,11 +1570,6 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
 
-            // QUY TẮC QUAN TRỌNG NHẤT (Rule 9 & 10):
-            // Khi Menu đang mở:
-            // - Bấm icon Chat -> Chỉ đóng Menu!
-            // - Chat vẫn CLOSED (KHÔNG tự động mở).
-            // - Muốn mở Chat, người dùng phải bấm icon Chat LẦN NỮA.
             if (isFloatingMenuOpenHelper()) {
                 closeFloatingMenuHelper();
                 return;
@@ -1577,7 +1592,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (btnRefresh) {
             btnRefresh.addEventListener('click', function(e) {
                 e.stopPropagation();
-                renderWorldMessages();
+                fetchWorldMessages(true);
             });
         }
 
@@ -1597,77 +1612,49 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Gửi tin nhắn lên Kênh Thế Giới
-        function sendWorldMessage() {
-            if (!chatInput) return;
+        // Gửi tin nhắn thực tế lên Kênh Thế Giới qua AJAX
+        async function sendWorldMessage() {
+            if (!chatInput || isSending) return;
             const text = chatInput.value.trim();
             if (!text) return;
 
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const submitBtn = document.getElementById('btnSendWorldMessage');
 
-            const newMsg = {
-                isMe: true,
-                author: 'Bạn',
-                avatar: 'ME',
-                text: text,
-                time: timeStr
-            };
+            isSending = true;
+            if (submitBtn) submitBtn.disabled = true;
 
-            const messages = loadWorldMessages();
-            messages.push(newMsg);
-            saveWorldMessages(messages);
+            try {
+                const res = await fetch('/world-chat/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                    },
+                    body: JSON.stringify({ noi_dung: text })
+                });
 
-            // Render ngay vào DOM
-            const row = document.createElement('div');
-            row.className = 'world-msg-row sent-by-me';
-            row.innerHTML = `
-                <div class="world-msg-bubble">
-                    <div>${text}</div>
-                    <span class="world-msg-time">${timeStr}</span>
-                </div>
-            `;
-            messagesArea.appendChild(row);
-            chatInput.value = '';
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-
-            // Phản hồi ngẫu nhiên từ cộng đồng sau 1.2s tạo không khí sôi động
-            const replies = [
-                { author: 'Nguyễn Văn Hùng (HLV)', avatar: 'VH', text: 'Tuyệt vời bro! Giữ form chuẩn và tập đều đặn nhé 🔥' },
-                { author: 'Tôn Đức Quang', avatar: 'TQ', text: 'Cố lên bạn ơi, rep cuối đẩy cháy hết mình luôn nhé! 💪' },
-                { author: 'Trần Hoàng Nam', avatar: 'HN', text: 'Chuẩn luôn anh em, tập xong nhớ nạp đủ protein và uống nước nha!' },
-                { author: 'Hoàng Lâm', avatar: 'HL', text: 'Đồng đội rèn luyện cùng nhau thế này năng lượng lên hẳn! 🔥' }
-            ];
-
-            setTimeout(() => {
-                const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                const replyMsg = {
-                    isMe: false,
-                    author: randomReply.author,
-                    avatar: randomReply.avatar,
-                    text: randomReply.text,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-
-                const currentMsgs = loadWorldMessages();
-                currentMsgs.push(replyMsg);
-                saveWorldMessages(currentMsgs);
-
-                const replyRow = document.createElement('div');
-                replyRow.className = 'world-msg-row';
-                replyRow.innerHTML = `
-                    <div class="world-msg-avatar">${replyMsg.avatar}</div>
-                    <div class="min-w-0">
-                        <div class="world-msg-author">${replyMsg.author}</div>
-                        <div class="world-msg-bubble">
-                            <div>${replyMsg.text}</div>
-                            <span class="world-msg-time">${replyMsg.time}</span>
-                        </div>
-                    </div>
-                `;
-                messagesArea.appendChild(replyRow);
-                messagesArea.scrollTop = messagesArea.scrollHeight;
-            }, 1200);
+                const data = await res.json();
+                if (res.ok && data.success && data.data) {
+                    chatInput.value = '';
+                    if (data.data.id > lastMessageId) {
+                        lastMessageId = data.data.id;
+                    }
+                    if (!messagesArea.querySelector(`[data-msg-id="${data.data.id}"]`)) {
+                        messagesArea.appendChild(createMessageElement(data.data));
+                        messagesArea.scrollTop = messagesArea.scrollHeight;
+                    }
+                } else {
+                    alert(data.message || 'Không thể gửi tin nhắn. Vui lòng thử lại!');
+                }
+            } catch (err) {
+                console.error('Send world message error:', err);
+            } finally {
+                isSending = false;
+                if (submitBtn) submitBtn.disabled = false;
+                if (chatInput) chatInput.focus();
+            }
         }
 
         if (chatForm) {

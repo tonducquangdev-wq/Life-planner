@@ -178,7 +178,7 @@ class CalendarViewTest extends TestCase
     {
         $user = User::factory()->create();
 
-        SuKien::create([
+        $event = SuKien::create([
             'user_id' => $user->id,
             'tieu_de' => 'Deadline kiểm thử API',
             'loai_su_kien' => 'deadline',
@@ -192,7 +192,50 @@ class CalendarViewTest extends TestCase
             'success' => true,
         ]);
         $response->assertJsonFragment([
+            'id' => 'sk-'.$event->id,
+            'raw_id' => $event->id,
+            'source_type' => 'su_kien',
             'tieu_de' => 'Deadline kiểm thử API',
         ]);
+
+        $item = collect($response->json('data'))->firstWhere('id', 'sk-'.$event->id);
+        $this->assertNotNull($item);
+        $this->assertArrayHasKey('due_time_raw', $item);
+        $this->assertArrayHasKey('due_timestamp', $item);
+    }
+
+    public function test_deadlines_accurately_detects_overdue_and_upcoming_today(): void
+    {
+        $user = User::factory()->create();
+
+        // 1. Deadline đã quá hạn hôm nay (30 phút trước) -> phải bị loại bỏ
+        SuKien::create([
+            'user_id' => $user->id,
+            'tieu_de' => 'Deadline đã trễ giờ',
+            'loai_su_kien' => 'deadline',
+            'thoi_gian_bat_dau' => Carbon::now()->subMinutes(30),
+        ]);
+
+        // 2. Deadline sắp tới hôm nay (45 phút nữa) -> được giữ lại
+        SuKien::create([
+            'user_id' => $user->id,
+            'tieu_de' => 'Deadline sắp đến trong 45 phút',
+            'loai_su_kien' => 'deadline',
+            'thoi_gian_bat_dau' => Carbon::now()->addMinutes(45),
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/calendar/deadlines');
+
+        $response->assertStatus(200);
+        $data = collect($response->json('data'));
+
+        // Deadline quá hạn phải bị loại bỏ hoàn toàn
+        $overdueItem = $data->firstWhere('tieu_de', 'Deadline đã trễ giờ');
+        $this->assertNull($overdueItem);
+
+        // Deadline sắp tới từ thời điểm hiện tại trở đi được hiển thị
+        $upcomingItem = $data->firstWhere('tieu_de', 'Deadline sắp đến trong 45 phút');
+        $this->assertNotNull($upcomingItem);
+        $this->assertStringStartsWith('Còn ', $upcomingItem['con_lai']);
     }
 }

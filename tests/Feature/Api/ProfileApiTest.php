@@ -19,63 +19,67 @@ class ProfileApiTest extends TestCase
     public function test_authenticated_user_can_update_profile_successfully(): void
     {
         $user = User::factory()->create([
-            'ho_ten'              => 'Tên Cũ',
-            'email'               => 'old_email@example.com',
-            'ngon_ngu'            => 'vi',
-            'giao_dien'           => 'light',
-            'thong_bao_enabled'   => true,
-            'thong_bao_lich_hoc'  => true,
-            'thong_bao_deadline'  => true,
+            'ho_ten' => 'Tên Cũ',
+            'email' => 'old_email@example.com',
+            'ngon_ngu' => 'vi',
+            'giao_dien' => 'light',
+            'thong_bao_enabled' => true,
+            'thong_bao_lich_hoc' => true,
+            'thong_bao_deadline' => true,
+            'thong_bao_cong_viec' => true,
             'thong_bao_tap_luyen' => true,
-            'am_thanh_thong_bao'  => true,
+            'am_thanh_thong_bao' => true,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $updateData = [
-            'ho_ten'              => 'Tên Mới Triển Khai',
-            'email'               => 'new_email@example.com',
-            'ngon_ngu'            => 'en',
-            'giao_dien'           => 'dark',
-            'thong_bao_enabled'   => false,
-            'thong_bao_lich_hoc'  => false,
-            'thong_bao_deadline'  => false,
+            'ho_ten' => 'Tên Mới Triển Khai',
+            'email' => 'new_email@example.com',
+            'ngon_ngu' => 'en',
+            'giao_dien' => 'dark',
+            'thong_bao_enabled' => false,
+            'thong_bao_lich_hoc' => false,
+            'thong_bao_deadline' => false,
+            'thong_bao_cong_viec' => false,
             'thong_bao_tap_luyen' => false,
-            'am_thanh_thong_bao'  => false,
+            'am_thanh_thong_bao' => false,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me', $updateData);
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Cập nhật thông tin trang cá nhân thành công!',
-                'data'    => [
-                    'id'                  => $user->id,
-                    'ho_ten'              => 'Tên Mới Triển Khai',
-                    'email'               => 'new_email@example.com',
-                    'ngon_ngu'            => 'en',
-                    'giao_dien'           => 'dark',
-                    'thong_bao_enabled'   => false,
-                    'thong_bao_lich_hoc'  => false,
-                    'thong_bao_deadline'  => false,
+                'data' => [
+                    'id' => $user->id,
+                    'ho_ten' => 'Tên Mới Triển Khai',
+                    'email' => 'new_email@example.com',
+                    'ngon_ngu' => 'en',
+                    'giao_dien' => 'dark',
+                    'thong_bao_enabled' => false,
+                    'thong_bao_lich_hoc' => false,
+                    'thong_bao_deadline' => false,
+                    'thong_bao_cong_viec' => false,
                     'thong_bao_tap_luyen' => false,
-                    'am_thanh_thong_bao'  => false,
+                    'am_thanh_thong_bao' => false,
                 ],
             ]);
 
         $this->assertDatabaseHas('users', [
-            'id'                  => $user->id,
-            'ho_ten'              => 'Tên Mới Triển Khai',
-            'email'               => 'new_email@example.com',
-            'ngon_ngu'            => 'en',
-            'giao_dien'           => 'dark',
-            'thong_bao_enabled'   => 0,
-            'thong_bao_lich_hoc'  => 0,
-            'thong_bao_deadline'  => 0,
+            'id' => $user->id,
+            'ho_ten' => 'Tên Mới Triển Khai',
+            'email' => 'new_email@example.com',
+            'ngon_ngu' => 'en',
+            'giao_dien' => 'dark',
+            'thong_bao_enabled' => 0,
+            'thong_bao_lich_hoc' => 0,
+            'thong_bao_deadline' => 0,
+            'thong_bao_cong_viec' => 0,
             'thong_bao_tap_luyen' => 0,
-            'am_thanh_thong_bao'  => 0,
+            'am_thanh_thong_bao' => 0,
         ]);
     }
 
@@ -89,7 +93,7 @@ class ProfileApiTest extends TestCase
 
         $tokenA = $userA->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $tokenA)
+        $response = $this->withHeader('Authorization', 'Bearer '.$tokenA)
             ->putJson('/api/me', [
                 'email' => 'userb@example.com',
             ]);
@@ -117,26 +121,26 @@ class ProfileApiTest extends TestCase
     {
         $originalPassword = 'password123';
         $user = User::factory()->create([
-            'ho_ten'   => 'Tên Gốc',
+            'ho_ten' => 'Tên Gốc',
             'password' => Hash::make($originalPassword),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me', [
-                'ho_ten'   => 'Tên Hợp Lệ',
+                'ho_ten' => 'Tên Hợp Lệ',
                 'password' => 'hacked_password_123',
-                'id'       => 99999,
-                'user_id'  => 88888,
+                'id' => 99999,
+                'user_id' => 88888,
                 'is_admin' => 1,
             ]);
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'data'    => [
-                    'id'     => $user->id,
+                'data' => [
+                    'id' => $user->id,
                     'ho_ten' => 'Tên Hợp Lệ',
                 ],
             ]);
@@ -163,7 +167,7 @@ class ProfileApiTest extends TestCase
 
         $file = UploadedFile::fake()->image('avatar.jpg', 200, 200);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/me/avatar', [
                 'avatar' => $file,
             ]);
@@ -183,7 +187,7 @@ class ProfileApiTest extends TestCase
         $response->assertJson([
             'data' => [
                 'anh_dai_dien' => $user->anh_dai_dien,
-                'avatar_url'   => $user->avatar_url,
+                'avatar_url' => $user->avatar_url,
             ],
         ]);
     }
@@ -216,7 +220,7 @@ class ProfileApiTest extends TestCase
 
         $file = UploadedFile::fake()->create('document.pdf', 500, 'application/pdf');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/me/avatar', [
                 'avatar' => $file,
             ]);
@@ -247,7 +251,7 @@ class ProfileApiTest extends TestCase
         // Upload avatar mới
         $newFile = UploadedFile::fake()->image('new_avatar.jpg');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/me/avatar', [
                 'avatar' => $newFile,
             ]);
@@ -278,17 +282,17 @@ class ProfileApiTest extends TestCase
         $user->anh_dai_dien = $filePath;
         $user->save();
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->deleteJson('/api/me/avatar');
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Đã xóa ảnh đại diện!',
-                'data'    => [
+                'data' => [
                     'anh_dai_dien' => null,
-                    'avatar_url'   => null,
-                    'initials'     => 'NA',
+                    'avatar_url' => null,
+                    'initials' => 'NA',
                 ],
             ]);
     }
@@ -320,7 +324,7 @@ class ProfileApiTest extends TestCase
 
         Storage::disk('public')->assertExists($filePath);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->deleteJson('/api/me/avatar');
 
         $response->assertStatus(200);
@@ -339,16 +343,16 @@ class ProfileApiTest extends TestCase
         $user = User::factory()->create(['anh_dai_dien' => null]);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->deleteJson('/api/me/avatar');
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Đã xóa ảnh đại diện!',
-                'data'    => [
+                'data' => [
                     'anh_dai_dien' => null,
-                    'avatar_url'   => null,
+                    'avatar_url' => null,
                 ],
             ]);
     }
@@ -364,10 +368,10 @@ class ProfileApiTest extends TestCase
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me/password', [
-                'current_password'      => 'oldpassword123',
-                'password'              => 'newpassword123',
+                'current_password' => 'oldpassword123',
+                'password' => 'newpassword123',
                 'password_confirmation' => 'newpassword123',
             ]);
 
@@ -395,23 +399,23 @@ class ProfileApiTest extends TestCase
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Đổi mật khẩu
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me/password', [
-                'current_password'      => 'oldpassword123',
-                'password'              => 'newpassword123',
+                'current_password' => 'oldpassword123',
+                'password' => 'newpassword123',
                 'password_confirmation' => 'newpassword123',
             ]);
 
         $response->assertStatus(200);
 
         // Gọi lại API GET /api/me bằng chính token đó
-        $meResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $meResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/me');
 
         $meResponse->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'data'    => [
+                'data' => [
                     'id' => $user->id,
                 ],
             ]);
@@ -428,10 +432,10 @@ class ProfileApiTest extends TestCase
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me/password', [
-                'current_password'      => 'wrongpassword',
-                'password'              => 'newpassword123',
+                'current_password' => 'wrongpassword',
+                'password' => 'newpassword123',
                 'password_confirmation' => 'newpassword123',
             ]);
 
@@ -450,10 +454,10 @@ class ProfileApiTest extends TestCase
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me/password', [
-                'current_password'      => 'oldpassword123',
-                'password'              => 'short',
+                'current_password' => 'oldpassword123',
+                'password' => 'short',
                 'password_confirmation' => 'short',
             ]);
 
@@ -472,10 +476,10 @@ class ProfileApiTest extends TestCase
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/me/password', [
-                'current_password'      => 'oldpassword123',
-                'password'              => 'newpassword123',
+                'current_password' => 'oldpassword123',
+                'password' => 'newpassword123',
                 'password_confirmation' => 'differentpassword123',
             ]);
 
@@ -489,8 +493,8 @@ class ProfileApiTest extends TestCase
     public function test_unauthenticated_guest_cannot_update_password(): void
     {
         $response = $this->putJson('/api/me/password', [
-            'current_password'      => 'oldpassword123',
-            'password'              => 'newpassword123',
+            'current_password' => 'oldpassword123',
+            'password' => 'newpassword123',
             'password_confirmation' => 'newpassword123',
         ]);
 

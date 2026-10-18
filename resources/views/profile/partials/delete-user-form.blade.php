@@ -9,7 +9,7 @@
     </header>
 
     <div class="mt-3">
-        <button type="button" class="btn btn-outline-danger rounded-pill px-4 fw-semibold" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3.5 py-2 fw-semibold fs-7 shadow-2xs" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
             <i class="bi bi-trash3-fill me-1"></i>Xóa tài khoản
         </button>
     </div>
@@ -46,10 +46,10 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold">
-                            <i class="bi bi-trash3-fill me-1"></i>Xác nhận xóa vĩnh viễn
+                    <div class="modal-footer border-0 pt-0 gap-2 justify-content-end">
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1.5 text-nowrap" data-bs-dismiss="modal">Hủy bỏ</button>
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3.5 py-1.5 fw-semibold text-nowrap">
+                            <i class="bi bi-trash3-fill me-1"></i>Xác nhận xóa
                         </button>
                     </div>
                 </form>

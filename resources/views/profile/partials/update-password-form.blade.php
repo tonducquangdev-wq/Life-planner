@@ -34,8 +34,8 @@
             @endif
         </div>
 
-        <div class="d-flex align-items-center gap-3 mt-4">
-            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+        <div class="d-flex align-items-center gap-2 mt-4">
+            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3.5 py-2 fw-semibold fs-7 shadow-xs">
                 <i class="bi bi-key-fill me-1"></i>Cập nhật mật khẩu
             </button>
         </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SuKienController;
 use App\Http\Controllers\TapLuyenController;
+use App\Http\Controllers\WorldChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -92,6 +93,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/push/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
     Route::get('/push/status', [PushNotificationController::class, 'status'])->name('push.status');
     Route::post('/push/test', [PushNotificationController::class, 'testPush'])->name('push.test');
+
+    // KÊNH CHAT THẾ GIỚI
+    Route::get('/world-chat/messages', [WorldChatController::class, 'index'])->name('world-chat.index');
+    Route::post('/world-chat/messages', [WorldChatController::class, 'store'])->name('world-chat.store');
 });
 
 // Route trang Offline dự phòng khi mất kết nối mạng

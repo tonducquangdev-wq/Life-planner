@@ -51,9 +51,9 @@
                     </div>
                 </div>
 
-                <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-end gap-2">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-medium" data-bs-dismiss="modal" id="cancelAvatarBtn">Hủy</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold" id="submitAvatarBtn">
+                <div class="modal-footer border-0 pt-0 pb-3 px-3 px-sm-4 justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1.5 fw-medium text-nowrap" data-bs-dismiss="modal" id="cancelAvatarBtn">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3.5 py-1.5 fw-semibold text-nowrap" id="submitAvatarBtn">
                         <i class="bi bi-cloud-arrow-up-fill me-1"></i>Cập nhật ảnh
                     </button>
                 </div>

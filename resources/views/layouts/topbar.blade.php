@@ -28,8 +28,14 @@
         </div>
     </div>
 
-    <!-- BÊN PHẢI: USER PROFILE DROPDOWN -->
+    <!-- BÊN PHẢI: USER PROFILE DROPDOWN & DARK MODE TOGGLE -->
     <div class="topbar-right header-actions d-flex align-items-center gap-2 gap-sm-3">
+
+        <!-- Nút Chuyển Giao Diện Sáng / Tối (Dark Mode Toggle) -->
+        <button type="button" class="btn btn-light rounded-circle p-2 topbar-theme-toggle border-0 shadow-2xs d-flex align-items-center justify-content-center cursor-pointer" id="topbarThemeToggle" title="Chuyển chế độ Sáng / Tối" onclick="window.LifePlannerTheme && window.LifePlannerTheme.toggle()" style="width: 38px; height: 38px;">
+            <i class="bi bi-moon-stars-fill theme-icon-dark text-warning fs-6"></i>
+            <i class="bi bi-sun-fill theme-icon-light text-warning fs-6 d-none"></i>
+        </button>
 
         <!-- Avatar người dùng, Tên & Email & Dropdown -->
         <div class="user-profile dropdown">

@@ -24,7 +24,7 @@
                 <!-- SECTION CHO ANDROID VÀ DESKTOP -->
                 <div id="pwaAndroidInstructions">
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-primary rounded-pill py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2"
+                        <button type="button" class="btn btn-sm btn-primary rounded-pill py-2 fw-semibold fs-7 shadow-sm d-flex align-items-center justify-content-center gap-2"
                                 onclick="window.LifePlannerPWA?.promptInstall()">
                             <i class="bi bi-download"></i>
                             <span>Cài đặt lên thiết bị ngay</span>
@@ -54,7 +54,7 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer border-0 pt-0 justify-content-center">
-                <button type="button" class="btn btn-sm btn-light rounded-pill px-4 text-muted border" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-sm btn-light rounded-pill px-3.5 py-1.5 text-muted border fs-8 fw-medium" data-bs-dismiss="modal">
                     Để sau
                 </button>
             </div>

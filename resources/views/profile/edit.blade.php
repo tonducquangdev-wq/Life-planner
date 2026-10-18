@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Hồ Sơ Cá Nhân & Cài Đặt - Life Planner</title>
 
@@ -127,6 +127,76 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* Tối ưu hiển thị Responsive trên thiết bị Mobile */
+        @media (max-width: 767.98px) {
+            .profile-cover-banner {
+                height: 95px;
+                border-radius: 0.85rem 0.85rem 0 0;
+            }
+            .profile-avatar-wrapper {
+                margin-top: -42px;
+            }
+            .profile-avatar-xl {
+                width: 82px;
+                height: 82px;
+                font-size: 1.85rem;
+                border-width: 3px;
+            }
+            .avatar-edit-badge {
+                width: 28px;
+                height: 28px;
+                bottom: 2px;
+                right: 2px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Menu Tabs cuộn ngang mượt mà (Horizontal Scrollable Chips) trên Mobile & Tablet */
+        @media (max-width: 991.98px) {
+            .profile-tabs-card {
+                padding: 0.35rem 0 !important;
+                margin-bottom: 0.5rem;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                position: static !important;
+            }
+            .profile-nav-pills {
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                gap: 0.5rem !important;
+                padding: 0.25rem 0.25rem 0.5rem 0.25rem;
+            }
+            .profile-nav-pills::-webkit-scrollbar {
+                display: none;
+            }
+            .profile-nav-pills .nav-link {
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+                padding: 0.5rem 0.95rem !important;
+                font-size: 0.85rem !important;
+                border-radius: 9999px !important;
+                background-color: #ffffff;
+                border: 1px solid rgba(226, 232, 240, 0.9);
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+            }
+            .profile-nav-pills .nav-link.active {
+                background-color: #6366f1 !important;
+                border-color: #6366f1 !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.28);
+            }
+            .profile-nav-pills .nav-link i {
+                font-size: 0.95rem !important;
+            }
+            .content-body {
+                padding-bottom: 95px !important; /* Khoảng cách an toàn tránh bị Bottom Nav che */
+            }
+        }
     </style>
 </head>
 
@@ -139,21 +209,23 @@
     <div class="main-wrapper">
 
         <!-- HEADER THANH CÔNG CỤ TRÊN CÙNG -->
-        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-none p-1 px-2 border rounded-3" id="sidebarToggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                    <i class="bi bi-list fs-4 text-primary"></i>
-                </button>
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="bi bi-person-bounding-box text-primary"></i> Hồ Sơ Cá Nhân & Cài Đặt
+        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2 gap-sm-3 min-w-0">
+                <a href="{{ route('calendar.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1.5 flex-shrink-0" title="Quay lại Lịch">
+                    <i class="bi bi-arrow-left"></i>
+                    <span class="d-none d-sm-inline">Lịch</span>
+                </a>
+                <h5 class="fw-bold text-dark mb-0 fs-6 fs-md-5 d-flex align-items-center gap-2 text-truncate">
+                    <i class="bi bi-person-bounding-box text-primary flex-shrink-0"></i>
+                    <span class="text-truncate">Hồ Sơ Cá Nhân & Cài Đặt</span>
                 </h5>
             </div>
 
-            <!-- Khu vực người dùng & Nút Thông báo -->
-            <div class="header-actions d-flex align-items-center gap-3">
+            <!-- Khu vực người dùng & Nút Dropdown -->
+            <div class="header-actions d-flex align-items-center gap-2 gap-sm-3 flex-shrink-0">
                 <!-- User Profile Dropdown -->
                 <div class="user-profile dropdown">
-                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-avatar">
                             @if(!empty($user->avatar_url))
                                 <img src="{{ $user->avatar_url }}" alt="Avatar" class="w-100 h-100 rounded-circle object-fit-cover">
@@ -180,51 +252,51 @@
         </header>
 
         <!-- NỘI DUNG CHÍNH (CONTENT BODY) -->
-        <main class="content-body p-3 p-lg-4">
+        <main class="content-body p-2 p-sm-3 p-lg-4">
 
             <!-- THÔNG BÁO THÀNH CÔNG NẾU CÓ -->
             @if (session('status') === 'avatar-updated')
-                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-3 mb-md-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>Ảnh đại diện đã được cập nhật thành công!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             @if (session('status') === 'profile-updated')
-                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-3 mb-md-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>Thông tin cá nhân đã được cập nhật thành công!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             @if (session('status') === 'password-updated')
-                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-3 mb-md-4" role="alert">
                     <i class="bi bi-shield-check me-2"></i>Mật khẩu tài khoản đã được cập nhật thành công!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             @if (session('status') === 'notifications-updated')
-                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-3 mb-md-4" role="alert">
                     <i class="bi bi-bell-check-fill me-2"></i>Cấu hình thông báo đã được cập nhật thành công!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             @if (session('status') === 'appearance-updated')
-                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-xs mb-3 mb-md-4" role="alert">
                     <i class="bi bi-palette-fill me-2"></i>Cấu hình giao diện và ngôn ngữ đã được cập nhật thành công!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             <!-- 1. HERO COVER & PROFILE SUMMARY CARD HEADER -->
-            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4 overflow-hidden">
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-3 mb-md-4 overflow-hidden">
                 <div class="profile-cover-banner"></div>
-                <div class="px-4 pb-4 position-relative">
+                <div class="px-3 px-sm-4 pb-3 pb-sm-4 position-relative">
                     <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-3 text-center text-md-start">
-                        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3">
-                            <div class="profile-avatar-wrapper">
+                        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 min-w-0">
+                            <div class="profile-avatar-wrapper flex-shrink-0">
                                 @if(!empty($user->avatar_url))
                                     <img src="{{ $user->avatar_url }}" alt="Avatar" class="profile-avatar-xl">
                                 @else
@@ -233,23 +305,23 @@
                                     </div>
                                 @endif
                                 <button type="button" class="avatar-edit-badge" data-bs-toggle="modal" data-bs-target="#changeAvatarModal" title="Đổi ảnh đại diện">
-                                    <i class="bi bi-camera-fill fs-6"></i>
+                                    <i class="bi bi-camera-fill"></i>
                                 </button>
                             </div>
-                            <div class="pt-2 pt-md-0 mb-md-2">
-                                <h4 class="fw-bold text-dark mb-1">{{ $user->ho_ten ?? 'Người dùng' }}</h4>
-                                <p class="text-muted small mb-0 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
-                                    <span><i class="bi bi-envelope me-1"></i>{{ $user->email }}</span>
-                                    <span>•</span>
+                            <div class="pt-2 pt-md-0 mb-md-2 min-w-0">
+                                <h4 class="fw-bold text-dark mb-1 fs-5 fs-md-4 text-truncate">{{ $user->ho_ten ?? 'Người dùng' }}</h4>
+                                <div class="text-muted small mb-0 d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2">
+                                    <span class="text-truncate"><i class="bi bi-envelope me-1"></i>{{ $user->email }}</span>
+                                    <span class="d-none d-sm-inline">•</span>
                                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">
                                         <i class="bi bi-patch-check-fill me-1"></i>Student Life Planner
                                     </span>
-                                </p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2 mb-md-2">
-                            <button type="button" class="btn btn-outline-primary rounded-pill px-3 btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#changeAvatarModal">
+                        <div class="d-flex align-items-center gap-2 mb-md-2 justify-content-center justify-content-md-end">
+                            <button type="button" class="btn btn-outline-primary rounded-pill px-3.5 py-1.5 btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#changeAvatarModal">
                                 <i class="bi bi-camera me-1"></i>Đổi ảnh đại diện
                             </button>
                         </div>
@@ -258,44 +330,46 @@
             </div>
 
             <!-- 2. BỐ CỤC CHÍNH (SIDE NAV TAB & CONTENT CARDS) -->
-            <div class="row g-4">
+            <div class="row g-3 g-lg-4">
                 
-                <!-- CỘT TRÁI: MENU TAB ĐIỀU HƯỚNG PROFILE (Col-lg-3) -->
+                <!-- CỘT TRÁI / TOP (MOBILE): MENU TAB ĐIỀU HƯỚNG PROFILE (Col-lg-3) -->
                 <div class="col-12 col-lg-3">
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 sticky-top" style="top: 80px; z-index: 10;">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 sticky-top profile-tabs-card" style="top: 72px; z-index: 10;">
                         <div class="nav flex-column nav-pills profile-nav-pills gap-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                             <button class="nav-link active" id="tab-info-btn" data-bs-toggle="pill" data-bs-target="#tab-info" type="button" role="tab" aria-controls="tab-info" aria-selected="true">
-                                <i class="bi bi-person-lines-fill fs-5"></i>
+                                <i class="bi bi-person-lines-fill"></i>
                                 <span>Thông tin cá nhân</span>
                             </button>
                             <button class="nav-link" id="tab-notif-btn" data-bs-toggle="pill" data-bs-target="#tab-notif" type="button" role="tab" aria-controls="tab-notif" aria-selected="false">
-                                <i class="bi bi-bell-fill fs-5 text-warning"></i>
+                                <i class="bi bi-bell-fill text-warning"></i>
                                 <span>Cài đặt thông báo</span>
                             </button>
                             <button class="nav-link" id="tab-appearance-btn" data-bs-toggle="pill" data-bs-target="#tab-appearance" type="button" role="tab" aria-controls="tab-appearance" aria-selected="false">
-                                <i class="bi bi-palette-fill fs-5 text-primary"></i>
+                                <i class="bi bi-palette-fill text-primary"></i>
                                 <span>Giao diện & Ngôn ngữ</span>
                             </button>
                             <button class="nav-link" id="tab-password-btn" data-bs-toggle="pill" data-bs-target="#tab-password" type="button" role="tab" aria-controls="tab-password" aria-selected="false">
-                                <i class="bi bi-shield-lock-fill fs-5 text-info"></i>
+                                <i class="bi bi-shield-lock-fill text-info"></i>
                                 <span>Mật khẩu & Bảo mật</span>
                             </button>
                             <button class="nav-link text-danger" id="tab-danger-btn" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button" role="tab" aria-controls="tab-danger" aria-selected="false">
-                                <i class="bi bi-trash3-fill fs-5 text-danger"></i>
+                                <i class="bi bi-trash3-fill text-danger"></i>
                                 <span>Xóa tài khoản</span>
                             </button>
                         </div>
 
-                        <hr class="my-3 text-muted opacity-25">
+                        <div class="d-none d-lg-block">
+                            <hr class="my-3 text-muted opacity-25">
 
-                        <div class="px-2 text-muted fs-8">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Ngày tham gia:</span>
-                                <strong class="text-dark">{{ $user->created_at ? $user->created_at->format('d/m/Y') : 'Mới tham gia' }}</strong>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Trạng thái:</span>
-                                <span class="badge bg-success-subtle text-success rounded-pill px-2">Hoạt động</span>
+                            <div class="px-2 text-muted fs-8">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Ngày tham gia:</span>
+                                    <strong class="text-dark">{{ $user->created_at ? $user->created_at->format('d/m/Y') : 'Mới tham gia' }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Trạng thái:</span>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2">Hoạt động</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,35 +381,35 @@
                         
                         <!-- TAB 1: THÔNG TIN CÁ NHÂN -->
                         <div class="tab-pane fade show active" id="tab-info" role="tabpanel" aria-labelledby="tab-info-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
                                 @include('profile.partials.update-profile-information-form')
                             </div>
                         </div>
 
                         <!-- TAB 2: CÀI ĐẶT THÔNG BÁO -->
                         <div class="tab-pane fade" id="tab-notif" role="tabpanel" aria-labelledby="tab-notif-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
                                 @include('profile.partials.update-notification-settings-form')
                             </div>
                         </div>
 
                         <!-- TAB 3: GIAO DIỆN & NGÔN NGỮ -->
                         <div class="tab-pane fade" id="tab-appearance" role="tabpanel" aria-labelledby="tab-appearance-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
                                 @include('profile.partials.update-appearance-form')
                             </div>
                         </div>
 
                         <!-- TAB 3: ĐỔI MẬT KHẨU -->
                         <div class="tab-pane fade" id="tab-password" role="tabpanel" aria-labelledby="tab-password-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
                                 @include('profile.partials.update-password-form')
                             </div>
                         </div>
 
                         <!-- TAB 4: XÓA TÀI KHOẢN -->
                         <div class="tab-pane fade" id="tab-danger" role="tabpanel" aria-labelledby="tab-danger-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 danger-zone-card">
+                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4 danger-zone-card">
                                 @include('profile.partials.delete-user-form')
                             </div>
                         </div>
@@ -451,7 +525,7 @@
         });
     </script>
 
-    <!-- Floating Action Menu & Mobile Bottom Navigation Bar -->
+    <!-- Floating Action Menu & Mobile Bottom Navigation Bar (Đã bao gồm bottom-nav) -->
     <x-floating-menu />
 
     <!-- MODAL HƯỚNG DẪN CÀI ĐẶT PWA CHO ANDROID & IOS -->

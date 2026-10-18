@@ -19,6 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
     'thong_bao_enabled',
     'thong_bao_lich_hoc',
     'thong_bao_deadline',
+    'thong_bao_cong_viec',
     'thong_bao_tap_luyen',
     'am_thanh_thong_bao',
     'ngon_ngu',
@@ -37,6 +38,7 @@ class User extends Authenticatable
             'thong_bao_enabled' => 'boolean',
             'thong_bao_lich_hoc' => 'boolean',
             'thong_bao_deadline' => 'boolean',
+            'thong_bao_cong_viec' => 'boolean',
             'thong_bao_tap_luyen' => 'boolean',
             'am_thanh_thong_bao' => 'boolean',
         ];

@@ -71,6 +71,153 @@
 }
 
 /* ==========================================================================
+   NEUMORPHISM CALENDAR - DARK THEME PALETTE (RICH MODERN DARK UI)
+   ========================================================================== */
+[data-bs-theme="dark"],
+.dark-theme {
+    --neu-cal-bg: #0b1120;
+    --neu-cal-surface: #111827;
+    --neu-cal-card-bg: #1e293b;
+    --neu-cal-sunken-bg: #0f172a;
+
+    --neu-shadow-dark: rgba(0, 0, 0, 0.55);
+    --neu-shadow-light: rgba(255, 255, 255, 0.04);
+    --neu-shadow-subtle: rgba(0, 0, 0, 0.35);
+
+    --neu-primary: #818cf8;
+    --neu-primary-hover: #6366f1;
+    --neu-primary-light: rgba(99, 102, 241, 0.2);
+    --neu-primary-glow: rgba(129, 140, 248, 0.3);
+
+    --neu-text-dark: #f8fafc;
+    --neu-text-slate: #cbd5e1;
+    --neu-text-muted: #94a3b8;
+    --neu-text-light: #64748b;
+
+    /* Semantic Event Category Palette */
+    --event-blue-bg: rgba(30, 58, 138, 0.35);
+    --event-blue-text: #93c5fd;
+    --event-blue-border: rgba(59, 130, 246, 0.4);
+    --event-blue-dot: #60a5fa;
+
+    --event-green-bg: rgba(20, 83, 45, 0.35);
+    --event-green-text: #86efac;
+    --event-green-border: rgba(34, 197, 94, 0.4);
+    --event-green-dot: #4ade80;
+
+    --event-orange-bg: rgba(124, 45, 18, 0.35);
+    --event-orange-text: #fdba74;
+    --event-orange-border: rgba(249, 115, 22, 0.4);
+    --event-orange-dot: #fb923c;
+
+    --event-purple-bg: rgba(88, 28, 135, 0.35);
+    --event-purple-text: #d8b4fe;
+    --event-purple-border: rgba(168, 85, 247, 0.4);
+    --event-purple-dot: #c084fc;
+
+    --event-indigo-bg: rgba(49, 46, 129, 0.35);
+    --event-indigo-text: #a5b4fc;
+    --event-indigo-border: rgba(99, 102, 241, 0.4);
+    --event-indigo-dot: #818cf8;
+}
+
+[data-bs-theme="dark"] .top-header,
+.dark-theme .top-header {
+    background: #111827 !important;
+    border-bottom: 1px solid #1f2937 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .brand-icon-wrapper,
+.dark-theme .brand-icon-wrapper {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .user-avatar,
+.dark-theme .user-avatar {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .search-box input,
+.dark-theme .search-box input {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .day-cell,
+.dark-theme .day-cell {
+    background: #151f32;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .day-cell:hover,
+.dark-theme .day-cell:hover {
+    background: #1a263e;
+}
+
+[data-bs-theme="dark"] .day-cell.other-month,
+.dark-theme .day-cell.other-month {
+    background: #0c1424;
+    opacity: 0.45;
+}
+
+[data-bs-theme="dark"] .day-cell.today,
+.dark-theme .day-cell.today {
+    background: #18243c;
+    border-color: #818cf8;
+    box-shadow: 0 0 16px rgba(129, 140, 248, 0.25);
+}
+
+[data-bs-theme="dark"] .calendar-right-sidebar,
+.dark-theme .calendar-right-sidebar {
+    background: #111827;
+}
+
+[data-bs-theme="dark"] .timeline-card,
+.dark-theme .timeline-card,
+[data-bs-theme="dark"] .deadline-item,
+.dark-theme .deadline-item {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .modal-content,
+.dark-theme .modal-content {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .modal-header,
+.dark-theme .modal-header,
+[data-bs-theme="dark"] .modal-footer,
+.dark-theme .modal-footer {
+    border-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu,
+.dark-theme .dropdown-menu {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item,
+.dark-theme .dropdown-item {
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+.dark-theme .dropdown-item:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+
+/* ==========================================================================
    GLOBAL LAYOUT & BACKGROUND OVERRIDE FOR CALENDAR
    ========================================================================== */
 body {
@@ -1126,6 +1273,29 @@ body {
     border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
+@keyframes spinSyncIcon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin-animation {
+    display: inline-block;
+    animation: spinSyncIcon 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+#btnManualRefreshDeadlines:hover {
+    background-color: rgba(148, 163, 184, 0.15) !important;
+}
+
+#btnManualRefreshDeadlines:hover i {
+    transform: rotate(90deg);
+}
+
+.deadline-compact-item.cursor-pointer:hover {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    cursor: pointer;
+}
+
 /* Empty States */
 .empty-neu-card {
     background: var(--neu-cal-sunken-bg);
@@ -1487,8 +1657,8 @@ body:has(#scheduleConflictModal.show) .modal-backdrop.show,
     }
 
     .top-header {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-left: calc(1rem + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(1rem + env(safe-area-inset-right, 0px)) !important;
     }
 
     .calendar-grid-container {
