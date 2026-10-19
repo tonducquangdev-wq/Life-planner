@@ -178,7 +178,7 @@
                                         <span class="badge {{ $prioBadge[0] }} fs-8">{{ $prioBadge[1] }}</span>
 
                                         @if($task->dong_bo_calendar)
-                                        <span class="badge bg-indigo-subtle text-indigo border border-indigo-subtle fs-8" style="background-color: #eef2ff; color: #6366f1;" title="Đã đồng bộ lên Calendar">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-8" title="Đã đồng bộ lên Calendar">
                                             <i class="bi bi-calendar-check-fill"></i>
                                         </span>
                                         @endif

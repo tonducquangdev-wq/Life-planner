@@ -726,6 +726,24 @@ body {
 /* ==========================================
    DARK MODE OVERRIDES FOR WELCOME LANDING (BS 5.3 DATA-BS-THEME="DARK")
    ========================================== */
+[data-bs-theme="dark"],
+.dark-theme {
+    --bg-light: #0f172a;
+    --bg-white: #1e293b;
+    --text-dark: #f8fafc;
+    --text-slate: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-light: #64748b;
+    --border-color: #334155;
+    color-scheme: dark;
+}
+
+[data-bs-theme="dark"] body,
+body.dark-theme {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
 [data-bs-theme="dark"] .landing-navbar {
     background: rgba(30, 41, 59, 0.92) !important;
     border-bottom-color: #334155 !important;

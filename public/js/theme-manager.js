@@ -35,7 +35,7 @@
             // Cập nhật meta theme-color cho thanh trạng thái di động
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             if (metaTheme) {
-                metaTheme.setAttribute('content', actualTheme === 'dark' ? '#0b1120' : '#6366f1');
+                metaTheme.setAttribute('content', actualTheme === 'dark' ? '#0f172a' : '#6366f1');
             }
 
             localStorage.setItem('theme', theme);

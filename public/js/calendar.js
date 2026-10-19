@@ -123,10 +123,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const typeLabelMap = {
         'hoc-tap': '📘 Học tập',
+        'hoc_tap': '📘 Học tập',
         'tap-luyen': '🏋️ Tập luyện',
+        'tap_luyen': '🏋️ Tập luyện',
         'deadline': '⏰ Deadline',
         'ca-nhan': '🎉 Cá nhân',
-        'cong-viec': '💼 Công việc'
+        'ca_nhan': '🎉 Cá nhân',
+        'cong-viec': '💼 Công việc',
+        'cong_viec': '💼 Công việc'
     };
 
     // Helper Toast Thông báo
@@ -397,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         });
 
+        calendarGrid.setAttribute('data-rows', monthDays.length > 35 ? '6' : '5');
         calendarGrid.innerHTML = headerHtml + cellsHtml;
 
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -750,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="schedule-item ${evt.type}" data-type="${evt.type}">
                     <div class="d-flex align-items-center justify-content-between mb-1 gap-2">
                         <span class="fw-bold text-dark fs-7 flex-shrink-0">${evt.time}</span>
-                        <span class="badge rounded-pill px-2 py-0 fs-8 legend-pill ${evt.type} flex-shrink-0">${typeLabelMap[evt.type] || 'Sự kiện'}</span>
+                        <span class="badge rounded-pill px-2 py-0.5 fs-8 legend-pill ${evt.type} flex-shrink-0">${typeLabelMap[evt.type] || 'Sự kiện'}</span>
                     </div>
                     <div class="fw-semibold text-dark fs-6 mb-1 text-break" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">${evt.title}</div>
                     <small class="text-muted fs-7 text-break d-flex align-items-center gap-1" style="word-break: break-word; overflow-wrap: anywhere;"><i class="bi bi-geo-alt flex-shrink-0"></i><span>${evt.location || 'Chưa có vị trí'}</span></small>

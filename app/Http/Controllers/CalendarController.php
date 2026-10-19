@@ -243,12 +243,13 @@ class CalendarController extends Controller
                     'thoi_gian' => $timeStr,
                     'tieu_de' => $evt->tieu_de,
                     'dia_diem' => $evt->mo_ta ?: 'Chưa có địa điểm',
+                    'type' => $type,
                     'badge' => match ($type) {
-                        'hoc-tap' => 'Học tập',
-                        'tap-luyen' => 'Tập luyện',
-                        'deadline' => 'Deadline',
-                        'cong-viec' => 'Công việc',
-                        default => 'Cá nhân',
+                        'hoc-tap' => '📘 Học tập',
+                        'tap-luyen' => '🏋️ Tập luyện',
+                        'deadline' => '⏰ Deadline',
+                        'cong-viec' => '💼 Công việc',
+                        default => '🎉 Cá nhân',
                     },
                     'badge_class' => match ($type) {
                         'hoc-tap' => 'bg-primary-subtle text-primary border border-primary-subtle',

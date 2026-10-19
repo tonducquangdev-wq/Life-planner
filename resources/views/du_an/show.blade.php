@@ -180,7 +180,7 @@
                                 </td>
                                 <td>
                                     @if($task->dong_bo_calendar)
-                                    <span class="badge bg-indigo-subtle text-indigo border border-indigo-subtle fs-8" style="background-color: #eef2ff; color: #6366f1;">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-8">
                                         <i class="bi bi-calendar-check-fill me-1"></i> Đã đồng bộ
                                     </span>
                                     @else

@@ -1,3 +1,54 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    /* Modern Slate Palette Elevation Tokens (Light Mode Default) */
+    --color-base: #f1f5f9;
+    --color-surface: #ffffff;
+    --color-elevated: #ffffff;
+    --color-elevated-hover: #f8fafc;
+    --color-border: #e2e8f0;
+    --color-border-subtle: rgba(15, 23, 42, 0.08);
+
+    --color-text-primary: #1e293b;
+    --color-text-secondary: #64748b;
+    --color-text-muted: #94a3b8;
+
+    --color-input-bg: #ffffff;
+    --color-input-border: #cbd5e1;
+    --color-input-focus-border: #6366f1;
+    --color-input-focus-ring: rgba(99, 102, 241, 0.25);
+}
+
+[data-bs-theme="dark"],
+.dark-theme,
+.dark {
+    --color-base: #0f172a;               /* Base/Body Background */
+    --color-surface: #1e293b;            /* Surface/Card/Sidebar */
+    --color-elevated: #334155;           /* Elevated: Modal, Dropdown, Popover */
+    --color-elevated-hover: #475569;
+    --color-sidebar: #1e293b;
+    --color-border: #334155;
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+
+    --color-input-bg: #1e293b;
+    --color-input-border: #475569;
+    --color-input-focus-border: #3b82f6;
+    --color-input-focus-ring: rgba(59, 130, 246, 0.25);
+
+    --color-success: #4ade80;
+    --color-success-bg: rgba(74, 222, 128, 0.15);
+    --color-danger: #f87171;
+    --color-danger-bg: rgba(248, 113, 113, 0.15);
+    --color-warning: #fbbf24;
+    --color-warning-bg: rgba(251, 191, 36, 0.15);
+    --color-info: #38bdf8;
+    --color-info-bg: rgba(56, 189, 248, 0.15);
+
+    color-scheme: dark;
+}

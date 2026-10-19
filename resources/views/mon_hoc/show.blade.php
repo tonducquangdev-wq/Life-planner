@@ -103,10 +103,10 @@
 
         /* GIAO DIỆN TỐI (DARK MODE NEUMORPHISM / SOFT UI) */
         [data-bs-theme="dark"] {
-            --nm-bg: #151821;
-            --nm-surface: #1b1e2a;
-            --nm-surface-hover: #222634;
-            --nm-surface-subtle: #202432;
+            --nm-bg: #0f172a;
+            --nm-surface: #1e293b;
+            --nm-surface-hover: #334155;
+            --nm-surface-subtle: #1e293b;
 
             --nm-shadow-flat: 6px 6px 14px rgba(0, 0, 0, 0.5), -4px -4px 12px rgba(255, 255, 255, 0.04);
             --nm-shadow-card: 14px 14px 28px rgba(0, 0, 0, 0.55), -10px -10px 24px rgba(255, 255, 255, 0.04);

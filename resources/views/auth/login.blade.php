@@ -50,17 +50,17 @@
                 <div class="neu-form-panel neu-login-panel" id="loginPanel">
                     <!-- Icon Badge -->
                     <div class="neu-header">
-                        <div class="neu-icon-badge" title="Life Planner Security">
+                        <div class="neu-icon-badge" title="Bảo mật Life Planner">
                             <i class="bi bi-lock-fill"></i>
                         </div>
-                        <h1 class="neu-title">Welcome</h1>
-                        <p class="neu-subtitle">Login to continue your journey</p>
+                        <h1 class="neu-title">Chào mừng</h1>
+                        <p class="neu-subtitle">Đăng nhập để tiếp tục hành trình của bạn</p>
                     </div>
 
                     <!-- Demo Account Quick Fill Card -->
                     <div class="neu-demo-card">
                         <div>
-                            <div class="neu-demo-title">Demo Account</div>
+                            <div class="neu-demo-title">Tài khoản dùng thử</div>
                             <div class="neu-demo-details">quang@gmail.com &bull; 12345678</div>
                         </div>
                         <button type="button" class="neu-btn-demo" id="btnDemoFill">Nạp dữ liệu</button>
@@ -95,7 +95,7 @@
 
                         <!-- Email Input -->
                         <div class="neu-form-group">
-                            <label for="email" class="neu-input-label">Email Address</label>
+                            <label for="email" class="neu-input-label">Địa chỉ Email</label>
                             <div class="neu-input-container @error('email') is-invalid @enderror">
                                 <i class="bi bi-envelope neu-input-icon"></i>
                                 <input type="email"
@@ -118,7 +118,7 @@
 
                         <!-- Password Input -->
                         <div class="neu-form-group">
-                            <label for="password" class="neu-input-label">Password</label>
+                            <label for="password" class="neu-input-label">Mật khẩu</label>
                             <div class="neu-input-container @error('password') is-invalid @enderror">
                                 <i class="bi bi-lock neu-input-icon"></i>
                                 <input type="password"
@@ -144,25 +144,25 @@
                         <div class="neu-options-row">
                             <label class="neu-checkbox-label" for="remember_me">
                                 <input type="checkbox" name="remember" id="remember_me" class="neu-checkbox">
-                                <span>Remember me</span>
+                                <span>Ghi nhớ đăng nhập</span>
                             </label>
 
                             @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="neu-forgot-link">Forgot Password?</a>
+                            <a href="{{ route('password.request') }}" class="neu-forgot-link">Quên mật khẩu?</a>
                             @else
-                            <a href="#" class="neu-forgot-link">Forgot Password?</a>
+                            <a href="#" class="neu-forgot-link">Quên mật khẩu?</a>
                             @endif
                         </div>
 
                         <!-- Login Submit Button -->
                         <button type="submit" class="neu-btn-submit" id="btnLoginSubmit">
-                            <span>Login</span>
+                            <span>Đăng nhập</span>
                         </button>
 
                         <!-- Footer Flip Prompt -->
                         <div class="neu-footer-prompt">
-                            <span>Don't have an account?</span>
-                            <a href="{{ route('register') }}" class="neu-flip-link" id="linkToRegister">Sign Up</a>
+                            <span>Chưa có tài khoản?</span>
+                            <a href="{{ route('register') }}" class="neu-flip-link" id="linkToRegister">Đăng ký</a>
                             <button type="button" class="neu-flip-circle-btn" id="btnFlipToRegister" title="Chuyển sang Đăng ký">
                                 <i class="bi bi-plus-lg"></i>
                             </button>
@@ -179,7 +179,7 @@
                         <div class="neu-icon-badge" title="Tạo tài khoản mới">
                             <i class="bi bi-person-plus-fill"></i>
                         </div>
-                        <h2 class="neu-title">Create Account</h2>
+                        <h2 class="neu-title">Tạo tài khoản</h2>
                         <p class="neu-subtitle">Bắt đầu hành trình cùng Life Planner</p>
                     </div>
 
@@ -211,7 +211,7 @@
 
                         <!-- Email -->
                         <div class="neu-form-group">
-                            <label for="reg_email" class="neu-input-label">Email Address</label>
+                            <label for="reg_email" class="neu-input-label">Địa chỉ Email</label>
                             <div class="neu-input-container @error('email') is-invalid @enderror">
                                 <i class="bi bi-envelope neu-input-icon"></i>
                                 <input type="email"
@@ -232,8 +232,8 @@
                         </div>
 
                         <!-- Mật khẩu -->
-                        <div class="neu-form-group" style="margin-bottom: 0.35rem;">
-                            <label for="reg_password" class="neu-input-label">Password</label>
+                        <div class="neu-form-group" style="margin-bottom: 0.2rem;">
+                            <label for="reg_password" class="neu-input-label">Mật khẩu</label>
                             <div class="neu-input-container @error('password') is-invalid @enderror">
                                 <i class="bi bi-lock neu-input-icon"></i>
                                 <input type="password"
@@ -265,7 +265,7 @@
 
                         <!-- Xác nhận mật khẩu -->
                         <div class="neu-form-group">
-                            <label for="password_confirmation" class="neu-input-label">Confirm Password</label>
+                            <label for="password_confirmation" class="neu-input-label">Xác nhận mật khẩu</label>
                             <div class="neu-input-container @error('password_confirmation') is-invalid @enderror">
                                 <i class="bi bi-shield-lock neu-input-icon"></i>
                                 <input type="password"
@@ -288,7 +288,7 @@
                         </div>
 
                         <!-- Điều khoản sử dụng -->
-                        <div class="neu-options-row" style="margin-bottom: 1.25rem;">
+                        <div class="neu-options-row">
                             <label class="neu-checkbox-label" for="terms">
                                 <input type="checkbox" name="terms" id="terms" class="neu-checkbox" required checked>
                                 <span>Đồng ý với <a href="#" class="neu-forgot-link">Điều khoản dịch vụ</a></span>
@@ -297,13 +297,13 @@
 
                         <!-- Register Submit Button -->
                         <button type="submit" class="neu-btn-submit" id="btnRegisterSubmit">
-                            <span>Sign Up</span>
+                            <span>Đăng ký</span>
                         </button>
 
                         <!-- Footer Flip Prompt -->
                         <div class="neu-footer-prompt">
-                            <span>Already have an account?</span>
-                            <a href="{{ route('login') }}" class="neu-flip-link" id="linkToLogin">Login</a>
+                            <span>Đã có tài khoản?</span>
+                            <a href="{{ route('login') }}" class="neu-flip-link" id="linkToLogin">Đăng nhập</a>
                             <button type="button" class="neu-flip-circle-btn" id="btnFlipToLogin" title="Quay lại Đăng nhập">
                                 <i class="bi bi-arrow-return-left"></i>
                             </button>
@@ -331,10 +331,9 @@
             function syncCardHeight(isFlipped) {
                 if (!flipCard || !loginPanel || !signupPanel) return;
                 const activePanel = isFlipped ? signupPanel : loginPanel;
-                // Áp dụng min-height để hiệu ứng chuyển cảnh mượt mà
                 const targetHeight = activePanel.scrollHeight;
                 if (targetHeight > 0) {
-                    flipCard.style.minHeight = targetHeight + 'px';
+                    flipCard.style.minHeight = Math.min(targetHeight, window.innerHeight - 20) + 'px';
                 }
             }
 

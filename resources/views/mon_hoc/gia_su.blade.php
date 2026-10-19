@@ -81,10 +81,10 @@
 
         /* GIAO DIỆN TỐI (DARK MODE NEUMORPHISM) */
         [data-bs-theme="dark"] {
-            --nm-bg: #151821;
-            --nm-surface: #1b1e2a;
-            --nm-surface-hover: #222634;
-            --nm-surface-subtle: #202432;
+            --nm-bg: #0f172a;
+            --nm-surface: #1e293b;
+            --nm-surface-hover: #334155;
+            --nm-surface-subtle: #1e293b;
 
             --nm-shadow-flat: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.035);
             --nm-shadow-flat-sm: 2px 2px 6px rgba(0, 0, 0, 0.4), -2px -2px 5px rgba(255, 255, 255, 0.03);

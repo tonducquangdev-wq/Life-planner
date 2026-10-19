@@ -1,7 +1,7 @@
 /**
  * Life Planner - PWA & Web Push Manager
- * Handles Service Worker registration, install prompts (Android/iOS),
- * and Web Push Notifications subscription.
+ * Xử lý đăng ký Service Worker, tương thích đa nền tảng (Android Chrome & iOS Safari),
+ * giải quyết các ràng buộc bảo mật HTTPS, Standalone mode trên iPhone và Web Push Notifications.
  */
 
 (function () {
@@ -26,7 +26,7 @@
     const LifePlannerPWA = {
         swRegistration: null,
 
-        // Kiểm tra ứng dụng có đang chạy ở chế độ Standalone (Đã cài đặt) không
+        // Kiểm tra ứng dụng có đang chạy ở chế độ Standalone (Đã cài đặt vào màn hình chính) không
         isStandalone: function () {
             return (
                 window.matchMedia('(display-mode: standalone)').matches ||
@@ -35,10 +35,35 @@
             );
         },
 
-        // Kiểm tra thiết bị iOS (iPhone/iPad)
+        // Kiểm tra thiết bị iOS (iPhone / iPad / iPod kể cả iPadOS mới)
         isIOS: function () {
-            const ua = window.navigator.userAgent.toLowerCase();
-            return /iphone|ipad|ipod/.test(ua);
+            const ua = (window.navigator.userAgent || '').toLowerCase();
+            const isStandardIOS = /iphone|ipad|ipod/.test(ua);
+            const isIPadOS = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            return isStandardIOS || isIPadOS;
+        },
+
+        // Kiểm tra môi trường kết nối bảo mật (HTTPS hoặc localhost)
+        isSecure: function () {
+            if (typeof window.isSecureContext !== 'undefined') {
+                return window.isSecureContext;
+            }
+            return (
+                location.protocol === 'https:' ||
+                location.hostname === 'localhost' ||
+                location.hostname === '127.0.0.1'
+            );
+        },
+
+        // Kiểm tra trình duyệt nội bộ trong ứng dụng (In-app WebView: Zalo, Facebook, Messenger, Instagram, TikTok)
+        isInAppBrowser: function () {
+            const ua = (window.navigator.userAgent || '').toLowerCase();
+            return /fban|fbav|instagram|line|zalo|micromessenger|tiktok|bytedance/i.test(ua);
+        },
+
+        // Kiểm tra có sự kiện cài đặt tự động từ trình duyệt (beforeinstallprompt) hay không
+        hasInstallPrompt: function () {
+            return !!deferredInstallPrompt;
         },
 
         // Khởi tạo Service Worker và các trình lắng nghe
@@ -49,9 +74,9 @@
                 document.body?.classList.add('pwa-standalone');
             }
 
-            // Đăng ký Service Worker
+            // Đăng ký Service Worker an toàn (bảo đảm chạy kể cả khi tài liệu đã load xong)
             if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
+                const registerWorker = () => {
                     navigator.serviceWorker.register('/sw.js', { scope: '/' })
                         .then((registration) => {
                             this.swRegistration = registration;
@@ -72,14 +97,20 @@
                         .catch((error) => {
                             console.warn('[PWA] Không thể đăng ký Service Worker:', error);
                         });
-                });
+                };
+
+                if (document.readyState === 'complete') {
+                    registerWorker();
+                } else {
+                    window.addEventListener('load', registerWorker);
+                }
             }
 
             // Lắng nghe sự kiện trước khi cài đặt trên Android / Chrome
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredInstallPrompt = e;
-                console.log('[PWA] Thiết bị đủ điều kiện cài đặt.');
+                console.log('[PWA] Thiết bị đủ điều kiện cài đặt tự động.');
 
                 // Báo cho giao diện biết để hiển thị nút/banner cài đặt nếu cần
                 window.dispatchEvent(new CustomEvent('pwa-installable', { detail: { prompt: e } }));
@@ -88,6 +119,9 @@
                 document.querySelectorAll('[data-pwa-install]').forEach(el => {
                     el.classList.remove('d-none');
                 });
+
+                // Cập nhật modal cài đặt nếu đang mở
+                this.setupInstallModal();
             });
 
             // Lắng nghe khi cài đặt thành công
@@ -105,13 +139,86 @@
                     const modal = bootstrap.Modal.getInstance(modalEl);
                     modal?.hide();
                 }
+
+                this.showToast('success', 'Ứng dụng Life Planner đã được cài đặt thành công lên màn hình chính!', 'Cài đặt thành công');
             });
+
+            // Tự động cấu hình modal khi được kích hoạt
+            const modalEl = document.getElementById('pwaInstallModal');
+            if (modalEl) {
+                modalEl.addEventListener('show.bs.modal', () => {
+                    this.setupInstallModal();
+                });
+            }
         },
 
-        // Kích hoạt hộp thoại cài đặt ứng dụng (Android / Desktop)
+        // Đồng bộ và điều chỉnh các thành phần bên trong Modal Cài đặt
+        setupInstallModal: function () {
+            const modalEl = document.getElementById('pwaInstallModal');
+            if (!modalEl) return;
+
+            const iosSection = document.getElementById('pwaIosInstructions');
+            const androidSection = document.getElementById('pwaAndroidInstructions');
+            const androidPromptBtn = document.getElementById('pwaAndroidPromptBtn');
+            const androidManual = document.getElementById('pwaAndroidManual');
+            const httpsNotice = document.getElementById('pwaHttpsNotice');
+            const inAppNotice = document.getElementById('pwaInAppNotice');
+
+            const isIos = this.isIOS();
+            const isSec = this.isSecure();
+            const inApp = this.isInAppBrowser();
+
+            // Cảnh báo HTTPS
+            if (httpsNotice) {
+                if (!isSec) {
+                    httpsNotice.classList.remove('d-none');
+                } else {
+                    httpsNotice.classList.add('d-none');
+                }
+            }
+
+            // Cảnh báo In-app browser (Zalo/Facebook)
+            if (inAppNotice) {
+                if (inApp) {
+                    inAppNotice.classList.remove('d-none');
+                } else {
+                    inAppNotice.classList.add('d-none');
+                }
+            }
+
+            // Phân nhánh hiển thị theo hệ điều hành
+            if (isIos) {
+                if (iosSection) iosSection.classList.remove('d-none');
+                if (androidSection) androidSection.classList.add('d-none');
+            } else {
+                if (iosSection) iosSection.classList.add('d-none');
+                if (androidSection) androidSection.classList.remove('d-none');
+
+                // Nếu trình duyệt hỗ trợ bấm cài đặt 1-chạm
+                if (this.hasInstallPrompt()) {
+                    if (androidPromptBtn) androidPromptBtn.classList.remove('d-none');
+                } else {
+                    if (androidPromptBtn) androidPromptBtn.classList.add('d-none');
+                }
+
+                // Luôn hiển thị hướng dẫn thủ công để người dùng biết cách thao tác
+                if (androidManual) {
+                    androidManual.classList.remove('d-none');
+                }
+            }
+        },
+
+        // Kích hoạt hộp thoại cài đặt ứng dụng (Android / Desktop / iOS)
         promptInstall: async function () {
             if (this.isStandalone()) {
-                alert('Ứng dụng Life Planner đã được cài đặt trên thiết bị của bạn!');
+                this.showToast('info', 'Ứng dụng Life Planner đã được cài đặt và đang chạy ở chế độ app độc lập!', 'Đã cài đặt');
+                return;
+            }
+
+            // Nếu đang mở trong Zalo/Facebook Webview
+            if (this.isInAppBrowser()) {
+                this.showGenericInstallModal();
+                this.showToast('warning', 'Vui lòng bấm menu (···) chọn "Mở bằng trình duyệt" ngoài để cài đặt PWA.', 'Mở trình duyệt');
                 return;
             }
 
@@ -123,16 +230,21 @@
 
             // Nếu là Android / Desktop có deferredPrompt
             if (deferredInstallPrompt) {
-                deferredInstallPrompt.prompt();
-                const choiceResult = await deferredInstallPrompt.userChoice;
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('[PWA] Người dùng đã chấp nhận cài đặt.');
-                } else {
-                    console.log('[PWA] Người dùng từ chối cài đặt.');
+                try {
+                    deferredInstallPrompt.prompt();
+                    const choiceResult = await deferredInstallPrompt.userChoice;
+                    if (choiceResult && choiceResult.outcome === 'accepted') {
+                        console.log('[PWA] Người dùng đã chấp nhận cài đặt.');
+                    } else {
+                        console.log('[PWA] Người dùng từ chối cài đặt.');
+                    }
+                } catch (err) {
+                    console.warn('[PWA] Lỗi kích hoạt hộp thoại cài đặt:', err);
+                    this.showGenericInstallModal();
                 }
                 deferredInstallPrompt = null;
             } else {
-                // Nếu trình duyệt không bắn beforeinstallprompt (đã từ chối hoặc đã cài)
+                // Nếu trình duyệt không bắn beforeinstallprompt (đã từ chối hoặc cần cài qua menu)
                 this.showGenericInstallModal();
             }
         },
@@ -141,6 +253,7 @@
         showIOSInstallInstructions: function () {
             const modalEl = document.getElementById('pwaInstallModal');
             if (modalEl && typeof bootstrap !== 'undefined') {
+                this.setupInstallModal();
                 const iosSection = document.getElementById('pwaIosInstructions');
                 const androidSection = document.getElementById('pwaAndroidInstructions');
                 if (iosSection) iosSection.classList.remove('d-none');
@@ -157,6 +270,7 @@
         showGenericInstallModal: function () {
             const modalEl = document.getElementById('pwaInstallModal');
             if (modalEl && typeof bootstrap !== 'undefined') {
+                this.setupInstallModal();
                 const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
                 modal.show();
             }
@@ -168,7 +282,23 @@
 
         // Đăng ký nhận thông báo đẩy
         subscribeToPush: async function () {
-            // Kiểm tra iOS Safari nếu chưa thêm vào MH chính
+            // 1. Kiểm tra môi trường kết nối bảo mật HTTPS
+            if (!this.isSecure()) {
+                const msg = 'Tính năng Web Push yêu cầu kết nối bảo mật HTTPS (hoặc localhost). Vui lòng truy cập qua link ngrok HTTPS để bật trên điện thoại.';
+                this.showToast('warning', msg, 'Yêu cầu HTTPS');
+                this.showGenericInstallModal();
+                throw new Error(msg);
+            }
+
+            // 2. Kiểm tra in-app browser
+            if (this.isInAppBrowser()) {
+                const msg = 'Trình duyệt nội bộ Zalo/Facebook không hỗ trợ Web Push. Vui lòng bấm menu (···) chọn "Mở bằng trình duyệt" ngoài.';
+                this.showToast('warning', msg, 'Mở trình duyệt ngoài');
+                this.showGenericInstallModal();
+                throw new Error(msg);
+            }
+
+            // 3. Kiểm tra iOS Safari: Apple chỉ cho phép Push khi đã Thêm vào MH chính (Standalone mode)
             if (this.isIOS() && !this.isStandalone()) {
                 this.showIOSInstallInstructions();
                 throw new Error('Trên iPhone/iPad (iOS), bạn cần bấm Chia sẻ ⎋ -> "Thêm vào MH chính" ➕ trước thì Safari mới cho phép nhận thông báo đẩy.');
@@ -178,20 +308,25 @@
                 throw new Error('Trình duyệt của bạn không hỗ trợ Notifications API.');
             }
 
+            // 4. Kiểm tra quyền nếu người dùng đã bấm chặn
+            if (Notification.permission === 'denied') {
+                throw new Error('Bạn đã chặn quyền thông báo của trang này. Vui lòng bấm vào biểu tượng 🔒 hoặc ⚙️ trên thanh địa chỉ để bật lại quyền Thông báo.');
+            }
+
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
                 throw new Error('Trình duyệt của bạn không hỗ trợ Push API.');
             }
 
-            // 1. Yêu cầu quyền từ người dùng
+            // 5. Yêu cầu quyền từ người dùng
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
                 throw new Error('Bạn chưa cấp quyền thông báo. Vui lòng cho phép quyền thông báo trong cài đặt trình duyệt.');
             }
 
-            // 2. Chờ Service Worker sẵn sàng
+            // 6. Chờ Service Worker sẵn sàng
             const registration = await navigator.serviceWorker.ready;
 
-            // 3. Lấy VAPID Public Key từ backend
+            // 7. Lấy VAPID Public Key từ backend
             const vapidRes = await fetch('/push/vapid-key');
             if (!vapidRes.ok) {
                 throw new Error('Không thể lấy VAPID Public Key từ máy chủ.');
@@ -203,7 +338,7 @@
 
             const applicationServerKey = urlBase64ToUint8Array(vapidData.publicKey);
 
-            // 4. Tạo Subscription với PushManager
+            // 8. Tạo Subscription với PushManager
             let subscription = await registration.pushManager.getSubscription();
             if (!subscription) {
                 subscription = await registration.pushManager.subscribe({
@@ -212,7 +347,7 @@
                 });
             }
 
-            // 5. Gửi subscription lên backend lưu trữ
+            // 9. Gửi subscription lên backend lưu trữ
             try {
                 return await this.sendSubscriptionToBackend(subscription);
             } catch (err) {
@@ -342,18 +477,87 @@
 
         // Kiểm tra trạng thái Push hiện tại và đồng bộ với máy chủ
         getPushStatus: async function () {
+            // 1. Kiểm tra môi trường HTTPS
+            if (!this.isSecure()) {
+                return {
+                    supported: false,
+                    reason: 'insecure_http',
+                    subscribed: false,
+                    permission: 'unsupported'
+                };
+            }
+
+            // 2. Kiểm tra In-App Browser (Zalo / Facebook)
+            if (this.isInAppBrowser()) {
+                return {
+                    supported: false,
+                    reason: 'in_app_browser',
+                    subscribed: false,
+                    permission: 'unsupported'
+                };
+            }
+
+            // 3. Xử lý trường hợp iOS Safari
+            if (this.isIOS()) {
+                // Trên iOS Safari thường (chưa Add to Home Screen), Web Push chưa thể bật
+                if (!this.isStandalone()) {
+                    return {
+                        supported: true,
+                        needsInstall: true,
+                        reason: 'ios_needs_home_screen',
+                        subscribed: false,
+                        permission: ('Notification' in window) ? Notification.permission : 'default'
+                    };
+                }
+                // Nếu đã chạy Standalone mà vẫn không có PushManager (iOS < 16.4)
+                if (!('PushManager' in window)) {
+                    return {
+                        supported: false,
+                        reason: 'ios_version_too_old',
+                        subscribed: false,
+                        permission: 'unsupported'
+                    };
+                }
+            }
+
+            // 4. Kiểm tra các API tiêu chuẩn
             if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-                return { supported: false, subscribed: false, permission: 'unsupported' };
+                return {
+                    supported: false,
+                    reason: 'api_unsupported',
+                    subscribed: false,
+                    permission: 'unsupported'
+                };
             }
+
             const permission = Notification.permission;
-            if (permission !== 'granted') {
-                return { supported: true, subscribed: false, permission: permission };
+            if (permission === 'denied') {
+                return {
+                    supported: true,
+                    reason: 'permission_denied',
+                    subscribed: false,
+                    permission: 'denied'
+                };
             }
+
+            if (permission !== 'granted') {
+                return {
+                    supported: true,
+                    subscribed: false,
+                    permission: permission
+                };
+            }
+
             try {
                 const reg = await navigator.serviceWorker.ready;
                 const sub = await reg.pushManager.getSubscription();
                 if (!sub) {
-                    return { supported: true, subscribed: false, permission: permission, endpoint: null };
+                    return {
+                        supported: true,
+                        subscribed: false,
+                        permission: permission,
+                        endpoint: null
+                    };
                 }
 
                 // Kiểm tra xem máy chủ đã có lưu thiết bị này chưa
@@ -373,13 +577,23 @@
                     console.warn('[PWA] Lỗi kiểm tra /push/status:', syncErr);
                 }
 
-                return { supported: true, subscribed: true, permission: permission, endpoint: sub.endpoint };
+                return {
+                    supported: true,
+                    subscribed: true,
+                    permission: permission,
+                    endpoint: sub.endpoint
+                };
             } catch (err) {
-                return { supported: true, subscribed: false, permission: permission, error: err.message };
+                return {
+                    supported: true,
+                    subscribed: false,
+                    permission: permission,
+                    error: err.message
+                };
             }
         },
 
-        // Hiển thị thông báo Toast hiện đại trên giao diện
+        // Hiển thị thông báo Toast hiện đại trên giao diện (Tương thích Dark Mode)
         showToast: function (type, message, title = 'Life Planner PWA') {
             let container = document.getElementById('pwaToastContainer');
             if (!container) {
@@ -389,15 +603,21 @@
                 document.body.appendChild(container);
             }
 
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.classList.contains('dark-mode');
+            const toastBg = isDark ? 'rgba(30, 41, 59, 0.96)' : 'rgba(255, 255, 255, 0.96)';
+            const titleColor = isDark ? '#f8fafc' : '#1e293b';
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const borderColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
+
             const toast = document.createElement('div');
-            toast.className = 'pwa-modern-toast shadow-lg border';
-            toast.style.cssText = 'pointer-events: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; transform: translateY(-12px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);';
+            toast.className = 'pwa-modern-toast shadow-lg';
+            toast.style.cssText = `pointer-events: auto; background: ${toastBg}; border: 1px solid ${borderColor}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; transform: translateY(-12px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);`;
 
             const iconMap = {
-                success: { icon: 'bi-check-circle-fill', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
-                info: { icon: 'bi-info-circle-fill', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.12)' },
-                warning: { icon: 'bi-exclamation-triangle-fill', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
-                danger: { icon: 'bi-x-circle-fill', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' }
+                success: { icon: 'bi-check-circle-fill', color: '#10b981', bg: 'rgba(16, 185, 129, 0.14)' },
+                info: { icon: 'bi-info-circle-fill', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.14)' },
+                warning: { icon: 'bi-exclamation-triangle-fill', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.14)' },
+                danger: { icon: 'bi-x-circle-fill', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.14)' }
             };
 
             const cfg = iconMap[type] || iconMap.info;
@@ -407,15 +627,15 @@
                     <i class="bi ${cfg.icon}"></i>
                 </div>
                 <div style="flex-grow: 1; min-width: 0;">
-                    <div style="font-weight: 700; font-size: 0.85rem; color: #1e293b; margin-bottom: 2px;">${title}</div>
-                    <div style="font-size: 0.8rem; color: #64748b; line-height: 1.35; word-break: break-word;">${message}</div>
+                    <div style="font-weight: 700; font-size: 0.85rem; color: ${titleColor}; margin-bottom: 2px;">${title}</div>
+                    <div style="font-size: 0.8rem; color: ${textColor}; line-height: 1.35; word-break: break-word;">${message}</div>
                 </div>
-                <button type="button" style="border: none; background: none; color: #94a3b8; font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0;" aria-label="Close">&times;</button>
+                <button type="button" style="border: none; background: none; color: ${textColor}; font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0;" aria-label="Close">&times;</button>
             `;
 
             container.appendChild(toast);
 
-            // Kích hoạt hiệu ứng trượt vào
+            // Hiệu ứng trượt vào
             requestAnimationFrame(() => {
                 toast.style.transform = 'translateY(0)';
                 toast.style.opacity = '1';
@@ -430,7 +650,7 @@
             };
 
             toast.querySelector('button')?.addEventListener('click', closeToast);
-            setTimeout(closeToast, 4500);
+            setTimeout(closeToast, 5000);
         },
 
         // Đồng bộ giao diện trạng thái Push Notification
@@ -441,23 +661,115 @@
             const testBtns = document.querySelectorAll('.pwa-push-test-btn, #pwa-push-test-btn');
             const quickTestCards = document.querySelectorAll('.pwa-quick-test-section');
 
-            if (!status.supported) {
+            // TRƯỜNG HỢP 1: Mở qua HTTP thường trên IP mạng LAN (cần link HTTPS / ngrok)
+            if (status.reason === 'insecure_http') {
                 badges.forEach(badge => {
-                    badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1';
-                    badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Trình duyệt chưa hỗ trợ';
+                    badge.className = 'badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-shield-exclamation me-1"></i>Cần link HTTPS (ngrok)';
                 });
-                toggleBtns.forEach(btn => btn.disabled = true);
+                toggleBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = 'btn btn-sm btn-outline-warning rounded-pill px-3.5 py-2 fs-8 fw-semibold text-nowrap w-100 w-sm-auto text-center d-inline-flex align-items-center justify-content-center gap-2 pwa-push-toggle-btn';
+                    btn.innerHTML = '<i class="bi bi-link-45deg me-1"></i> Bật qua HTTPS';
+                });
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
                 return;
             }
 
-            if (status.subscribed) {
+            // TRƯỜNG HỢP 2: Mở trong Zalo / Facebook In-app browser
+            if (status.reason === 'in_app_browser') {
                 badges.forEach(badge => {
-                    badge.className = 'badge bg-success-subtle text-success rounded-pill px-2.5 py-1';
-                    badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Đã kích hoạt trên thiết bị này';
+                    badge.className = 'badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-browser-safari me-1"></i>Mở bằng Safari / Chrome';
+                });
+                toggleBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = 'btn btn-sm btn-outline-warning rounded-pill px-3';
+                    btn.innerHTML = '<i class="bi bi-box-arrow-up-right me-1"></i> Mở trình duyệt ngoài';
+                });
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
+                return;
+            }
+
+            // TRƯỜNG HỢP 3: iPhone / iPad trong Safari tab (cần thêm vào MH chính trước)
+            if (status.reason === 'ios_needs_home_screen' || status.needsInstall) {
+                badges.forEach(badge => {
+                    badge.className = 'badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-apple me-1"></i>Thêm vào MH chính để bật';
+                });
+                toggleBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = 'btn btn-sm btn-outline-primary rounded-pill px-3';
+                    btn.innerHTML = '<i class="bi bi-box-arrow-up me-1"></i> Cách bật trên iPhone';
+                });
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
+                return;
+            }
+
+            // TRƯỜNG HỢP 4: iPhone chạy Standalone nhưng iOS quá cũ (< 16.4)
+            if (status.reason === 'ios_version_too_old') {
+                badges.forEach(badge => {
+                    badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-exclamation-octagon me-1"></i>Yêu cầu iOS 16.4+';
+                });
+                toggleBtns.forEach(btn => {
+                    btn.disabled = true;
+                    btn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-3';
+                    btn.innerHTML = '<i class="bi bi-slash-circle me-1"></i> Cần iOS 16.4+';
+                });
+                return;
+            }
+
+            // TRƯỜNG HỢP 5: Quyền thông báo bị người dùng từ chối (Block)
+            if (status.reason === 'permission_denied') {
+                badges.forEach(badge => {
+                    badge.className = 'badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-bell-slash me-1"></i>Đã chặn quyền thông báo';
                 });
                 toggleBtns.forEach(btn => {
                     btn.disabled = false;
                     btn.className = 'btn btn-sm btn-outline-danger rounded-pill px-3';
+                    btn.innerHTML = '<i class="bi bi-gear-fill me-1"></i> Bỏ chặn thông báo';
+                });
+                testBtns.forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                });
+                return;
+            }
+
+            // TRƯỜNG HỢP 6: Trình duyệt hoàn toàn không hỗ trợ Service Worker / Push
+            if (!status.supported) {
+                badges.forEach(badge => {
+                    badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Trình duyệt chưa hỗ trợ';
+                });
+                toggleBtns.forEach(btn => {
+                    btn.disabled = true;
+                    btn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-3.5 py-2 fs-8 fw-semibold text-nowrap w-100 w-sm-auto text-center d-inline-flex align-items-center justify-content-center gap-2 pwa-push-toggle-btn';
+                    btn.innerHTML = '<i class="bi bi-slash-circle me-1"></i> Không hỗ trợ';
+                });
+                return;
+            }
+
+            // TRƯỜNG HỢP 7: Đã đăng ký thành công trên thiết bị này
+            if (status.subscribed) {
+                badges.forEach(badge => {
+                    badge.className = 'badge bg-success-subtle text-success rounded-pill px-2.5 py-1 text-nowrap';
+                    badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Đã kích hoạt trên thiết bị này';
+                });
+                toggleBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = 'btn btn-sm btn-outline-danger rounded-pill px-3.5 py-2 fs-8 fw-semibold text-nowrap w-100 w-sm-auto text-center d-inline-flex align-items-center justify-content-center gap-2 pwa-push-toggle-btn';
                     btn.innerHTML = '<i class="bi bi-bell-slash-fill me-1"></i> Tắt thông báo';
                 });
                 testBtns.forEach(btn => {
@@ -466,16 +778,16 @@
                 });
                 quickTestCards.forEach(c => c.classList.remove('opacity-75'));
             } else {
+                // TRƯỜNG HỢP 8: Thiết bị đủ điều kiện nhưng chưa bấm bật
                 badges.forEach(badge => {
-                    badge.className = 'badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1';
+                    badge.className = 'badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1 text-nowrap';
                     badge.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Chưa kích hoạt trên máy';
                 });
                 toggleBtns.forEach(btn => {
                     btn.disabled = false;
-                    btn.className = 'btn btn-sm btn-primary rounded-pill px-3';
+                    btn.className = 'btn btn-sm btn-primary rounded-pill px-3.5 py-2 fs-8 fw-semibold text-nowrap w-100 w-sm-auto text-center d-inline-flex align-items-center justify-content-center gap-2 pwa-push-toggle-btn';
                     btn.innerHTML = '<i class="bi bi-bell-fill me-1"></i> Bật thông báo đẩy';
                 });
-                // Vẫn giữ nút test hiển thị để người dùng bấm 1 chạm là tự kích hoạt và bắn test luôn!
                 testBtns.forEach(btn => {
                     btn.style.display = 'inline-flex';
                     btn.disabled = false;
@@ -486,8 +798,32 @@
         // Chuyển đổi trạng thái nhận thông báo (Toggle)
         togglePush: async function () {
             const status = await this.getPushStatus();
-            if (!status.supported) {
-                this.showToast('danger', 'Trình duyệt hoặc môi trường hiện tại không hỗ trợ Web Push Notification.', 'Không hỗ trợ');
+
+            if (status.reason === 'insecure_http') {
+                this.showToast('warning', 'Web Push yêu cầu kết nối bảo mật HTTPS. Vui lòng mở trang web qua link ngrok HTTPS trên điện thoại để bật.', 'Cần liên kết HTTPS');
+                this.showGenericInstallModal();
+                return;
+            }
+
+            if (status.reason === 'in_app_browser') {
+                this.showToast('warning', 'Trình duyệt Zalo/Facebook chặn tính năng thông báo. Vui lòng bấm menu (···) chọn "Mở bằng trình duyệt ngoài" (Safari/Chrome).', 'Mở trình duyệt ngoài');
+                this.showGenericInstallModal();
+                return;
+            }
+
+            if (status.reason === 'ios_needs_home_screen' || status.needsInstall) {
+                this.showIOSInstallInstructions();
+                this.showToast('info', 'Trên iPhone: Bấm nút Chia sẻ ⎋ -> chọn "Thêm vào MH chính" ➕ rồi mở app từ icon ngoài màn hình để bật thông báo nhé!', 'Hướng dẫn iPhone');
+                return;
+            }
+
+            if (status.reason === 'permission_denied') {
+                this.showToast('danger', 'Bạn đã chặn quyền thông báo trước đó. Vui lòng bấm vào biểu tượng 🔒 hoặc ⚙️ trên thanh địa chỉ trình duyệt để Cho phép Thông báo.', 'Đã chặn quyền');
+                return;
+            }
+
+            if (status.reason === 'ios_version_too_old' || !status.supported) {
+                this.showToast('danger', 'Trình duyệt hoặc phiên bản hệ điều hành hiện tại không hỗ trợ Web Push Notification.', 'Không hỗ trợ');
                 return;
             }
 
@@ -532,14 +868,37 @@
             }
 
             try {
-                // 1. Kiểm tra trạng thái hỗ trợ
                 const status = await this.getPushStatus();
-                if (!status.supported) {
-                    this.showToast('danger', 'Trình duyệt hoặc môi trường hiện tại không hỗ trợ Web Push (Cần HTTPS hoặc cài đặt PWA).', 'Không hỗ trợ');
+
+                if (status.reason === 'insecure_http') {
+                    this.showToast('warning', 'Cần mở qua liên kết HTTPS (ngrok) trên điện thoại mới có thể nhận thông báo đẩy.', 'Yêu cầu HTTPS');
+                    this.showGenericInstallModal();
                     return;
                 }
 
-                // 2. Nếu thiết bị chưa đăng ký Push, tự động kích hoạt quyền trước (1-Click Experience)
+                if (status.reason === 'in_app_browser') {
+                    this.showToast('warning', 'Vui lòng mở bằng Safari hoặc Chrome bên ngoài để nhận thông báo đẩy.', 'Mở trình duyệt ngoài');
+                    this.showGenericInstallModal();
+                    return;
+                }
+
+                if (status.reason === 'ios_needs_home_screen' || status.needsInstall) {
+                    this.showIOSInstallInstructions();
+                    this.showToast('info', 'Trên iPhone, bạn cần Thêm vào Màn hình chính trước thì Safari mới cho phép nhận thông báo.', 'Hướng dẫn iPhone');
+                    return;
+                }
+
+                if (status.reason === 'permission_denied') {
+                    this.showToast('danger', 'Trình duyệt đang bị chặn quyền thông báo. Vui lòng mở cài đặt trình duyệt để cho phép.', 'Bị chặn quyền');
+                    return;
+                }
+
+                if (!status.supported) {
+                    this.showToast('danger', 'Trình duyệt này chưa hỗ trợ Web Push.', 'Không hỗ trợ');
+                    return;
+                }
+
+                // Nếu thiết bị chưa đăng ký Push, tự động kích hoạt quyền trước (1-Click Experience)
                 if (!status.subscribed) {
                     this.showToast('info', 'Đang yêu cầu cấp quyền thông báo đẩy trên thiết bị của bạn...', 'Cấp quyền thông báo');
                     try {
@@ -551,7 +910,7 @@
                     }
                 }
 
-                // 3. Gửi lệnh Test Push lên máy chủ
+                // Gửi lệnh Test Push lên máy chủ
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 const res = await fetch('/push/test', {
                     method: 'POST',

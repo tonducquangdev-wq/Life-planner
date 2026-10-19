@@ -156,7 +156,7 @@
                         <!-- KHO NỘI DUNG LỊCH (LỊCH THÁNG HOẶC LỊCH TUẦN MOBILE) -->
                         <div class="card-body p-2 p-md-3">
                             <!-- 1. LƯỚI LỊCH THÁNG LỚN (7 CỘT) -->
-                            <div class="calendar-grid-container" id="calendarGrid">
+                            <div class="calendar-grid-container" id="calendarGrid" data-rows="6">
                                 <!-- Hàng 0: Header thứ (CN -> T7) -->
                                 <div class="calendar-header-day weekend">CN</div>
                                 <div class="calendar-header-day">T2</div>
@@ -201,10 +201,21 @@
                                 <i class="bi bi-clock-history text-primary"></i>
                                 <span>Lịch trình hôm nay</span>
                             </h6>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fs-7" id="todayCountBadge">0</span>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fs-7" id="todayCountBadge">{{ count($lichTrinhHomNay ?? []) }}</span>
                         </div>
                         <div class="card-body p-3" id="todayScheduleList">
-                            <!-- JS render via calendar.js -->
+                            @forelse($lichTrinhHomNay ?? [] as $sk)
+                            <div class="schedule-item {{ $sk['type'] ?? 'ca-nhan' }}" data-type="{{ $sk['type'] ?? 'ca-nhan' }}">
+                                <div class="d-flex align-items-center justify-content-between mb-1 gap-2">
+                                    <span class="fw-bold text-dark fs-7 flex-shrink-0">{{ $sk['thoi_gian'] }}</span>
+                                    <span class="badge rounded-pill px-2 py-0.5 fs-8 legend-pill {{ $sk['type'] ?? 'ca-nhan' }} flex-shrink-0">{{ $sk['badge'] }}</span>
+                                </div>
+                                <div class="fw-semibold text-dark fs-6 mb-1 text-break" style="word-break: break-word; overflow-wrap: anywhere; line-height: 1.35;">{{ $sk['tieu_de'] }}</div>
+                                <small class="text-muted fs-7 text-break d-flex align-items-center gap-1" style="word-break: break-word; overflow-wrap: anywhere;"><i class="bi bi-geo-alt flex-shrink-0"></i><span>{{ $sk['dia_diem'] }}</span></small>
+                            </div>
+                            @empty
+                            <p class="text-muted fs-7 text-center py-3 mb-0">Hôm nay không có lịch trình nào.</p>
+                            @endforelse
                         </div>
                     </div>
 
@@ -277,9 +288,7 @@
 
             </div>
 
-    </div>
-
-    </main>
+        </main>
     </div>
 
     <!-- ==========================================================================

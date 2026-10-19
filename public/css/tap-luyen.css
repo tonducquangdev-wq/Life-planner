@@ -64,10 +64,10 @@
 
 /* GIAO DIỆN TỐI (DARK MODE NEUMORPHISM) */
 [data-bs-theme="dark"] {
-    --nm-bg: #151821;
-    --nm-surface: #1b1e2a;
-    --nm-surface-hover: #222634;
-    --nm-surface-subtle: #202432;
+    --nm-bg: #0f172a;
+    --nm-surface: #1e293b;
+    --nm-surface-hover: #334155;
+    --nm-surface-subtle: #1e293b;
 
     --nm-shadow-flat: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.035);
     --nm-shadow-flat-sm: 2px 2px 6px rgba(0, 0, 0, 0.4), -2px -2px 5px rgba(255, 255, 255, 0.03);
@@ -84,7 +84,7 @@
     --nm-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
     --nm-divider: rgba(255, 255, 255, 0.08);
 
-    --nm-text-main: #f1f5f9;
+    --nm-text-main: #f8fafc;
     --nm-text-muted: #94a3b8;
     --nm-text-light: #64748b;
 
@@ -1205,9 +1205,9 @@ body {
    -------------------------------------------------------------------------- */
 .floating-community-btn {
     position: fixed;
-    bottom: 84px;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
     right: 24px;
-    z-index: 1050;
+    z-index: 1040;
     width: 52px;
     height: 52px;
     border-radius: 50%;
@@ -1671,8 +1671,9 @@ body {
    15. GIAO DIỆN TỐI (DARK MODE STRICT TOKEN OVERRIDES)
    -------------------------------------------------------------------------- */
 [data-bs-theme="dark"] .modal-content {
-    background-color: var(--nm-surface) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background-color: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: #f8fafc !important;
     box-shadow: 
         0 24px 48px -12px rgba(0, 0, 0, 0.8),
         0 12px 28px -6px rgba(0, 0, 0, 0.5),
@@ -1680,8 +1681,9 @@ body {
 }
 
 [data-bs-theme="dark"] .modal-backdrop.show {
-    opacity: 0.65 !important;
-    background-color: #020617 !important;
+    opacity: 0.82 !important;
+    background-color: #0f172a !important;
+    backdrop-filter: blur(4px) !important;
 }
 
 [data-bs-theme="dark"] .community-messenger-popup {
@@ -1786,19 +1788,39 @@ body {
 /* --------------------------------------------------------------------------
    16. RESPONSIVE BREAKPOINT TWEAKS
    -------------------------------------------------------------------------- */
-@media (max-width: 576px) {
+@media (max-width: 991.98px) {
     .floating-community-btn {
-        bottom: 74px;
-        right: 18px;
-        width: 46px;
-        height: 46px;
-        font-size: 1.2rem;
+        bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
+        right: 18px !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1.25rem !important;
+        z-index: 1040 !important;
     }
     .community-messenger-popup {
-        right: 14px;
-        width: calc(100vw - 28px);
-        bottom: 126px;
-        height: 400px;
+        right: 14px !important;
+        width: calc(100vw - 28px) !important;
+        bottom: calc(144px + env(safe-area-inset-bottom, 0px)) !important;
+        height: 440px !important;
+        max-height: calc(100vh - 165px - env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .floating-community-btn {
+        bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+        right: 16px !important;
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 1.2rem !important;
+        z-index: 1040 !important;
+    }
+    .community-messenger-popup {
+        right: 12px !important;
+        width: calc(100vw - 24px) !important;
+        bottom: calc(144px + env(safe-area-inset-bottom, 0px)) !important;
+        height: 420px !important;
+        max-height: calc(100vh - 165px - env(safe-area-inset-bottom, 0px)) !important;
     }
 }
 

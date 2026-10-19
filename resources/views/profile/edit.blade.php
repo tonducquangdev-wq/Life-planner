@@ -69,6 +69,10 @@
             justify-content: center;
             object-fit: cover;
         }
+        [data-bs-theme="dark"] .profile-avatar-xl {
+            border-color: #1e1e24;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
         .avatar-edit-badge {
             position: absolute;
             bottom: 4px;
@@ -85,6 +89,12 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
+        }
+        [data-bs-theme="dark"] .avatar-edit-badge {
+            background-color: #272732;
+            color: #818cf8;
+            border-color: #1e1e24;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
         .avatar-edit-badge:hover {
             background-color: #4f46e5;
@@ -122,6 +132,9 @@
             justify-content: center;
             background-color: #f8fafc;
         }
+        [data-bs-theme="dark"] .avatar-preview-box {
+            background-color: #1a1a22;
+        }
         .avatar-preview-img {
             width: 100%;
             height: 100%;
@@ -135,32 +148,41 @@
                 border-radius: 0.85rem 0.85rem 0 0;
             }
             .profile-avatar-wrapper {
-                margin-top: -42px;
+                margin-top: -44px;
             }
             .profile-avatar-xl {
-                width: 82px;
-                height: 82px;
+                width: 84px;
+                height: 84px;
                 font-size: 1.85rem;
                 border-width: 3px;
             }
             .avatar-edit-badge {
-                width: 28px;
-                height: 28px;
+                width: 30px;
+                height: 30px;
                 bottom: 2px;
                 right: 2px;
-                font-size: 0.8rem;
+                font-size: 0.85rem;
             }
         }
 
-        /* Menu Tabs cuộn ngang mượt mà (Horizontal Scrollable Chips) trên Mobile & Tablet */
+        /* Menu Tabs cuộn ngang mượt mà (Sticky Horizontal Scrollable Chips) trên Mobile & Tablet */
         @media (max-width: 991.98px) {
             .profile-tabs-card {
-                padding: 0.35rem 0 !important;
-                margin-bottom: 0.5rem;
-                background: transparent !important;
+                position: sticky !important;
+                top: 54px !important;
+                z-index: 1015 !important;
+                background: rgba(var(--bs-body-bg-rgb, 248, 250, 252), 0.94) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                padding: 0.45rem 0 !important;
+                margin-bottom: 0.75rem !important;
                 border: none !important;
-                box-shadow: none !important;
-                position: static !important;
+                border-radius: 0 !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+            }
+            [data-bs-theme="dark"] .profile-tabs-card {
+                background: rgba(22, 22, 28, 0.92) !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35) !important;
             }
             .profile-nav-pills {
                 flex-direction: row !important;
@@ -169,7 +191,7 @@
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
                 gap: 0.5rem !important;
-                padding: 0.25rem 0.25rem 0.5rem 0.25rem;
+                padding: 0.25rem 0.5rem !important;
             }
             .profile-nav-pills::-webkit-scrollbar {
                 display: none;
@@ -177,24 +199,35 @@
             .profile-nav-pills .nav-link {
                 white-space: nowrap !important;
                 flex-shrink: 0 !important;
-                padding: 0.5rem 0.95rem !important;
+                padding: 0.45rem 0.9rem !important;
                 font-size: 0.85rem !important;
                 border-radius: 9999px !important;
                 background-color: #ffffff;
                 border: 1px solid rgba(226, 232, 240, 0.9);
                 box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
             }
+            [data-bs-theme="dark"] .profile-nav-pills .nav-link {
+                background-color: #1e293b;
+                border-color: #334155;
+                color: #cbd5e1;
+            }
             .profile-nav-pills .nav-link.active {
                 background-color: #6366f1 !important;
                 border-color: #6366f1 !important;
                 color: #ffffff !important;
-                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.28);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.32);
             }
             .profile-nav-pills .nav-link i {
                 font-size: 0.95rem !important;
             }
             .content-body {
-                padding-bottom: 95px !important; /* Khoảng cách an toàn tránh bị Bottom Nav che */
+                padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px)) !important; /* Khoảng cách an toàn tránh bị Bottom Nav che */
+            }
+        }
+
+        @media (min-width: 576px) {
+            .w-sm-auto {
+                width: auto !important;
             }
         }
     </style>
@@ -209,8 +242,12 @@
     <div class="main-wrapper">
 
         <!-- HEADER THANH CÔNG CỤ TRÊN CÙNG -->
-        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2 d-flex align-items-center justify-content-between">
+        <header class="top-header border-bottom bg-white px-3 px-lg-4 py-2 d-flex align-items-center justify-content-between sticky-top" style="z-index: 1020;">
             <div class="d-flex align-items-center gap-2 gap-sm-3 min-w-0">
+                <!-- Nút mở Menu Offcanvas trên màn hình Mobile & Tablet -->
+                <button class="btn btn-sm btn-light border-0 d-lg-none p-1.5 rounded-3 me-1 d-inline-flex align-items-center justify-content-center text-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" title="Mở danh mục menu">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
                 <a href="{{ route('calendar.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1.5 flex-shrink-0" title="Quay lại Lịch">
                     <i class="bi bi-arrow-left"></i>
                     <span class="d-none d-sm-inline">Lịch</span>
@@ -291,11 +328,11 @@
             @endif
 
             <!-- 1. HERO COVER & PROFILE SUMMARY CARD HEADER -->
-            <div class="card border-0 shadow-sm rounded-4 bg-white mb-3 mb-md-4 overflow-hidden">
+            <div class="card border shadow-sm rounded-4 bg-body mb-3 mb-md-4 overflow-hidden">
                 <div class="profile-cover-banner"></div>
                 <div class="px-3 px-sm-4 pb-3 pb-sm-4 position-relative">
-                    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-3 text-center text-md-start">
-                        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 min-w-0">
+                    <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-end justify-content-between gap-3 text-center text-sm-start">
+                        <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-end gap-2.5 gap-sm-3 min-w-0">
                             <div class="profile-avatar-wrapper flex-shrink-0">
                                 @if(!empty($user->avatar_url))
                                     <img src="{{ $user->avatar_url }}" alt="Avatar" class="profile-avatar-xl">
@@ -308,21 +345,22 @@
                                     <i class="bi bi-camera-fill"></i>
                                 </button>
                             </div>
-                            <div class="pt-2 pt-md-0 mb-md-2 min-w-0">
-                                <h4 class="fw-bold text-dark mb-1 fs-5 fs-md-4 text-truncate">{{ $user->ho_ten ?? 'Người dùng' }}</h4>
-                                <div class="text-muted small mb-0 d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2">
-                                    <span class="text-truncate"><i class="bi bi-envelope me-1"></i>{{ $user->email }}</span>
+                            <div class="pt-1 pt-sm-0 mb-sm-1 min-w-0">
+                                <h4 class="fw-bold text-body mb-1 fs-5 fs-md-4 text-truncate">{{ $user->ho_ten ?? 'Người dùng' }}</h4>
+                                <div class="text-body-secondary small mb-0 d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-1.5 gap-sm-2">
+                                    <span class="text-truncate fs-8 fs-sm-7"><i class="bi bi-envelope me-1"></i>{{ $user->email }}</span>
                                     <span class="d-none d-sm-inline">•</span>
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-0.5 fs-9 fs-sm-8 fw-semibold">
                                         <i class="bi bi-patch-check-fill me-1"></i>Student Life Planner
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2 mb-md-2 justify-content-center justify-content-md-end">
-                            <button type="button" class="btn btn-outline-primary rounded-pill px-3.5 py-1.5 btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#changeAvatarModal">
-                                <i class="bi bi-camera me-1"></i>Đổi ảnh đại diện
+                        <div class="w-100 w-sm-auto d-flex justify-content-center justify-content-sm-end mb-sm-1">
+                            <button type="button" class="btn btn-outline-primary rounded-pill px-3.5 py-2 btn-sm fw-semibold w-100 w-sm-auto d-inline-flex align-items-center justify-content-center gap-2 shadow-2xs" data-bs-toggle="modal" data-bs-target="#changeAvatarModal">
+                                <i class="bi bi-camera-fill"></i>
+                                <span>Đổi ảnh đại diện</span>
                             </button>
                         </div>
                     </div>
@@ -334,25 +372,25 @@
                 
                 <!-- CỘT TRÁI / TOP (MOBILE): MENU TAB ĐIỀU HƯỚNG PROFILE (Col-lg-3) -->
                 <div class="col-12 col-lg-3">
-                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 sticky-top profile-tabs-card" style="top: 72px; z-index: 10;">
+                    <div class="card border shadow-sm rounded-4 bg-body p-2 p-sm-3 profile-tabs-card">
                         <div class="nav flex-column nav-pills profile-nav-pills gap-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                            <button class="nav-link active" id="tab-info-btn" data-bs-toggle="pill" data-bs-target="#tab-info" type="button" role="tab" aria-controls="tab-info" aria-selected="true">
+                            <button class="nav-link active d-inline-flex align-items-center gap-2" id="tab-info-btn" data-bs-toggle="pill" data-bs-target="#tab-info" type="button" role="tab" aria-controls="tab-info" aria-selected="true">
                                 <i class="bi bi-person-lines-fill"></i>
                                 <span>Thông tin cá nhân</span>
                             </button>
-                            <button class="nav-link" id="tab-notif-btn" data-bs-toggle="pill" data-bs-target="#tab-notif" type="button" role="tab" aria-controls="tab-notif" aria-selected="false">
+                            <button class="nav-link d-inline-flex align-items-center gap-2" id="tab-notif-btn" data-bs-toggle="pill" data-bs-target="#tab-notif" type="button" role="tab" aria-controls="tab-notif" aria-selected="false">
                                 <i class="bi bi-bell-fill text-warning"></i>
                                 <span>Cài đặt thông báo</span>
                             </button>
-                            <button class="nav-link" id="tab-appearance-btn" data-bs-toggle="pill" data-bs-target="#tab-appearance" type="button" role="tab" aria-controls="tab-appearance" aria-selected="false">
+                            <button class="nav-link d-inline-flex align-items-center gap-2" id="tab-appearance-btn" data-bs-toggle="pill" data-bs-target="#tab-appearance" type="button" role="tab" aria-controls="tab-appearance" aria-selected="false">
                                 <i class="bi bi-palette-fill text-primary"></i>
                                 <span>Giao diện & Ngôn ngữ</span>
                             </button>
-                            <button class="nav-link" id="tab-password-btn" data-bs-toggle="pill" data-bs-target="#tab-password" type="button" role="tab" aria-controls="tab-password" aria-selected="false">
+                            <button class="nav-link d-inline-flex align-items-center gap-2" id="tab-password-btn" data-bs-toggle="pill" data-bs-target="#tab-password" type="button" role="tab" aria-controls="tab-password" aria-selected="false">
                                 <i class="bi bi-shield-lock-fill text-info"></i>
                                 <span>Mật khẩu & Bảo mật</span>
                             </button>
-                            <button class="nav-link text-danger" id="tab-danger-btn" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button" role="tab" aria-controls="tab-danger" aria-selected="false">
+                            <button class="nav-link text-danger d-inline-flex align-items-center gap-2" id="tab-danger-btn" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button" role="tab" aria-controls="tab-danger" aria-selected="false">
                                 <i class="bi bi-trash3-fill text-danger"></i>
                                 <span>Xóa tài khoản</span>
                             </button>
@@ -381,35 +419,35 @@
                         
                         <!-- TAB 1: THÔNG TIN CÁ NHÂN -->
                         <div class="tab-pane fade show active" id="tab-info" role="tabpanel" aria-labelledby="tab-info-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
+                            <div class="card border shadow-sm rounded-4 bg-body p-3 p-sm-4">
                                 @include('profile.partials.update-profile-information-form')
                             </div>
                         </div>
 
                         <!-- TAB 2: CÀI ĐẶT THÔNG BÁO -->
                         <div class="tab-pane fade" id="tab-notif" role="tabpanel" aria-labelledby="tab-notif-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
+                            <div class="card border shadow-sm rounded-4 bg-body p-3 p-sm-4">
                                 @include('profile.partials.update-notification-settings-form')
                             </div>
                         </div>
 
                         <!-- TAB 3: GIAO DIỆN & NGÔN NGỮ -->
                         <div class="tab-pane fade" id="tab-appearance" role="tabpanel" aria-labelledby="tab-appearance-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
+                            <div class="card border shadow-sm rounded-4 bg-body p-3 p-sm-4">
                                 @include('profile.partials.update-appearance-form')
                             </div>
                         </div>
 
                         <!-- TAB 3: ĐỔI MẬT KHẨU -->
                         <div class="tab-pane fade" id="tab-password" role="tabpanel" aria-labelledby="tab-password-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4">
+                            <div class="card border shadow-sm rounded-4 bg-body p-3 p-sm-4">
                                 @include('profile.partials.update-password-form')
                             </div>
                         </div>
 
                         <!-- TAB 4: XÓA TÀI KHOẢN -->
                         <div class="tab-pane fade" id="tab-danger" role="tabpanel" aria-labelledby="tab-danger-btn">
-                            <div class="card border-0 shadow-sm rounded-4 bg-white p-3 p-sm-4 danger-zone-card">
+                            <div class="card border shadow-sm rounded-4 bg-body p-3 p-sm-4 danger-zone-card">
                                 @include('profile.partials.delete-user-form')
                             </div>
                         </div>
@@ -521,6 +559,16 @@
             // Sidebar Offcanvas Toggle Mobile
             document.getElementById('sidebarToggle')?.addEventListener('click', function() {
                 document.getElementById('sidebar')?.classList.toggle('show');
+            });
+
+            // Tự động cuộn ngang đưa Tab đang chọn vào giữa tầm nhìn trên Mobile
+            const tabButtons = document.querySelectorAll('.profile-nav-pills .nav-link');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('shown.bs.tab', function() {
+                    if (window.innerWidth < 992) {
+                        this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
+                });
             });
         });
     </script>

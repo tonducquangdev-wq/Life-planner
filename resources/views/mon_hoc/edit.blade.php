@@ -64,31 +64,33 @@
         }
 
         [data-bs-theme="dark"] .text-dark {
-            color: #E8E8EA !important;
+            color: #f8fafc !important;
         }
 
         [data-bs-theme="dark"] .text-muted {
-            color: #A0A0A8 !important;
+            color: #94a3b8 !important;
         }
 
         [data-bs-theme="dark"] .bg-white {
-            background-color: #1E1E22 !important;
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
         }
 
         [data-bs-theme="dark"] .bg-light {
-            background-color: #26262B !important;
-            color: #E8E8EA !important;
+            background-color: #0f172a !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
         }
 
         [data-bs-theme="dark"] .btn-light {
-            background-color: #1E1E22 !important;
-            border-color: #2E2E34 !important;
-            color: #E8E8EA !important;
+            background-color: #334155 !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
         }
 
         [data-bs-theme="dark"] .btn-light:hover {
-            background-color: #2E2E34 !important;
-            color: #FFFFFF !important;
+            background-color: #475569 !important;
+            color: #ffffff !important;
         }
     </style>
 </head>
