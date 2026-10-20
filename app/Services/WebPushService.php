@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PushSubscription;
 use App\Models\User;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Log;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
@@ -22,11 +23,20 @@ class WebPushService
         $privateKey = config('webpush.vapid.private_key');
 
         if ($subject && $publicKey && $privateKey) {
+            $subject = trim($subject);
+            // Apple APNs yêu cầu mailto: hoặc URL có domain công khai hợp lệ (từ chối tên miền .local)
+            if (str_ends_with(strtolower($subject), '.local')) {
+                $subject = 'mailto:quang@gmail.com';
+            }
+            if (! str_starts_with($subject, 'mailto:') && ! str_starts_with($subject, 'http://') && ! str_starts_with($subject, 'https://')) {
+                $subject = 'mailto:'.$subject;
+            }
+
             $this->auth = [
                 'VAPID' => [
                     'subject' => $subject,
-                    'publicKey' => $publicKey,
-                    'privateKey' => $privateKey,
+                    'publicKey' => trim($publicKey),
+                    'privateKey' => trim($privateKey),
                 ],
             ];
         }
@@ -65,6 +75,11 @@ class WebPushService
         $authToken = $subscriptionData['keys']['auth'] ?? ($subscriptionData['auth_token'] ?? '');
         $contentEncoding = $subscriptionData['content_encoding'] ?? 'aes128gcm';
         $deviceName = $deviceName ? mb_substr(trim($deviceName), 0, 255) : null;
+
+        // Tự động bật thông báo tổng cho user khi họ đăng ký thiết bị mới
+        if ($user->thong_bao_enabled === false) {
+            $user->update(['thong_bao_enabled' => true]);
+        }
 
         return PushSubscription::updateOrCreate(
             ['endpoint_hash' => $endpointHash],
@@ -138,8 +153,16 @@ class WebPushService
             ]),
         ], JSON_UNESCAPED_UNICODE);
 
-        $clientOptions = config('webpush.client_options', []);
-        $webPush = new WebPush($this->auth, $clientOptions);
+        $clientOptions = array_merge([
+            'timeout' => 8,
+            'connect_timeout' => 5,
+            'verify' => config('webpush.client_options.verify', false),
+            'http_errors' => false,
+        ], config('webpush.client_options', []));
+
+        $httpClient = new GuzzleClient($clientOptions);
+        $defaultOptions = config('webpush.default_options', []);
+        $webPush = new WebPush($this->auth, $defaultOptions, $httpClient);
         $webPush->setReuseVAPIDHeaders(true);
 
         $sentCount = 0;
@@ -175,10 +198,11 @@ class WebPushService
             } else {
                 $failedCount++;
                 $reason = $report->getReason();
-                Log::warning("WebPush send failed for endpoint {$endpoint}: {$reason}");
+                $statusCode = $report->getResponse()?->getStatusCode();
+                Log::warning("WebPush send failed for endpoint {$endpoint}: {$reason}".($statusCode ? " (HTTP {$statusCode})" : ''));
 
                 // Nếu subscription đã hết hạn hoặc không còn tồn tại trên server của Google/Apple (404, 410)
-                if ($report->isSubscriptionExpired()) {
+                if ($report->isSubscriptionExpired() || in_array($statusCode, [404, 410], true)) {
                     if ($currentSub) {
                         $currentSub->delete();
                     } else {

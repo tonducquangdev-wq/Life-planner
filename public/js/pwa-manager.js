@@ -150,6 +150,19 @@
                     this.setupInstallModal();
                 });
             }
+
+            // Tự động quét và phát thông báo đẩy định kỳ mỗi 60 giây khi client mở
+            setTimeout(() => this.checkReminders(), 3000);
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    this.checkReminders();
+                }
+            }, 60000);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    this.checkReminders();
+                }
+            });
         },
 
         // Đồng bộ và điều chỉnh các thành phần bên trong Modal Cài đặt
@@ -327,7 +340,12 @@
             const registration = await navigator.serviceWorker.ready;
 
             // 7. Lấy VAPID Public Key từ backend
-            const vapidRes = await fetch('/push/vapid-key');
+            const vapidRes = await fetch('/push/vapid-key', {
+                headers: {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
             if (!vapidRes.ok) {
                 throw new Error('Không thể lấy VAPID Public Key từ máy chủ.');
             }
@@ -421,7 +439,8 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken || '',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify({
                     endpoint: subscription.endpoint,
@@ -464,7 +483,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken || '',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
                     },
                     body: JSON.stringify({ endpoint: endpoint })
                 }).catch(err => console.warn('Lỗi báo hủy lên backend:', err));
@@ -563,7 +583,10 @@
                 // Kiểm tra xem máy chủ đã có lưu thiết bị này chưa
                 try {
                     const statusRes = await fetch('/push/status', {
-                        headers: { 'Accept': 'application/json' }
+                        headers: {
+                            'Accept': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        }
                     });
                     if (statusRes.ok) {
                         const statusData = await statusRes.json();
@@ -850,6 +873,7 @@
                 await this.syncPushUI();
                 if (toggleBtn && originalHtml) {
                     toggleBtn.disabled = false;
+                    toggleBtn.innerHTML = originalHtml;
                 }
             }
         },
@@ -864,7 +888,7 @@
             const originalHtml = activeBtn ? activeBtn.innerHTML : null;
             if (activeBtn) {
                 activeBtn.disabled = true;
-                activeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang gửi...';
+                activeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang test...';
             }
 
             try {
@@ -910,28 +934,43 @@
                     }
                 }
 
-                // Gửi lệnh Test Push lên máy chủ
+                // Gửi lệnh Test Push lên máy chủ có Timeout 15s bảo vệ
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                const res = await fetch('/push/test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken || '',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ type: type })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    if (navigator.vibrate) {
-                        try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+                try {
+                    const res = await fetch('/push/test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken || '',
+                            'Accept': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify({ type: type }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        if (navigator.vibrate) {
+                            try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+                        }
+                        this.showToast('success', data.body || 'Đã gửi test thông báo đẩy đến thiết bị! Hãy nhìn lên thanh thông báo / màn hình khóa.', data.title || 'Đã gửi test thông báo');
+                    } else {
+                        this.showToast('danger', data.message || 'Gửi thông báo thử thất bại.', 'Lỗi gửi thông báo');
                     }
-                    this.showToast('success', data.body || 'Đã bắn thông báo đẩy đến thiết bị! Hãy nhìn lên thanh thông báo / màn hình khóa.', data.title || 'Đã gửi thông báo đẩy');
-                } else {
-                    this.showToast('danger', data.message || 'Gửi thông báo thử thất bại.', 'Lỗi gửi thông báo');
+                    return data;
+                } catch (fetchErr) {
+                    clearTimeout(timeoutId);
+                    if (fetchErr.name === 'AbortError') {
+                        this.showToast('danger', 'Quá thời gian chờ phản hồi từ máy chủ (Timeout). Vui lòng kiểm tra lại mạng hoặc thử lại.', 'Hết thời gian chờ');
+                    } else {
+                        throw fetchErr;
+                    }
                 }
-                return data;
             } catch (err) {
                 this.showToast('danger', 'Lỗi kết nối máy chủ: ' + err.message, 'Lỗi kết nối');
             } finally {
@@ -939,6 +978,25 @@
                     activeBtn.disabled = false;
                     activeBtn.innerHTML = originalHtml;
                 }
+            }
+        },
+
+        // Tự động kiểm tra và kích hoạt thông báo đến hạn
+        checkReminders: async function () {
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                if (!csrfToken) return;
+                await fetch('/push/check-reminders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+            } catch (e) {
+                // Im lặng khi chạy ngầm
             }
         }
     };

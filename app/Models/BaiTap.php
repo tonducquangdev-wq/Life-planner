@@ -15,7 +15,11 @@ class BaiTap extends Model
         'mo_ta',
         'han_nop',
         'muc_do_uu_tien',
-        'trang_thai'
+        'trang_thai',
+    ];
+
+    protected $casts = [
+        'han_nop' => 'datetime',
     ];
 
     public function monHoc()

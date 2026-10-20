@@ -1,0 +1,2031 @@
+/* ==========================================================================
+   LIFE PLANNER - QUẢN LÝ HỌC TẬP (STUDY MANAGEMENT)
+   PREMIUM SOFT NEUMORPHISM DESIGN SYSTEM
+   Synchronized with Tap-Luyen, Calendar, and Global Dashboard Neumorphic Tokens
+   ========================================================================== */
+
+:root {
+    /* Base Neumorphic Surfaces */
+    --nm-bg: #e8ecf2;
+    --nm-surface: #eef2f6;
+    --nm-surface-hover: #f4f7fb;
+    --nm-surface-subtle: #e4eaf2;
+    --nm-surface-pressed: #e2e8f0;
+
+    /* Neumorphic Dual Shadows (Bottom-Right Dark + Top-Left Light) */
+    --nm-shadow-flat: 4px 4px 10px rgba(163, 177, 198, 0.42), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    --nm-shadow-flat-sm: 2px 2px 6px rgba(163, 177, 198, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.8);
+    --nm-shadow-card: 8px 8px 20px rgba(163, 177, 198, 0.42), -8px -8px 20px rgba(255, 255, 255, 0.9);
+    --nm-shadow-card-hover: 12px 12px 26px rgba(163, 177, 198, 0.5), -10px -10px 24px rgba(255, 255, 255, 1);
+    
+    --nm-shadow-btn: 4px 4px 10px rgba(163, 177, 198, 0.4), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    --nm-shadow-btn-hover: 6px 6px 14px rgba(163, 177, 198, 0.48), -5px -5px 12px rgba(255, 255, 255, 1);
+    
+    --nm-shadow-primary: 5px 5px 14px rgba(37, 99, 235, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.8);
+    --nm-shadow-purple: 4px 4px 12px rgba(124, 58, 237, 0.28), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    --nm-shadow-danger: 3px 3px 8px rgba(220, 38, 38, 0.25), -3px -3px 8px rgba(255, 255, 255, 0.85);
+    --nm-shadow-pill: 2px 2px 6px rgba(163, 177, 198, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.8);
+
+    /* Inset Concave Shadows (for pressed buttons, active tabs, inputs, checkboxes) */
+    --nm-shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+    --nm-shadow-inset-deep: inset 4px 4px 8px rgba(163, 177, 198, 0.48), inset -4px -4px 8px rgba(255, 255, 255, 0.95);
+
+    /* Delicate Soft Borders */
+    --nm-border: 1.5px solid rgba(255, 255, 255, 0.75);
+    --nm-border-subtle: 1px solid rgba(163, 177, 198, 0.28);
+    --nm-divider: rgba(163, 177, 198, 0.32);
+
+    /* Typography */
+    --nm-text-main: #1e293b;
+    --nm-text-muted: #64748b;
+    --nm-text-light: #94a3b8;
+
+    /* Theme Accents */
+    --nm-primary: #2563eb;
+    --nm-primary-hover: #1d4ed8;
+    --nm-primary-gradient: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+
+    --nm-purple: #7c3aed;
+    --nm-purple-bg: #ede9fe;
+    --nm-purple-gradient: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+    --nm-purple-border: #ddd6fe;
+
+    --nm-verified-bg: #dcfce7;
+    --nm-verified-text: #166534;
+    --nm-verified-border: #bbf7d0;
+
+    --nm-room-bg: #e0f2fe;
+    --nm-room-text: #0284c7;
+    --nm-room-border: #bae6fd;
+
+    --nm-time-bg: #eff6ff;
+    --nm-time-text: #1d4ed8;
+
+    --nm-danger-bg: #fee2e2;
+    --nm-danger-text: #dc2626;
+    --nm-danger-border: #fecaca;
+    --nm-danger-hover: #fca5a5;
+
+    --nm-deadline-badge-bg: #fef3c7;
+    --nm-deadline-badge-text: #b45309;
+    --nm-deadline-badge-border: #fde68a;
+
+    --study-radius-card: 22px;
+    --study-radius-btn: 9999px;
+    --study-surface-subtle: var(--nm-surface-subtle);
+    --study-border: var(--nm-border-subtle);
+}
+
+/* ==========================================================================
+   DARK THEME NEUMORPHISM TOKENS
+   ========================================================================== */
+[data-bs-theme="dark"] {
+    --nm-bg: #0f172a;
+    --nm-surface: #1e293b;
+    --nm-surface-hover: #27354a;
+    --nm-surface-subtle: #172234;
+    --nm-surface-pressed: #131c2c;
+
+    --nm-shadow-flat: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.035);
+    --nm-shadow-flat-sm: 2px 2px 6px rgba(0, 0, 0, 0.4), -2px -2px 5px rgba(255, 255, 255, 0.03);
+    --nm-shadow-card: 8px 8px 22px rgba(0, 0, 0, 0.55), -6px -6px 18px rgba(255, 255, 255, 0.035);
+    --nm-shadow-card-hover: 12px 12px 28px rgba(0, 0, 0, 0.65), -8px -8px 22px rgba(255, 255, 255, 0.045);
+    
+    --nm-shadow-btn: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.03);
+    --nm-shadow-btn-hover: 6px 6px 14px rgba(0, 0, 0, 0.55), -4px -4px 10px rgba(255, 255, 255, 0.045);
+    
+    --nm-shadow-primary: 5px 5px 14px rgba(59, 130, 246, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.04);
+    --nm-shadow-purple: 4px 4px 12px rgba(167, 139, 250, 0.25), -2px -2px 6px rgba(255, 255, 255, 0.04);
+    --nm-shadow-danger: 3px 3px 8px rgba(239, 68, 68, 0.25), -2px -2px 6px rgba(255, 255, 255, 0.03);
+    --nm-shadow-pill: 2px 2px 6px rgba(0, 0, 0, 0.4), -2px -2px 5px rgba(255, 255, 255, 0.02);
+
+    --nm-shadow-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.65), inset -3px -3px 6px rgba(255, 255, 255, 0.03);
+    --nm-shadow-inset-deep: inset 4px 4px 8px rgba(0, 0, 0, 0.75), inset -4px -4px 8px rgba(255, 255, 255, 0.04);
+
+    --nm-border: 1.5px solid rgba(255, 255, 255, 0.07);
+    --nm-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+    --nm-divider: rgba(255, 255, 255, 0.08);
+
+    --nm-text-main: #f8fafc;
+    --nm-text-muted: #94a3b8;
+    --nm-text-light: #64748b;
+
+    --nm-primary: #3b82f6;
+    --nm-primary-hover: #60a5fa;
+    --nm-primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+
+    --nm-purple: #c4b5fd;
+    --nm-purple-bg: rgba(139, 92, 246, 0.16);
+    --nm-purple-gradient: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.12) 100%);
+    --nm-purple-border: rgba(139, 92, 246, 0.3);
+
+    --nm-verified-bg: rgba(34, 197, 94, 0.15);
+    --nm-verified-text: #4ade80;
+    --nm-verified-border: rgba(34, 197, 94, 0.3);
+
+    --nm-room-bg: rgba(14, 165, 233, 0.15);
+    --nm-room-text: #38bdf8;
+    --nm-room-border: rgba(14, 165, 233, 0.3);
+
+    --nm-time-bg: rgba(59, 130, 246, 0.15);
+    --nm-time-text: #93c5fd;
+
+    --nm-danger-bg: rgba(239, 68, 68, 0.15);
+    --nm-danger-text: #f87171;
+    --nm-danger-border: rgba(239, 68, 68, 0.3);
+    --nm-danger-hover: rgba(239, 68, 68, 0.25);
+
+    --nm-deadline-badge-bg: rgba(245, 158, 11, 0.15);
+    --nm-deadline-badge-text: #fbbf24;
+    --nm-deadline-badge-border: rgba(245, 158, 11, 0.3);
+}
+
+/* ==========================================================================
+   GLOBAL LAYOUT FOR STUDY PAGE (CHO PHÉP CUỘN TOÀN TRANG MƯỢT MÀ)
+   ========================================================================== */
+html, body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important; /* Ghi đè overflow: hidden từ dashboard.css để trang cuộn bình thường */
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--nm-bg) !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    color: var(--nm-text-main);
+    margin: 0;
+    padding: 0;
+}
+
+body.modal-open {
+    overflow: hidden !important;
+}
+
+.study-page-wrapper {
+    min-height: 100vh;
+    background-color: var(--nm-bg);
+    overflow-x: hidden;
+    overflow-y: visible !important;
+}
+
+.study-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 60px 20px;
+}
+
+@media (min-width: 768px) {
+    .study-container {
+        padding: 28px 32px 70px 32px;
+    }
+}
+
+/* ==========================================================================
+   TOPBAR NAVBAR (LP LIFE PLANNER & NEUMORPHIC TOP ACTIONS)
+   ========================================================================== */
+.study-topbar {
+    background-color: var(--nm-surface);
+    border-bottom: var(--nm-border-subtle);
+    box-shadow: 0 4px 12px rgba(163, 177, 198, 0.25);
+    padding: 12px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(12px);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+[data-bs-theme="dark"] .study-topbar {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.study-navbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.study-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.study-logo-square {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--nm-primary-gradient);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.5px;
+    box-shadow: var(--nm-shadow-primary);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.study-brand-title {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--nm-text-main);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.study-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Verified Tutor Badge (Soft Neumorphic Convex Pill) */
+.study-badge-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--nm-verified-bg);
+    color: var(--nm-verified-text);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.study-badge-verified:hover {
+    box-shadow: var(--nm-shadow-btn-hover);
+    transform: translateY(-1px);
+    color: var(--nm-verified-text);
+}
+
+.study-badge-verified:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+/* Chat Button Pill (Neumorphic Raised) */
+.study-btn-chat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--nm-surface);
+    color: var(--nm-text-main);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-btn);
+    padding: 7px 16px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.study-btn-chat:hover {
+    background-color: var(--nm-surface-hover);
+    box-shadow: var(--nm-shadow-btn-hover);
+    color: var(--nm-primary);
+    transform: translateY(-1px);
+}
+
+.study-btn-chat:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+/* Theme Toggle Button (Neumorphic Circle) */
+.study-theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-btn);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #f59e0b;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.study-theme-toggle:hover {
+    background-color: var(--nm-surface-hover);
+    box-shadow: var(--nm-shadow-btn-hover);
+    transform: rotate(15deg) translateY(-1px);
+}
+
+.study-theme-toggle:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+/* User Avatar Pill (Neumorphic Raised) */
+.study-user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-btn);
+    padding: 4px 14px 4px 5px;
+    border-radius: 9999px;
+    text-decoration: none;
+    color: var(--nm-text-main);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.study-user-pill:hover {
+    background-color: var(--nm-surface-hover);
+    box-shadow: var(--nm-shadow-btn-hover);
+    transform: translateY(-1px);
+}
+
+.study-user-pill:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+.study-avatar-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--nm-primary-gradient);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: var(--nm-shadow-primary);
+}
+
+/* ==========================================================================
+   PAGE HEADER & NEUMORPHIC ACTIONS ROW
+   ========================================================================== */
+.study-header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+@media (min-width: 992px) {
+    .study-header-section {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.study-header-title-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.study-header-icon {
+    font-size: 2.3rem;
+    line-height: 1;
+    color: var(--nm-text-main);
+    filter: drop-shadow(2px 4px 6px rgba(163, 177, 198, 0.4));
+}
+
+[data-bs-theme="dark"] .study-header-icon {
+    filter: drop-shadow(2px 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.study-page-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
+    margin: 0 0 4px 0;
+    letter-spacing: -0.3px;
+}
+
+.study-page-subtitle {
+    font-size: 0.875rem;
+    color: var(--nm-text-muted);
+    margin: 0;
+    max-width: 650px;
+    line-height: 1.45;
+}
+
+/* Quick Actions Wrapper & Mobile Dropdown/Collapse */
+.study-actions-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.study-mobile-actions-toggle {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: var(--study-radius-btn);
+    font-size: 0.925rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: var(--nm-border);
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.study-chevron-icon {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+}
+
+.study-mobile-actions-toggle[aria-expanded="true"] .study-chevron-icon {
+    transform: rotate(180deg);
+}
+
+@media (min-width: 992px) {
+    .study-actions-wrapper {
+        width: auto;
+    }
+
+    .study-mobile-actions-toggle {
+        display: none !important;
+    }
+
+    .study-actions-collapse {
+        display: flex !important;
+        height: auto !important;
+        visibility: visible !important;
+    }
+
+    .study-actions-collapse .study-actions-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Top Action Buttons Group */
+.study-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Common Neumorphic Pill Button */
+.study-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    border-radius: var(--study-radius-btn);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-btn);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    user-select: none;
+}
+
+.study-action-btn:hover {
+    box-shadow: var(--nm-shadow-btn-hover);
+    transform: translateY(-2px);
+}
+
+.study-action-btn:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+/* Button 1 & 2: Soft Neumorphic Raised Buttons (Đăng Ký Gia Sư & Tìm Gia Sư) */
+.study-btn-outline {
+    background-color: var(--nm-surface);
+    color: var(--nm-text-main);
+}
+
+.study-btn-outline:hover {
+    background-color: var(--nm-surface-hover);
+    color: var(--nm-primary);
+}
+
+/* Button 3: Soft Lavender Neumorphic Button (+ Thêm Bài Tập) */
+.study-btn-purple {
+    background: var(--nm-purple-gradient);
+    color: var(--nm-purple);
+    border: 1.5px solid var(--nm-purple-border);
+    box-shadow: var(--nm-shadow-purple);
+}
+
+.study-btn-purple:hover {
+    background: linear-gradient(135deg, #e9d5ff 0%, #ede9fe 100%);
+    color: #6d28d9;
+    box-shadow: 6px 6px 16px rgba(124, 58, 237, 0.35), -5px -5px 12px rgba(255, 255, 255, 1);
+}
+
+.study-btn-purple:active {
+    box-shadow: inset 3px 3px 6px rgba(109, 40, 217, 0.3), inset -3px -3px 6px rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-bs-theme="dark"] .study-btn-purple:hover {
+    color: #ddd6fe;
+}
+
+/* Button 4: Vibrant Blue Neumorphic Button (+ Thêm Môn Học) */
+.study-btn-primary {
+    background: var(--nm-primary-gradient);
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow: var(--nm-shadow-primary);
+}
+
+.study-btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 6px 6px 18px rgba(37, 99, 235, 0.5), -4px -4px 12px rgba(255, 255, 255, 0.9);
+}
+
+.study-btn-primary:active {
+    box-shadow: inset 3px 3px 6px rgba(15, 23, 42, 0.5), inset -2px -2px 6px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ==========================================================================
+   NEUMORPHIC CARDS (MAIN CONTENT PANELS)
+   ========================================================================== */
+.study-card {
+    background-color: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: var(--study-radius-card);
+    box-shadow: var(--nm-shadow-card);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    transition: background-color 0.2s, box-shadow 0.25s, transform 0.2s;
+}
+
+.study-card:hover {
+    box-shadow: var(--nm-shadow-card-hover);
+}
+
+.study-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 576px) {
+    .study-card-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.study-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.study-card-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    filter: drop-shadow(1px 2px 3px rgba(163, 177, 198, 0.3));
+}
+
+.study-card-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--nm-text-main);
+    margin: 0;
+}
+
+.study-card-count {
+    font-size: 0.85rem;
+    color: var(--nm-text-muted);
+    font-weight: 600;
+}
+
+.study-card-count strong {
+    color: var(--nm-primary);
+    font-weight: 800;
+}
+
+.study-card-subtitle {
+    font-size: 0.82rem;
+    color: var(--nm-text-muted);
+    margin: 3px 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==========================================================================
+   NEUMORPHIC TABLE: DANH SÁCH MÔN HỌC & LỊCH TRÌNH
+   ========================================================================== */
+.study-table-responsive {
+    overflow-x: auto;
+    border-radius: 16px;
+    background-color: var(--nm-surface);
+    border: var(--nm-border-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    padding: 6px;
+}
+
+.study-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    min-width: 900px;
+}
+
+.study-table thead {
+    background-color: var(--nm-surface-subtle);
+}
+
+.study-table th {
+    padding: 14px 18px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--nm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: var(--nm-border-subtle);
+    white-space: nowrap;
+}
+
+.study-table th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.study-table th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.study-table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.study-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid rgba(163, 177, 198, 0.18);
+}
+
+[data-bs-theme="dark"] .study-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.study-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+[data-bs-theme="dark"] .study-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.study-table td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+/* Cell: Tên Môn Học */
+.study-course-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.study-course-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.study-course-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.study-course-name {
+    font-weight: 700;
+    color: var(--nm-text-main);
+    text-decoration: none;
+    font-size: 0.925rem;
+    transition: color 0.15s;
+}
+
+.study-course-name:hover {
+    color: var(--nm-primary);
+}
+
+.study-course-credits {
+    font-size: 0.78rem;
+    color: var(--nm-text-light);
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* Cell: Giảng viên */
+.study-teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--nm-text-main);
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.study-teacher-cell i {
+    color: var(--nm-text-light);
+    font-size: 1.05rem;
+}
+
+/* Cell: Phòng học (Neumorphic Soft Pill) */
+.badge-room-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--nm-room-bg);
+    color: var(--nm-room-text);
+    border: 1px solid var(--nm-room-border);
+    box-shadow: var(--nm-shadow-pill);
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Cell: Giờ & Ngày học */
+.study-schedule-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.badge-time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--nm-time-text);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge-time-pill i {
+    font-size: 0.85rem;
+}
+
+.study-dow-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--nm-text-muted);
+}
+
+/* Cell: Thời gian môn (Neumorphic Inset/Convex Range Pill) */
+.badge-date-range {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: var(--nm-border);
+    background-color: var(--nm-surface);
+    box-shadow: var(--nm-shadow-flat-sm);
+    padding: 5px 14px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--nm-text-main);
+    white-space: nowrap;
+}
+
+/* Cell: Trạng thái (Neumorphic Soft Badge) */
+.badge-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--nm-shadow-pill);
+}
+
+.badge-status-pill.status-dang_hoc {
+    background-color: var(--nm-room-bg);
+    color: var(--nm-room-text);
+    border: 1px solid var(--nm-room-border);
+}
+
+.badge-status-pill.status-da_hoan_thanh {
+    background-color: var(--nm-verified-bg);
+    color: var(--nm-verified-text);
+    border: 1px solid var(--nm-verified-border);
+}
+
+.badge-status-pill.status-tam_dung {
+    background-color: var(--nm-deadline-badge-bg);
+    color: var(--nm-deadline-badge-text);
+    border: 1px solid var(--nm-deadline-badge-border);
+}
+
+.badge-status-pill .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 0 5px currentColor;
+}
+
+/* Cell: Thao tác (Neumorphic Red Button: 🗑 Xóa) */
+.study-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--nm-danger-bg);
+    color: var(--nm-danger-text);
+    border: 1px solid var(--nm-danger-border);
+    box-shadow: var(--nm-shadow-danger);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.study-btn-delete:hover {
+    background-color: var(--nm-danger-hover);
+    color: #991b1b;
+    box-shadow: 4px 4px 12px rgba(220, 38, 38, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+}
+
+.study-btn-delete:active {
+    box-shadow: inset 2px 2px 5px rgba(220, 38, 38, 0.35), inset -2px -2px 5px rgba(255, 255, 255, 0.8) !important;
+    transform: translateY(1px);
+}
+
+[data-bs-theme="dark"] .study-btn-delete:hover {
+    color: #fee2e2;
+}
+
+/* Cell: Thao tác (Neumorphic Blue Button: ✏ Sửa) */
+.study-btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--nm-time-bg);
+    color: var(--nm-time-text);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    box-shadow: 2px 2px 6px rgba(59, 130, 246, 0.15), -2px -2px 6px rgba(255, 255, 255, 0.7);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    text-decoration: none;
+}
+
+.study-btn-edit:hover {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    box-shadow: 4px 4px 12px rgba(37, 99, 235, 0.25), -3px -3px 8px rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+}
+
+.study-btn-edit:active {
+    box-shadow: inset 2px 2px 5px rgba(37, 99, 235, 0.25), inset -2px -2px 5px rgba(255, 255, 255, 0.8) !important;
+    transform: translateY(1px);
+}
+
+[data-bs-theme="dark"] .study-btn-edit {
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4), -1px -1px 3px rgba(255, 255, 255, 0.04);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+[data-bs-theme="dark"] .study-btn-edit:hover {
+    background-color: rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
+}
+
+/* ==========================================================================
+   NEUMORPHIC DEADLINE / ASSIGNMENTS SECTION
+   ========================================================================== */
+.study-deadline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.study-deadline-item {
+    background-color: var(--nm-surface);
+    border: var(--nm-border);
+    border-radius: 16px;
+    padding: 18px 22px;
+    box-shadow: var(--nm-shadow-btn);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.study-deadline-item:hover {
+    box-shadow: var(--nm-shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+.study-deadline-item.completed-item {
+    box-shadow: var(--nm-shadow-inset);
+    background-color: var(--nm-surface-subtle);
+    opacity: 0.75;
+}
+
+.study-deadline-top-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@media (min-width: 768px) {
+    .study-deadline-top-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.study-deadline-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Custom Neumorphic Square Checkbox (Inset Concave) */
+.study-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(163, 177, 198, 0.35);
+    background-color: var(--nm-surface-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .study-checkbox {
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.study-checkbox:checked {
+    background: var(--nm-primary-gradient);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: var(--nm-shadow-primary);
+}
+
+.study-checkbox:checked::before {
+    content: "✓";
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.study-checkbox:hover {
+    border-color: var(--nm-primary);
+}
+
+.study-deadline-title {
+    font-size: 0.975rem;
+    font-weight: 700;
+    color: var(--nm-text-main);
+    transition: color 0.15s;
+    cursor: pointer;
+    margin: 0;
+}
+
+.study-deadline-title.is-done {
+    text-decoration: line-through;
+    color: var(--nm-text-light);
+}
+
+/* Badges on right side */
+.study-deadline-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.badge-deadline-sync {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--nm-deadline-badge-bg);
+    color: var(--nm-deadline-badge-text);
+    border: 1px solid var(--nm-deadline-badge-border);
+    box-shadow: var(--nm-shadow-pill);
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.badge-priority-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: var(--nm-shadow-pill);
+}
+
+.badge-priority-tag.priority-cao {
+    background-color: var(--nm-danger-bg);
+    color: var(--nm-danger-text);
+    border: 1px solid var(--nm-danger-border);
+}
+
+.badge-priority-tag.priority-trung_binh {
+    background-color: var(--nm-deadline-badge-bg);
+    color: var(--nm-deadline-badge-text);
+    border: 1px solid var(--nm-deadline-badge-border);
+}
+
+.badge-priority-tag.priority-thap {
+    background-color: var(--nm-surface-subtle);
+    color: var(--nm-text-muted);
+    border: var(--nm-border-subtle);
+}
+
+.study-rocket-badge {
+    font-size: 1.2rem;
+    line-height: 1;
+    display: inline-block;
+    filter: drop-shadow(2px 3px 4px rgba(163, 177, 198, 0.4));
+}
+
+[data-bs-theme="dark"] .study-rocket-badge {
+    filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.6));
+}
+
+/* Bottom metadata line */
+.study-deadline-meta-row {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--nm-divider);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.825rem;
+    color: var(--nm-text-muted);
+}
+
+.study-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.study-meta-item strong {
+    color: var(--nm-text-main);
+    font-weight: 700;
+}
+
+.study-btn-delete-assignment {
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    color: var(--nm-text-light);
+    font-size: 0.85rem;
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.study-btn-delete-assignment:hover {
+    color: var(--nm-danger-text);
+    background-color: var(--nm-danger-bg);
+    box-shadow: var(--nm-shadow-danger);
+    transform: translateY(-1px);
+}
+
+.study-btn-delete-assignment:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+.study-btn-edit-assignment {
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-flat-sm);
+    color: var(--nm-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.study-btn-edit-assignment:hover {
+    color: var(--nm-primary);
+    background-color: var(--nm-time-bg);
+    box-shadow: 2px 2px 6px rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+}
+
+.study-btn-edit-assignment:active {
+    box-shadow: var(--nm-shadow-inset) !important;
+    transform: translateY(1px);
+}
+
+/* Empty State */
+.study-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--nm-text-muted);
+}
+
+.study-empty-icon {
+    font-size: 2.8rem;
+    color: var(--nm-text-light);
+    margin-bottom: 12px;
+    filter: drop-shadow(2px 4px 6px rgba(163, 177, 198, 0.3));
+}
+
+/* ==========================================================================
+   NEUMORPHIC MODALS & FORMS (CHỐNG CHÓI, TRIỆT TIÊU QUẦNG SÁNG TRẮNG NGOÀI BOX)
+   ========================================================================= */
+.study-modal .modal-content {
+    background-color: var(--nm-surface) !important;
+    border: 1px solid rgba(163, 177, 198, 0.38) !important;
+    border-radius: 24px !important;
+    /* Triệt tiêu bóng sáng trắng gây chói (-10px -10px ... #ffffff), dùng shadow độ sâu tự nhiên và viền inset tinh tế */
+    box-shadow: 
+        0 20px 45px -10px rgba(15, 23, 42, 0.22),
+        0 8px 20px -4px rgba(15, 23, 42, 0.1),
+        inset 1px 1px 1px rgba(255, 255, 255, 0.6) !important;
+    color: var(--nm-text-main) !important;
+    overflow: hidden;
+    max-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Đảm bảo form bên trong modal không làm vỡ cấu trúc flex scrollable */
+.study-modal .modal-content > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
+/* Lớp backdrop mờ dịu mắt, tránh tương phản gắt với hộp thoại */
+.modal-backdrop.show {
+    opacity: 0.45 !important;
+    background-color: #0f172a !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+[data-bs-theme="dark"] .study-modal .modal-content,
+.dark-theme .study-modal .modal-content {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 
+        0 24px 48px -12px rgba(0, 0, 0, 0.8),
+        0 12px 28px -6px rgba(0, 0, 0, 0.5),
+        inset 1px 1px 1px rgba(255, 255, 255, 0.04) !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .modal-backdrop.show,
+.dark-theme .modal-backdrop.show {
+    opacity: 0.75 !important;
+    background-color: #020617 !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+.study-modal-header {
+    padding: 20px 26px;
+    border-bottom: var(--nm-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.study-modal-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.study-modal-body {
+    padding: 26px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Thanh cuộn tinh tế, hiện đại cho modal body */
+.study-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+.study-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.study-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 9999px;
+}
+.study-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+}
+
+.study-modal-footer {
+    padding: 16px 26px;
+    border-top: var(--nm-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.study-form-label {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: var(--nm-text-main);
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Inset Neumorphic Input & Select */
+.study-form-control,
+.study-form-select {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    border: 1.5px solid rgba(163, 177, 198, 0.32);
+    border-radius: 12px;
+    background-color: var(--nm-surface-subtle);
+    box-shadow: var(--nm-shadow-inset);
+    color: var(--nm-text-main);
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+[data-bs-theme="dark"] .study-form-control,
+[data-bs-theme="dark"] .study-form-select {
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.study-form-control:focus,
+.study-form-select:focus {
+    border-color: var(--nm-primary);
+    box-shadow: inset 2px 2px 4px rgba(163, 177, 198, 0.4), 0 0 0 3px rgba(37, 99, 235, 0.18);
+    background-color: var(--nm-surface);
+}
+
+/* Day of Week Selector Pills */
+.study-dow-container {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.study-dow-check {
+    display: none;
+}
+
+.study-dow-label {
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: var(--nm-border);
+    background-color: var(--nm-surface);
+    box-shadow: var(--nm-shadow-flat-sm);
+    color: var(--nm-text-main);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.study-dow-label:hover {
+    box-shadow: var(--nm-shadow-btn-hover);
+    transform: translateY(-1px);
+}
+
+.study-dow-check:checked + .study-dow-label {
+    background: var(--nm-primary-gradient);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: var(--nm-shadow-primary);
+    color: #ffffff;
+}
+
+/* Neumorphic Toast Notification */
+.study-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    padding: 14px 22px;
+    border-radius: 14px;
+    background: var(--nm-surface);
+    border: var(--nm-border);
+    box-shadow: var(--nm-shadow-card-hover);
+    color: var(--nm-text-main);
+    font-weight: 700;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateY(-24px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.study-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.study-toast.toast-success {
+    border-left: 5px solid #10b981;
+}
+
+.study-toast.toast-error {
+    border-left: 5px solid #ef4444;
+}
+
+/* ==========================================================================
+   NEUMORPHIC FLOATING NAVIGATION BUBBLE (BONG BÓNG ĐIỀU HƯỚNG NHANH)
+   ========================================================================== */
+.floating-menu-container {
+    display: block !important;
+    position: fixed !important;
+    bottom: 28px !important;
+    right: 28px !important;
+    z-index: 1060 !important;
+}
+
+@media (max-width: 767.98px) {
+    .floating-menu-container {
+        display: block !important;
+        bottom: 84px !important; /* Float above mobile bottom navigation */
+        right: 18px !important;
+    }
+}
+
+/* Dark theme styling for floating menu */
+[data-bs-theme="dark"] .floating-menu-btn,
+.dark-theme .floating-menu-btn {
+    background: #1e293b !important;
+    border: 2px solid #334155 !important;
+    color: #818cf8 !important;
+    box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-btn:hover,
+.dark-theme .floating-menu-btn:hover {
+    background: #27354a !important;
+    color: #a5b4fc !important;
+    box-shadow: 6px 8px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-container.active .floating-menu-btn,
+.dark-theme .floating-menu-container.active .floating-menu-btn {
+    background: #1e293b !important;
+    color: #fb7185 !important;
+    border: 2px solid rgba(251, 113, 133, 0.45) !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.35), 4px 6px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-popup,
+.dark-theme .floating-menu-popup {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-header-title,
+.dark-theme .floating-menu-header-title,
+[data-bs-theme="dark"] .floating-menu-popup .text-uppercase,
+.dark-theme .floating-menu-popup .text-uppercase {
+    color: #94a3b8 !important;
+    text-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-badge,
+.dark-theme .floating-menu-badge,
+[data-bs-theme="dark"] .floating-menu-popup .badge,
+.dark-theme .floating-menu-popup .badge {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+    color: #818cf8 !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item,
+.dark-theme .floating-menu-item {
+    color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item:hover,
+.dark-theme .floating-menu-item:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item.active,
+.dark-theme .floating-menu-item.active {
+    background: rgba(99, 102, 241, 0.22) !important;
+    color: #818cf8 !important;
+    border: 1.5px solid rgba(129, 140, 248, 0.4) !important;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item .menu-item-icon,
+.dark-theme .floating-menu-item .menu-item-icon {
+    background: #0f172a !important;
+    border: 1.5px solid #334155 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item.active .menu-item-icon,
+.dark-theme .floating-menu-item.active .menu-item-icon {
+    background: rgba(99, 102, 241, 0.35) !important;
+    color: #a5b4fc !important;
+    border: 1.5px solid rgba(129, 140, 248, 0.5) !important;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-divider,
+.dark-theme .floating-menu-divider {
+    background: #334155 !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE STYLES (CHỐNG DỒN CỤC TRÊN MÀN HÌNH MOBILE)
+   ========================================================================== */
+
+/* Tablet & Mobile Screens (<= 767.98px) */
+@media (max-width: 767.98px) {
+    /* 1. Page Container & Layout Spacing */
+    .study-container {
+        padding: 16px 12px 60px 12px !important;
+    }
+
+    /* 2. Page Header & Actions Grid (Biến 4 nút bị dồn thành Grid 2x2 cân xứng) */
+    .study-header-section {
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .study-header-title-box {
+        gap: 10px;
+    }
+
+    .study-header-icon {
+        font-size: 1.8rem;
+    }
+
+    .study-page-title {
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+    }
+
+    .study-page-subtitle {
+        font-size: 0.82rem;
+        line-height: 1.4;
+    }
+
+    /* Tối ưu hóa Quick Actions trên Mobile: Nút gộp 1 nút & Khung 4 nút xổ ra */
+    .study-actions-wrapper {
+        width: 100% !important;
+    }
+
+    .study-mobile-actions-toggle {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        padding: 11px 16px !important;
+        font-size: 0.88rem !important;
+        border-radius: 16px !important;
+    }
+
+    .study-actions-collapse {
+        width: 100% !important;
+        margin-top: 10px;
+    }
+
+    .study-actions-collapse.collapsing,
+    .study-actions-collapse.show {
+        display: block !important;
+    }
+
+    /* 4 nút hành động khi xổ ra xếp dạng Lưới 2x2 trong khung nổi Neumorphic */
+    .study-actions-collapse .study-actions-row {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+        padding: 12px !important;
+        background: var(--nm-surface) !important;
+        border: 1px solid rgba(163, 177, 198, 0.35) !important;
+        border-radius: 18px !important;
+        box-shadow: 
+            0 12px 28px -6px rgba(15, 23, 42, 0.12),
+            0 4px 10px -2px rgba(15, 23, 42, 0.04),
+            inset 1px 1px 1px rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .study-actions-collapse .study-actions-row .study-action-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 8px !important;
+        font-size: 0.82rem !important;
+        white-space: normal !important;
+        text-align: center !important;
+        margin: 0 !important;
+    }
+
+    [data-bs-theme="dark"] .study-actions-collapse .study-actions-row,
+    .dark-theme .study-actions-collapse .study-actions-row {
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+        box-shadow: 
+            0 14px 30px -6px rgba(0, 0, 0, 0.6),
+            inset 1px 1px 1px rgba(255, 255, 255, 0.05) !important;
+    }
+
+    [data-bs-theme="dark"] .study-mobile-actions-toggle .badge,
+    .dark-theme .study-mobile-actions-toggle .badge {
+        background: rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+    }
+
+    /* 3. Neumorphic Main Cards */
+    .study-card {
+        padding: 16px 14px !important;
+        border-radius: 18px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .study-card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .study-card-header .study-action-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-top: 4px !important;
+    }
+
+    .study-card-title {
+        font-size: 1.05rem !important;
+    }
+
+    .study-card-count {
+        font-size: 0.8rem !important;
+    }
+
+    /* 4. CHUYỂN BẢNG MÔN HỌC THÀNH DẠNG APP CARDS TRÊN MOBILE (Không còn bị cuộn ngang hay kẹt chữ) */
+    .study-table-responsive {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        overflow-x: visible !important;
+    }
+
+    .study-table {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .study-table thead {
+        display: none !important; /* Ẩn dòng tiêu đề thead trên mobile */
+    }
+
+    .study-table tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+        width: 100% !important;
+    }
+
+    /* Mỗi dòng môn học tr.nm-course-card biến thành 1 thẻ Neumorphic riêng biệt */
+    .study-table tbody tr.nm-course-card {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 9px !important;
+        background-color: var(--nm-surface) !important;
+        border: var(--nm-border) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--nm-shadow-btn) !important;
+        padding: 16px !important;
+        margin: 0 !important;
+        width: 100% !important;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .study-table tbody tr.nm-course-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--nm-shadow-card-hover) !important;
+    }
+
+    .study-table tbody tr.nm-course-card td {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 5px 0 !important;
+        border: none !important;
+        width: 100% !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Ô Tên Môn Học (Cell 1): Header của Thẻ Card */
+    .study-table tbody tr.nm-course-card td[data-label="Tên môn học"],
+    .study-table tbody tr.nm-course-card td:first-child {
+        display: block !important;
+        padding-bottom: 10px !important;
+        border-bottom: 1px dashed var(--nm-divider) !important;
+    }
+
+    .study-table tbody tr.nm-course-card td:first-child::before {
+        display: none !important;
+    }
+
+    .study-course-cell {
+        gap: 10px !important;
+        align-items: flex-start !important;
+    }
+
+    .study-course-dot {
+        margin-top: 6px !important;
+    }
+
+    .study-course-name {
+        font-size: 1.05rem !important;
+        line-height: 1.35;
+        font-weight: 800 !important;
+    }
+
+    .study-course-credits {
+        font-size: 0.8rem !important;
+    }
+
+    /* Nhãn động bằng CSS Pseudo-element data-label cho các dòng thông tin ở giữa */
+    .study-table tbody tr.nm-course-card td:not(:first-child):not(:last-child)::before {
+        content: attr(data-label);
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--nm-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+        margin-right: 12px;
+    }
+
+    /* Căn chỉnh Lịch học và Giờ học sang phải gọn gàng */
+    .study-table tbody tr.nm-course-card td[data-label="Lịch học"] .study-schedule-cell {
+        align-items: flex-end !important;
+        text-align: right !important;
+    }
+
+    /* Dòng thao tác (Cell cuối cùng): 2 nút Sửa và Xóa chia đều 50% hàng */
+    .study-table tbody tr.nm-course-card td[data-label="Thao tác"],
+    .study-table tbody tr.nm-course-card td:last-child {
+        display: block !important;
+        padding-top: 10px !important;
+        border-top: 1px dashed var(--nm-divider) !important;
+        margin-top: 4px !important;
+    }
+
+    .study-table tbody tr.nm-course-card td:last-child::before {
+        display: none !important;
+    }
+
+    .study-table-actions {
+        width: 100% !important;
+        display: flex !important;
+        gap: 10px !important;
+    }
+
+    .study-table-actions .study-btn-edit,
+    .study-table-actions .study-btn-delete {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 9px 12px !important;
+        font-size: 0.85rem !important;
+        border-radius: 10px !important;
+    }
+
+    /* Trạng thái bảng rỗng trên mobile */
+    .study-table tbody tr#emptyRowMonHoc {
+        display: block !important;
+    }
+
+    .study-table tbody tr#emptyRowMonHoc td {
+        display: block !important;
+        padding: 24px 12px !important;
+        border: none !important;
+    }
+
+    /* 5. Deadline / Assignment Items trên Mobile */
+    .study-deadline-item {
+        padding: 14px 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .study-deadline-title-wrap {
+        gap: 10px !important;
+        align-items: flex-start !important;
+    }
+
+    .study-checkbox {
+        margin-top: 2px !important;
+    }
+
+    .study-deadline-title {
+        font-size: 0.925rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .study-deadline-badges {
+        gap: 6px !important;
+    }
+
+    .badge-deadline-sync,
+    .badge-priority-tag {
+        font-size: 0.72rem !important;
+        padding: 3px 10px !important;
+    }
+
+    .study-deadline-meta-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 7px !important;
+        margin-top: 10px !important;
+        padding-top: 10px !important;
+    }
+
+    .study-meta-item {
+        font-size: 0.8rem !important;
+        width: 100% !important;
+    }
+
+    .study-deadline-actions {
+        width: 100% !important;
+        margin-top: 6px !important;
+        padding-top: 8px !important;
+        border-top: 1px dashed var(--nm-divider) !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        margin-left: 0 !important;
+    }
+
+    .study-btn-edit-assignment,
+    .study-btn-delete-assignment {
+        padding: 6px 14px !important;
+        font-size: 0.82rem !important;
+    }
+}
+
+/* Small Smartphone Screens (<= 575.98px) */
+@media (max-width: 575.98px) {
+    /* 1. Topbar Navbar */
+    .study-topbar {
+        padding: 10px 14px !important;
+    }
+
+    .study-navbar-inner {
+        gap: 8px !important;
+    }
+
+    .study-logo-square {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .study-brand-title {
+        font-size: 0.88rem !important;
+        letter-spacing: 0.1px !important;
+    }
+
+    .study-topbar-actions {
+        gap: 6px !important;
+    }
+
+    /* Các nút trên topbar chuyển thành icon pill tròn gọn gàng */
+    .study-badge-verified,
+    .study-btn-chat {
+        padding: 6px 10px !important;
+        border-radius: 9999px !important;
+        height: 34px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .study-theme-toggle {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .study-user-pill {
+        padding: 3px 8px 3px 4px !important;
+        font-size: 0.78rem !important;
+    }
+
+    .study-avatar-circle {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* 2. Action buttons font size tuning */
+    .study-actions-row {
+        gap: 8px !important;
+    }
+
+    .study-actions-row .study-action-btn {
+        padding: 8px 6px !important;
+        font-size: 0.78rem !important;
+        gap: 5px !important;
+    }
+
+    /* 3. Modal Dialogs Optimization */
+    .study-modal .modal-dialog {
+        margin: 10px auto !important;
+        max-width: calc(100% - 20px) !important;
+        --bs-modal-margin: 10px;
+    }
+
+    .study-modal .modal-dialog-scrollable {
+        max-height: calc(100dvh - 20px) !important;
+        height: auto !important;
+    }
+
+    .study-modal .modal-content {
+        max-height: calc(100dvh - 20px) !important;
+        border-radius: 20px !important;
+    }
+
+    .study-modal-header {
+        padding: 14px 18px !important;
+    }
+
+    .study-modal-title {
+        font-size: 1.05rem !important;
+    }
+
+    .study-modal-body {
+        padding: 16px 16px !important;
+    }
+
+    .study-modal-footer {
+        padding: 12px 16px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+    }
+
+    .study-modal-footer .study-action-btn {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 9px 12px !important;
+        font-size: 0.825rem !important;
+    }
+
+    /* Nút + ở footer (Bottom Nav) trong chế độ Dark Mode */
+    [data-bs-theme="dark"] .nav-fab-btn,
+    .dark-theme .nav-fab-btn {
+        background: #334155 !important;
+        border: 2.5px solid #475569 !important;
+        color: #818cf8 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Khung chọn Thứ trong tuần: Xếp Grid 4 cột gọn gàng không bị lộn xộn */
+    .study-dow-container {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important;
+    }
+
+    .study-dow-label {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 7px 2px !important;
+        font-size: 0.78rem !important;
+        margin: 0 !important;
+    }
+
+    /* Khung giờ từng buổi: Đổi từ flex row chật chội sang xếp dọc có căn chỉnh */
+    .study-dow-time-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+
+    .study-dow-time-badge-col {
+        width: 100% !important;
+    }
+
+    .study-dow-time-inputs-col {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .study-dow-time-inputs-col input[type="time"] {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Toast Notification */
+    .study-toast {
+        top: 14px !important;
+        left: 14px !important;
+        right: 14px !important;
+        padding: 10px 16px !important;
+        font-size: 0.82rem !important;
+        justify-content: center !important;
+    }
+}
+

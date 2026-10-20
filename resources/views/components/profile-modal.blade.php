@@ -451,18 +451,18 @@ $user = Auth::user();
                                 </span>
                             </div>
 
-                            <!-- Khung Test Bắn Thông Báo Nhanh -->
+                            <!-- Khung Test Thông Báo Nhanh -->
                             <div class="p-3 bg-body rounded-3 border border-primary-subtle border-opacity-40 mb-2.5 pwa-quick-test-section">
                                 <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-2.5 mb-2">
                                     <div class="min-w-0 flex-grow-1 pe-sm-2">
                                         <div class="fw-bold text-body fs-8 d-flex align-items-center gap-2">
                                             <i class="bi bi-lightning-charge-fill text-warning"></i>
-                                            <span>Bắn thông báo thử ngay</span>
+                                            <span>Kiểm tra thông báo thử</span>
                                         </div>
                                         <small class="text-body-secondary fs-9 d-block lh-sm mt-0.5">Gửi trực tiếp 1 thông báo chuông/rung về máy</small>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-primary rounded-pill px-3.5 py-2 fs-8 fw-semibold text-nowrap w-100 w-sm-auto flex-shrink-0 pwa-push-test-btn d-inline-flex align-items-center justify-content-center gap-1.5" onclick="window.LifePlannerPWA && window.LifePlannerPWA.sendTestPush('test', this)">
-                                        <i class="bi bi-send-fill"></i><span>Bắn ngay</span>
+                                        <i class="bi bi-send-fill"></i><span>Test thông báo</span>
                                     </button>
                                 </div>
 

@@ -4,7 +4,7 @@
  * Scope: /
  */
 
-const CACHE_VERSION = 'life-planner-v1.0.0';
+const CACHE_VERSION = 'life-planner-v1.0.5';
 const STATIC_CACHE_NAME = `lp-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `lp-dynamic-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -19,6 +19,9 @@ const PRECACHE_ASSETS = [
     '/images/icons/apple-touch-icon.png',
     '/images/icons/icon.svg',
     '/css/dashboard.css',
+    '/css/mon-hoc.css',
+    '/css/calendar.css',
+    '/css/tap-luyen.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
@@ -116,10 +119,13 @@ self.addEventListener('fetch', (event) => {
     );
 
     if (isStaticAsset) {
-        event.respondWith(
-            caches.match(request, { ignoreSearch: true }).then((cachedResponse) => {
-                const fetchPromise = fetch(request).then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+        const hasVersion = url.searchParams.has('v');
+
+        // Đối với tài nguyên có chuỗi phiên bản (?v=...): Ưu tiên Network First để nhận ngay CSS/JS mới nhất mà không cần F5
+        if (hasVersion) {
+            event.respondWith(
+                fetch(request).then((networkResponse) => {
+                    if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
                         const responseToCache = networkResponse.clone();
                         caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
                             cache.put(request, responseToCache);
@@ -127,10 +133,36 @@ self.addEventListener('fetch', (event) => {
                     }
                     return networkResponse;
                 }).catch(() => {
-                    // Nếu fetch lỗi mà không có cache thì bỏ qua
-                });
+                    return caches.match(request, { ignoreSearch: true });
+                })
+            );
+            return;
+        }
 
-                return cachedResponse || fetchPromise;
+        // Đối với tài nguyên tĩnh khác: Cache First với cập nhật nền an toàn
+        event.respondWith(
+            caches.match(request).then((cachedResponse) => {
+                if (cachedResponse) {
+                    fetch(request).then((networkResponse) => {
+                        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+                            const responseToCache = networkResponse.clone();
+                            caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+                                cache.put(request, responseToCache);
+                            });
+                        }
+                    }).catch(() => {});
+                    return cachedResponse;
+                }
+
+                return fetch(request).then((networkResponse) => {
+                    if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+                            cache.put(request, responseToCache);
+                        });
+                    }
+                    return networkResponse;
+                });
             })
         );
         return;

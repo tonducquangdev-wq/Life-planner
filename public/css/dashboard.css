@@ -1879,6 +1879,28 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.5), inset -3px -3px 6px #ffffff;
     }
 
+    [data-bs-theme="dark"] .nav-fab-btn,
+    .dark-theme .nav-fab-btn {
+        background: #334155 !important;
+        border: 2.5px solid #475569 !important;
+        color: #818cf8 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.08) !important;
+    }
+
+    [data-bs-theme="dark"] .nav-fab-btn:hover,
+    .dark-theme .nav-fab-btn:hover {
+        background: #3b4252 !important;
+        border-color: #64748b !important;
+        color: #a5b4fc !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    [data-bs-theme="dark"] .nav-fab-btn:active,
+    .dark-theme .nav-fab-btn:active {
+        background: #1e293b !important;
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6) !important;
+    }
+
     /* 4. Ẩn Floating Menu trên Mobile vì đã có Bottom Nav */
     .floating-menu-container {
         display: none !important;
@@ -2544,11 +2566,53 @@ body.dark-theme,
     border: 1px solid #475569;
 }
 
+/* Floating Navigation Menu Dark Theme */
+[data-bs-theme="dark"] .floating-menu-btn,
+.dark-theme .floating-menu-btn {
+    background: #1e293b !important;
+    border: 2px solid #334155 !important;
+    color: #818cf8 !important;
+    box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-btn:hover,
+.dark-theme .floating-menu-btn:hover {
+    background: #27354a !important;
+    color: #a5b4fc !important;
+    box-shadow: 6px 8px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-container.active .floating-menu-btn,
+.dark-theme .floating-menu-container.active .floating-menu-btn {
+    background: #1e293b !important;
+    color: #fb7185 !important;
+    border: 2px solid rgba(251, 113, 133, 0.45) !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.35), 4px 6px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
 [data-bs-theme="dark"] .floating-menu-popup,
 .dark-theme .floating-menu-popup {
-    background-color: #334155 !important;
-    border: 1px solid #475569 !important;
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-header-title,
+.dark-theme .floating-menu-header-title,
+[data-bs-theme="dark"] .floating-menu-popup .text-uppercase,
+.dark-theme .floating-menu-popup .text-uppercase {
+    color: #94a3b8 !important;
+    text-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-badge,
+.dark-theme .floating-menu-badge,
+[data-bs-theme="dark"] .floating-menu-popup .badge,
+.dark-theme .floating-menu-popup .badge {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+    color: #818cf8 !important;
 }
 
 [data-bs-theme="dark"] .floating-menu-item,
@@ -2558,8 +2622,39 @@ body.dark-theme,
 
 [data-bs-theme="dark"] .floating-menu-item:hover,
 .dark-theme .floating-menu-item:hover {
-    background-color: #475569 !important;
+    background-color: #334155 !important;
     color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item.active,
+.dark-theme .floating-menu-item.active {
+    background: rgba(99, 102, 241, 0.22) !important;
+    color: #818cf8 !important;
+    border: 1.5px solid rgba(129, 140, 248, 0.4) !important;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item .menu-item-icon,
+.dark-theme .floating-menu-item .menu-item-icon {
+    background: #0f172a !important;
+    border: 1.5px solid #334155 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-item.active .menu-item-icon,
+.dark-theme .floating-menu-item.active .menu-item-icon {
+    background: rgba(99, 102, 241, 0.35) !important;
+    color: #a5b4fc !important;
+    border: 1.5px solid rgba(129, 140, 248, 0.5) !important;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .floating-menu-divider,
+.dark-theme .floating-menu-divider {
+    background: #334155 !important;
+    box-shadow: none !important;
 }
 
 /* 8. Bảng biểu (Tables) */
@@ -2804,6 +2899,28 @@ body.dark-theme,
 [data-bs-theme="dark"] .mobile-bottom-nav .nav-item.active,
 .dark-theme .mobile-bottom-nav .nav-item.active {
     color: #818cf8 !important;
+}
+
+[data-bs-theme="dark"] .nav-fab-btn,
+.dark-theme .nav-fab-btn {
+    background: #334155 !important;
+    border: 2.5px solid #475569 !important;
+    color: #818cf8 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .nav-fab-btn:hover,
+.dark-theme .nav-fab-btn:hover {
+    background: #3b4252 !important;
+    border-color: #64748b !important;
+    color: #a5b4fc !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-bs-theme="dark"] .nav-fab-btn:active,
+.dark-theme .nav-fab-btn:active {
+    background: #1e293b !important;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* ==========================================================================

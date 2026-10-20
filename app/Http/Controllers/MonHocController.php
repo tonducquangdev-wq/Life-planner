@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BaiTap;
 use App\Models\GiaSu;
 use App\Models\MonHoc;
+use App\Models\SuKien;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -15,13 +17,140 @@ class MonHocController extends Controller
      */
     public function index()
     {
-        $monHocs = MonHoc::where('user_id', Auth::id())
+        $userId = Auth::id();
+
+        $monHocs = MonHoc::where('user_id', $userId)
             ->withCount('baiTaps')
-            ->with('baiTaps')
+            ->with(['baiTaps', 'lichHocs'])
             ->latest()
             ->get();
 
-        return view('mon_hoc.index', compact('monHocs'));
+        // Tự động khởi tạo dữ liệu chuẩn theo hình ảnh mẫu nếu người dùng chưa có môn học nào
+        if ($monHocs->isEmpty()) {
+            $sampleData = [
+                [
+                    'ten_mon' => 'Lập trình Web máy chủ',
+                    'ma_mon' => 'WEB301',
+                    'giang_vien' => 'GV. Trương Châu Long',
+                    'phong_hoc' => 'A204',
+                    'so_tin_chi' => 3,
+                    'ngay_bat_dau' => '2026-10-15',
+                    'ngay_ket_thuc' => '2026-11-06',
+                    'mau_sac' => '#3b82f6',
+                    'trang_thai' => 'dang_hoc',
+                    'dow' => [5], // T6
+                    'start_time' => '07:00',
+                    'end_time' => '10:01',
+                ],
+                [
+                    'ten_mon' => 'Chuyên đề Front-End',
+                    'ma_mon' => 'FED202',
+                    'giang_vien' => 'GV. Trần Phương Duy',
+                    'phong_hoc' => 'A204',
+                    'so_tin_chi' => 3,
+                    'ngay_bat_dau' => '2026-10-15',
+                    'ngay_ket_thuc' => '2026-11-04',
+                    'mau_sac' => '#3b82f6',
+                    'trang_thai' => 'dang_hoc',
+                    'dow' => [3], // T4
+                    'start_time' => '07:00',
+                    'end_time' => '11:00',
+                ],
+                [
+                    'ten_mon' => 'Hệ quản trị CSDL',
+                    'ma_mon' => 'DB201',
+                    'giang_vien' => 'GV. Trương Châu Long',
+                    'phong_hoc' => 'A204',
+                    'so_tin_chi' => 3,
+                    'ngay_bat_dau' => '2026-10-15',
+                    'ngay_ket_thuc' => '2027-01-04',
+                    'mau_sac' => '#3b82f6',
+                    'trang_thai' => 'dang_hoc',
+                    'dow' => [2], // T3
+                    'start_time' => '07:00',
+                    'end_time' => '11:00',
+                ],
+                [
+                    'ten_mon' => 'Chuyên đề PHP',
+                    'ma_mon' => 'PHP401',
+                    'giang_vien' => 'GV. Huỳnh Luân',
+                    'phong_hoc' => 'A204',
+                    'so_tin_chi' => 3,
+                    'ngay_bat_dau' => '2026-10-15',
+                    'ngay_ket_thuc' => '2026-11-03',
+                    'mau_sac' => '#3b82f6',
+                    'trang_thai' => 'dang_hoc',
+                    'dow' => [1], // T2
+                    'start_time' => '07:00',
+                    'end_time' => '11:00',
+                ],
+                [
+                    'ten_mon' => 'CD Back-End',
+                    'ma_mon' => 'BED301',
+                    'giang_vien' => 'GV. Nguyễn Minh Hải',
+                    'phong_hoc' => 'A204',
+                    'so_tin_chi' => 3,
+                    'ngay_bat_dau' => '2026-10-15',
+                    'ngay_ket_thuc' => '2026-10-29',
+                    'mau_sac' => '#3b82f6',
+                    'trang_thai' => 'dang_hoc',
+                    'dow' => [4], // T5
+                    'start_time' => '07:00',
+                    'end_time' => '11:00',
+                ],
+            ];
+
+            foreach (array_reverse($sampleData) as $item) {
+                $dow = $item['dow'];
+                $st = $item['start_time'];
+                $et = $item['end_time'];
+                unset($item['dow'], $item['start_time'], $item['end_time']);
+
+                $item['user_id'] = $userId;
+                $mh = MonHoc::create($item);
+                $mh->syncToCalendar($dow, $st, $et, true);
+
+                if ($mh->ten_mon === 'Chuyên đề PHP') {
+                    $mh->baiTaps()->create([
+                        'tieu_de' => 'Báo cáo cuối kì CD-PHP',
+                        'mo_ta' => 'Nộp báo cáo bài tập lớn cuối kỳ môn Chuyên đề PHP',
+                        'han_nop' => '2026-10-19 19:00:00',
+                        'muc_do_uu_tien' => 'cao',
+                        'trang_thai' => 'chua_hoan_thanh',
+                    ]);
+
+                    SuKien::create([
+                        'user_id' => $userId,
+                        'mon_hoc_id' => $mh->id,
+                        'tieu_de' => 'Deadline: Báo cáo cuối kì CD-PHP',
+                        'mo_ta' => 'Hạn nộp bài tập môn Chuyên đề PHP',
+                        'loai_su_kien' => 'deadline',
+                        'thoi_gian_bat_dau' => '2026-10-19 19:00:00',
+                        'thoi_gian_ket_thuc' => '2026-10-19 20:00:00',
+                        'mau_hien_thi' => '#ef4444',
+                        'bat_thong_bao' => true,
+                        'so_ngay_nhac' => 1,
+                        'quy_tac_lap' => 'once',
+                    ]);
+                }
+            }
+
+            $monHocs = MonHoc::where('user_id', $userId)
+                ->withCount('baiTaps')
+                ->with(['baiTaps', 'lichHocs'])
+                ->latest()
+                ->get();
+        }
+
+        $baiTaps = BaiTap::whereHas('monHoc', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+            ->with('monHoc')
+            ->orderByRaw("CASE WHEN trang_thai = 'da_hoan_thanh' THEN 1 ELSE 0 END ASC")
+            ->orderBy('han_nop', 'asc')
+            ->get();
+
+        return view('mon_hoc.index', compact('monHocs', 'baiTaps'));
     }
 
     /**
@@ -139,8 +268,10 @@ class MonHocController extends Controller
         $daysOfWeek = $request->input('ngay_trong_tuan', []);
         $gioBatDau = $request->input('gio_bat_dau', '08:00');
         $gioKetThuc = $request->input('gio_ket_thuc', '10:30');
+        $gioBatDauTheoThu = $request->input('gio_bat_dau_theo_thu');
+        $gioKetThucTheoThu = $request->input('gio_ket_thuc_theo_thu');
 
-        $eventsCount = $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+        $eventsCount = $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar, $gioBatDauTheoThu, $gioKetThucTheoThu);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
@@ -215,6 +346,12 @@ class MonHocController extends Controller
         if ($hasEnd) {
             $mergeData['ngay_ket_thuc'] = $normalizedEnd;
         }
+        $maMon = trim((string) $request->input('ma_mon'));
+        if ($maMon === '') {
+            $maMon = $monHoc->ma_mon ?: (strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', (string) $request->input('ten_mon', 'MH')), 0, 4)).rand(100, 999));
+        }
+        $mergeData['ma_mon'] = $maMon;
+
         if (! $request->has('so_tin_chi')) {
             $mergeData['so_tin_chi'] = $monHoc->so_tin_chi ?? 3;
         }
@@ -282,8 +419,18 @@ class MonHocController extends Controller
         $daysOfWeek = $request->input('ngay_trong_tuan');
         $gioBatDau = $request->input('gio_bat_dau');
         $gioKetThuc = $request->input('gio_ket_thuc');
+        $gioBatDauTheoThu = $request->input('gio_bat_dau_theo_thu');
+        $gioKetThucTheoThu = $request->input('gio_ket_thuc_theo_thu');
 
-        $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar);
+        $monHoc->syncToCalendar($daysOfWeek, $gioBatDau, $gioKetThuc, $dongBoCalendar, $gioBatDauTheoThu, $gioKetThucTheoThu);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật môn học thành công'.($dongBoCalendar ? ' và đã đồng bộ vào Lịch trình!' : '!'),
+                'mon_hoc' => $monHoc->load('lichHocs'),
+            ]);
+        }
 
         return redirect()->route('mon-hoc.index')
             ->with('status', 'Cập nhật môn học thành công'.($dongBoCalendar ? ' và đã đồng bộ vào Lịch trình!' : '!'));
@@ -292,15 +439,55 @@ class MonHocController extends Controller
     /**
      * Xóa mềm môn học (Soft Delete)
      */
-    public function destroy(MonHoc $monHoc)
+    public function destroy(Request $request, MonHoc $monHoc)
     {
         // Kiểm tra quyền sở hữu môn học
         abort_if($monHoc->user_id !== Auth::id(), 403);
 
         $monHoc->delete();
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã xóa môn học thành công!',
+            ]);
+        }
+
         return redirect()->route('mon-hoc.index')
             ->with('status', 'Đã xóa môn học thành công!');
+    }
+
+    /**
+     * Đăng ký trở thành gia sư
+     */
+    public function dangKyGiaSu(Request $request)
+    {
+        $validated = $request->validate([
+            'ho_ten' => 'required|string|max:255',
+            'chuyen_mon' => 'required|string|max:255',
+            'so_dien_thoai' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'hoc_phi_theo_gio' => 'nullable|numeric|min:0',
+            'mo_ta_kinh_nghiem' => 'nullable|string',
+            'mon_hoc_id' => 'nullable|exists:mon_hoc,id',
+        ]);
+
+        $validated['hoc_phi_theo_gio'] = (int) ($request->input('hoc_phi_theo_gio') ?: 150000);
+        $validated['danh_gia'] = 5.0;
+        $validated['so_danh_gia'] = 1;
+        $validated['trang_thai'] = 'san_sang';
+
+        $giaSu = GiaSu::create($validated);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đăng ký hồ sơ Gia Sư thành công! Thông tin của bạn đã được lưu vào hệ thống.',
+                'data' => $giaSu,
+            ]);
+        }
+
+        return redirect()->route('mon-hoc.index')->with('status', 'Đăng ký hồ sơ Gia Sư thành công!');
     }
 
     /**

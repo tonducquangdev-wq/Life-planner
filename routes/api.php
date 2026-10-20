@@ -50,6 +50,7 @@ Route::as('api.')->group(function () {
         Route::post('/push/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
         Route::get('/push/status', [PushNotificationController::class, 'status'])->name('push.status');
         Route::post('/push/test', [PushNotificationController::class, 'testPush'])->name('push.test');
+        Route::post('/push/check-reminders', [PushNotificationController::class, 'checkReminders'])->name('push.check-reminders');
 
         // MODULE 6: DASHBOARD / BÁO CÁO API
         Route::get('/dashboard', [DashboardApiController::class, 'index'])->name('dashboard');

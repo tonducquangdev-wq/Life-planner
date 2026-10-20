@@ -118,14 +118,16 @@ class MonHoc extends Model
      */
     public function syncToCalendar(
         ?array $daysOfWeek = null,
-        ?string $gioBatDau = null,
-        ?string $gioKetThuc = null,
-        bool $dongBoCalendar = true
+        string|array|null $gioBatDau = null,
+        string|array|null $gioKetThuc = null,
+        bool $dongBoCalendar = true,
+        ?array $gioBatDauTheoThu = null,
+        ?array $gioKetThucTheoThu = null
     ): int {
         $userId = $this->user_id;
 
-        $gioBatDau = ! empty($gioBatDau) ? trim($gioBatDau) : '08:00';
-        $gioKetThuc = ! empty($gioKetThuc) ? trim($gioKetThuc) : '10:30';
+        $defaultStart = is_string($gioBatDau) && ! empty($gioBatDau) ? trim($gioBatDau) : '08:00';
+        $defaultEnd = is_string($gioKetThuc) && ! empty($gioKetThuc) ? trim($gioKetThuc) : '10:30';
 
         $selectedDays = [];
         if (! empty($daysOfWeek) && is_array($daysOfWeek)) {
@@ -154,13 +156,31 @@ class MonHoc extends Model
             ($this->giang_vien ? ($this->phong_hoc ? ' • ' : '').'GV: '.$this->giang_vien : '')
         );
 
+        $perDayTimes = [];
         foreach ($selectedDays as $dayIso) {
+            $dayStart = $gioBatDauTheoThu[$dayIso] ?? (is_array($gioBatDau) ? ($gioBatDau[$dayIso] ?? null) : null);
+            if (empty($dayStart)) {
+                $dayStart = $defaultStart;
+            }
+            $dayStart = trim($dayStart);
+
+            $dayEnd = $gioKetThucTheoThu[$dayIso] ?? (is_array($gioKetThuc) ? ($gioKetThuc[$dayIso] ?? null) : null);
+            if (empty($dayEnd)) {
+                $dayEnd = $defaultEnd;
+            }
+            $dayEnd = trim($dayEnd);
+
+            $perDayTimes[$dayIso] = [
+                'start' => $dayStart,
+                'end' => $dayEnd,
+            ];
+
             LichHoc::create([
                 'user_id' => $userId,
                 'mon_hoc_id' => $this->id,
                 'ngay_trong_tuan' => $dayIso,
-                'gio_bat_dau' => $gioBatDau,
-                'gio_ket_thuc' => $gioKetThuc,
+                'gio_bat_dau' => $dayStart,
+                'gio_ket_thuc' => $dayEnd,
                 'ghi_chu' => $ghiChu ?: null,
             ]);
         }
@@ -182,6 +202,9 @@ class MonHoc extends Model
         $eventsCount = 0;
 
         foreach ($selectedDays as $dayIso) {
+            $dayStart = $perDayTimes[$dayIso]['start'];
+            $dayEnd = $perDayTimes[$dayIso]['end'];
+
             $firstDate = $startDate->copy();
             while ($firstDate->dayOfWeekIso !== $dayIso) {
                 $firstDate->addDay();
@@ -191,8 +214,8 @@ class MonHoc extends Model
                 continue;
             }
 
-            $firstStart = Carbon::parse($firstDate->toDateString().' '.$gioBatDau.':00');
-            $firstEnd = Carbon::parse($firstDate->toDateString().' '.$gioKetThuc.':00');
+            $firstStart = Carbon::parse($firstDate->toDateString().' '.$dayStart.':00');
+            $firstEnd = Carbon::parse($firstDate->toDateString().' '.$dayEnd.':00');
             if ($firstEnd->lte($firstStart)) {
                 $firstEnd = $firstStart->copy()->addHours(2)->addMinutes(30);
             }

@@ -7,6 +7,7 @@ use App\Models\ThongBao;
 use App\Services\WebPushService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class PushNotificationController extends Controller
 {
@@ -195,6 +196,19 @@ class PushNotificationController extends Controller
             'title' => $title,
             'body' => $body,
             'results' => $results,
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Kích hoạt quét nhanh các thông báo đến hạn (Tự động trigger khi client PWA hoạt động).
+     */
+    public function checkReminders(): JsonResponse
+    {
+        Artisan::call('push:send-reminders');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã quét nhắc nhở thành công.',
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 }

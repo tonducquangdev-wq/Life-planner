@@ -11,7 +11,7 @@ return [
     |
     */
     'vapid' => [
-        'subject' => env('VAPID_SUBJECT', 'mailto:admin@lifeplanner.local'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:contact@lifeplanner.vn'),
         'public_key' => env('VAPID_PUBLIC_KEY'),
         'private_key' => env('VAPID_PRIVATE_KEY'),
     ],
@@ -22,7 +22,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'client_options' => [
-        'timeout' => 15,
+        'timeout' => 8,
+        'connect_timeout' => 5,
         'verify' => env('WEBPUSH_SSL_VERIFY', false),
+        'http_errors' => false,
     ],
 ];

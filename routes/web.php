@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PushNotificationController;
+use App\Http\Controllers\BaiTapController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CongViecController;
 use App\Http\Controllers\CongViecDashboardController;
@@ -34,7 +35,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/bao-cao-hoc-tap', [MonHocController::class, 'baoCaoHocTap'])->name('bao-cao-hoc-tap.index');
     Route::get('/study/tutors', [MonHocController::class, 'danhSachGiaSu'])->name('study.tutors');
     Route::get('/mon-hoc/gia-su', [MonHocController::class, 'danhSachGiaSu'])->name('mon-hoc.gia-su');
+    Route::post('/gia-su/dang-ky', [MonHocController::class, 'dangKyGiaSu'])->name('gia-su.dang-ky');
     Route::resource('mon-hoc', MonHocController::class);
+    Route::patch('/bai-tap/{baiTap}/toggle-status', [BaiTapController::class, 'toggleStatus'])->name('bai-tap.toggle-status');
+    Route::resource('bai-tap', BaiTapController::class);
 
     Route::get('/tap-luyen', [TapLuyenController::class, 'index'])->name('tap-luyen.index');
     Route::get('/bao-cao-tap-luyen', [TapLuyenController::class, 'baoCaoTapLuyen'])->name('bao-cao-tap-luyen.index');
@@ -93,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/push/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('push.unsubscribe');
     Route::get('/push/status', [PushNotificationController::class, 'status'])->name('push.status');
     Route::post('/push/test', [PushNotificationController::class, 'testPush'])->name('push.test');
+    Route::post('/push/check-reminders', [PushNotificationController::class, 'checkReminders'])->name('push.check-reminders');
 
     // KÊNH CHAT THẾ GIỚI
     Route::get('/world-chat/messages', [WorldChatController::class, 'index'])->name('world-chat.index');

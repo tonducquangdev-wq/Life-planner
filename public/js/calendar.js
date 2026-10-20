@@ -31,6 +31,27 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${d}/${m}/${year}`;
     }
 
+    function formatRemindTimeLabel(minutes) {
+        if (minutes === undefined || minutes === null) return 'Nhắc trước 15 phút';
+        const val = parseInt(minutes);
+        if (isNaN(val)) return 'Nhắc trước 15 phút';
+        if (val === 0) return 'Nhắc đúng giờ diễn ra';
+
+        // 1 ngày hoặc các bội số của ngày (1440 phút)
+        if (val === 1 || (val >= 1440 && val % 1440 === 0)) {
+            const days = val === 1 ? 1 : Math.round(val / 1440);
+            return `Nhắc trước ${days} ngày`;
+        }
+
+        // Bội số của giờ (60 phút)
+        if (val >= 60 && val % 60 === 0) {
+            const hours = Math.round(val / 60);
+            return `Nhắc trước ${hours} giờ`;
+        }
+
+        return `Nhắc trước ${val} phút`;
+    }
+
     function getRemindTimeValue(selectId) {
         const sel = document.getElementById(selectId);
         if (!sel) return 15;
@@ -51,7 +72,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const customBox = box?.querySelector('.custom-time-inputs');
 
         const presetValues = ['0', '5', '10', '15', '30', '60', '120', '1440', '2880', '10080'];
-        if (presetValues.includes(String(val))) {
+        if (val === 1) {
+            sel.value = '1440';
+            if (customBox) customBox.classList.add('d-none');
+        } else if (presetValues.includes(String(val))) {
             sel.value = String(val);
             if (customBox) customBox.classList.add('d-none');
         } else {
@@ -225,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         endTime: endTimeStr,
                         location: evt.location || '',
                         batThongBao: Boolean(evt.bat_thong_bao),
-                        soNgayNhac: parseInt(evt.so_ngay_nhac || 1),
+                        soNgayNhac: (evt.so_ngay_nhac !== undefined && evt.so_ngay_nhac !== null) ? parseInt(evt.so_ngay_nhac) : 15,
                         quyTacLap: evt.quy_tac_lap || 'once',
                         ngayKetThucLap: evt.ngay_ket_thuc_lap || null,
                         nhomLapId: evt.nhom_lap_id || null
@@ -374,8 +398,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const iconClass = typeIconMap[evt.type] || 'bi-circle-fill';
                 const bellIconHtml = evt.batThongBao ? '🔔 ' : '';
                 const repeatIconHtml = (evt.quyTacLap && evt.quyTacLap !== 'once') ? '🔄 ' : '';
+                const remindLabel = formatRemindTimeLabel(evt.soNgayNhac);
                 const tooltipTitle = evt.batThongBao
-                    ? `Đang nhắc trước ${evt.soNgayNhac || 1} ngày • ${evt.title} (${evt.time})`
+                    ? `Đang ${remindLabel.toLowerCase()} • ${evt.title} (${evt.time})`
                     : `${evt.title} (${evt.time}) • ${evt.location}`;
 
                 cellsHtml += `
@@ -571,7 +596,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 let agendaHtml = '';
                 filteredEvents.forEach(evt => {
                     const iconClass = typeIconMap[evt.type] || 'bi-calendar';
-                    const notifTag = evt.batThongBao ? `<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8">🔔 Nhắc trước ${evt.soNgayNhac || 1}d</span>` : '';
+                    const remindLabel = formatRemindTimeLabel(evt.soNgayNhac);
+                    const notifTag = evt.batThongBao ? `<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8">🔔 ${remindLabel}</span>` : '';
                     const repeatTag = (evt.quyTacLap && evt.quyTacLap !== 'once') ? `<span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0.5 fs-8">🔄 Lặp</span>` : '';
 
                     agendaHtml += `
@@ -676,9 +702,10 @@ document.addEventListener('DOMContentLoaded', function () {
         let html = '';
         dayEvents.forEach(evt => {
             const iconClass = typeIconMap[evt.type] || 'bi-calendar';
+            const remindLabel = formatRemindTimeLabel(evt.soNgayNhac);
             const notifTag = evt.batThongBao ? `
-                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1" title="Đang nhắc trước ${evt.soNgayNhac || 1} ngày">
-                    🔔 Nhắc trước ${evt.soNgayNhac || 1} ngày
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5 fs-8 d-inline-flex align-items-center gap-1" title="Đang ${remindLabel.toLowerCase()}">
+                    🔔 ${remindLabel}
                 </span>
             ` : '';
             const repeatTag = (evt.quyTacLap && evt.quyTacLap !== 'once') ? `

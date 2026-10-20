@@ -40,9 +40,11 @@ class SendPushRemindersCommand extends Command
         $sentCount = 0;
 
         // 1. NHẮC NHỞ SỰ KIỆN LỊCH (Bảng su_kien)
+        // Lấy các sự kiện bật thông báo, chưa quá giờ bắt đầu quá 15 phút và trong vòng 7 ngày tới
         $suKiens = SuKien::with(['user', 'monHoc', 'congViec'])
             ->where('bat_thong_bao', true)
-            ->whereBetween('thoi_gian_bat_dau', [$now, $targetTime])
+            ->where('thoi_gian_bat_dau', '>=', $now->copy()->subMinutes(15))
+            ->where('thoi_gian_bat_dau', '<=', $now->copy()->addDays(7))
             ->get();
 
         foreach ($suKiens as $suKien) {
@@ -64,13 +66,36 @@ class SendPushRemindersCommand extends Command
                 continue;
             }
 
-            // Tránh gửi lặp lại trong vòng 2 giờ
+            // Tính thời gian cần nhắc (phút): nếu giá trị 1 thì hiểu là 1440 phút (1 ngày)
+            $remindMinutes = ($suKien->so_ngay_nhac === 1) ? 1440 : (int) ($suKien->so_ngay_nhac ?? 15);
+            $remindAt = $suKien->thoi_gian_bat_dau->copy()->subMinutes($remindMinutes);
+
+            // Kiểm tra xem đã đến thời điểm cần nhắc chưa
+            // Sự kiện chỉ được gửi nếu:
+            // 1. Thời điểm hiện tại đã đến hoặc qua mốc nhắc ($now >= $remindAt)
+            // 2. Sự kiện chưa bắt đầu quá 15 phút ($now <= $suKien->thoi_gian_bat_dau + 15 phút)
+            if ($now->lt($remindAt) || $now->gt($suKien->thoi_gian_bat_dau->copy()->addMinutes(15))) {
+                continue;
+            }
+
+            // Tránh gửi lặp lại trong vòng 6 giờ
             $cacheKey = "push_notif_sukien_{$suKien->id}_".$suKien->thoi_gian_bat_dau->format('YmdHi');
             if (Cache::has($cacheKey)) {
                 continue;
             }
 
-            $minutesLeft = max(1, (int) $now->diffInMinutes($suKien->thoi_gian_bat_dau, false));
+            $diffMinutes = (int) $now->diffInMinutes($suKien->thoi_gian_bat_dau, false);
+            if ($diffMinutes <= 0) {
+                $timeText = 'đang diễn ra ngay bây giờ';
+            } elseif ($diffMinutes >= 1440) {
+                $days = (int) round($diffMinutes / 1440);
+                $timeText = "sau {$days} ngày nữa";
+            } elseif ($diffMinutes >= 60) {
+                $hours = (int) round($diffMinutes / 60);
+                $timeText = "sau {$hours} giờ nữa";
+            } else {
+                $timeText = "sau {$diffMinutes} phút nữa";
+            }
 
             $typeLabel = match ($suKien->loai_su_kien) {
                 'hoc_tap' => 'Sắp đến giờ học',
@@ -81,7 +106,8 @@ class SendPushRemindersCommand extends Command
             };
 
             $title = "Life Planner — {$typeLabel}";
-            $body = "Sự kiện \"{$suKien->tieu_de}\" sẽ diễn ra sau {$minutesLeft} phút nữa (".$suKien->thoi_gian_bat_dau->format('H:i').').';
+            $timeDisplay = $suKien->thoi_gian_bat_dau->format('H:i');
+            $body = "Sự kiện \"{$suKien->tieu_de}\" sẽ diễn ra {$timeText} ({$timeDisplay}).";
             $url = route('calendar.index');
 
             // Ghi vào thông báo in-app
@@ -114,7 +140,7 @@ class SendPushRemindersCommand extends Command
                 $this->line("-> Đã gửi thông báo cho User #{$user->id}: {$title}");
             }
 
-            Cache::put($cacheKey, true, now()->addHours(2));
+            Cache::put($cacheKey, true, now()->addHours(6));
         }
 
         // 2. NHẮC NHỞ CÔNG VIỆC CÓ DEADLINE (Bảng cong_viec)

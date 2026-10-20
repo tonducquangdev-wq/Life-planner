@@ -7,6 +7,7 @@ use App\Models\SuKien;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -273,8 +274,14 @@ class SuKienController extends Controller
             $validated['quy_tac_lap'] = 'once';
             $validated['ngay_ket_thuc_lap'] = null;
             $validated['nhom_lap_id'] = null;
-            unset($validated['force']);
             $suKien = SuKien::create($validated);
+        }
+
+        if ($suKien && $suKien->bat_thong_bao) {
+            try {
+                Artisan::call('push:send-reminders');
+            } catch (\Throwable $e) {
+            }
         }
 
         return response()->json([
@@ -589,6 +596,13 @@ class SuKienController extends Controller
                 }
             } else {
                 $suKien->update($validated);
+            }
+        }
+
+        if ($suKien && $suKien->bat_thong_bao) {
+            try {
+                Artisan::call('push:send-reminders');
+            } catch (\Throwable $e) {
             }
         }
 
