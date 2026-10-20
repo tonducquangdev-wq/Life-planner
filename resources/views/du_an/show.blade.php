@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Chi Tiết Dự Án {{ $duAn->ten_du_an }} - Life Planner</title>
 
@@ -37,6 +37,7 @@
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
+    @include('layouts.pwa-head')
 </head>
 
 <body>

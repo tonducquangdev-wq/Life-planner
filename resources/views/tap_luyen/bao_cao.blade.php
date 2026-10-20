@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Báo Cáo Tập Luyện & Thể Chất - Life Planner</title>
 
@@ -41,6 +41,7 @@
     <!-- CSS Tùy chỉnh Dashboard & Tap luyen -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ file_exists(public_path('css/dashboard.css')) ? filemtime(public_path('css/dashboard.css')) : '1.0' }}">
     <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}?v={{ file_exists(public_path('css/tap-luyen.css')) ? filemtime(public_path('css/tap-luyen.css')) : '1.0' }}">
+    @include('layouts.pwa-head')
 </head>
 
 <body>

@@ -2,7 +2,7 @@
 <html lang="vi" data-bs-theme="{{ Auth::check() && (Auth::user()->giao_dien === 'dark') ? 'dark' : 'light' }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Thêm Môn Học Mới - Life Planner</title>
     
     <!-- Kịch bản Khởi tạo Giao diện Sáng/Tối chống giật trang (Anti-Flicker) -->
@@ -35,6 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    @include('layouts.pwa-head')
 
     <style>
         /* Dark mode variables and enhancements */

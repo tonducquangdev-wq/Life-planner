@@ -1727,22 +1727,24 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         overflow-y: visible !important;
     }
 
-    /* 2. AppBar trên cùng gọn gàng kiểu Flutter Scaffold AppBar (Tối ưu Tai thỏ / Dynamic Island) */
+    /* 2. AppBar trên cùng gọn gàng kiểu Flutter Scaffold AppBar (Tối ưu Tai thỏ / Dynamic Island / Camera trước) */
     .top-header {
-        height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+        height: auto !important;
         min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
-        padding-top: env(safe-area-inset-top, 0px) !important;
-        padding-bottom: 0 !important;
-        padding-left: calc(14px + env(safe-area-inset-left, 0px)) !important;
-        padding-right: calc(14px + env(safe-area-inset-right, 0px)) !important;
+        max-height: none !important;
+        padding-top: max(env(safe-area-inset-top, 0px), 12px) !important;
+        padding-bottom: 10px !important;
+        padding-left: max(calc(16px + env(safe-area-inset-left, 0px)), 16px) !important;
+        padding-right: max(calc(16px + env(safe-area-inset-right, 0px)), 16px) !important;
         position: sticky;
         top: 0;
         z-index: 1030;
-        background: rgba(255, 255, 255, 0.94) !important;
+        background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+        box-sizing: border-box !important;
     }
 
     [data-bs-theme="dark"] .top-header {
@@ -1771,7 +1773,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         bottom: 0;
         left: 0;
         right: 0;
-        height: 64px;
+        height: calc(62px + max(env(safe-area-inset-bottom, 0px), 8px)) !important;
+        min-height: calc(62px + max(env(safe-area-inset-bottom, 0px), 8px)) !important;
         background: rgba(238, 242, 246, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
@@ -1781,8 +1784,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         justify-content: space-around;
         align-items: center;
         padding: 0 6px;
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px) !important;
         box-shadow: 0 -6px 20px rgba(163, 177, 198, 0.35);
+        box-sizing: border-box !important;
+    }
     }
 
     [data-bs-theme="dark"] .mobile-bottom-nav {

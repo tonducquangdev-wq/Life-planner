@@ -4,7 +4,7 @@
  * Scope: /
  */
 
-const CACHE_VERSION = 'life-planner-v1.0.5';
+const CACHE_VERSION = 'life-planner-v1.0.6';
 const STATIC_CACHE_NAME = `lp-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `lp-dynamic-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';

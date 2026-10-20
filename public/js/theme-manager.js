@@ -32,11 +32,11 @@
                 document.body?.classList.remove('dark-theme');
             }
 
-            // Cập nhật meta theme-color cho thanh trạng thái di động
-            const metaTheme = document.querySelector('meta[name="theme-color"]');
-            if (metaTheme) {
-                metaTheme.setAttribute('content', actualTheme === 'dark' ? '#0f172a' : '#6366f1');
-            }
+            // Cập nhật meta theme-color cho thanh trạng thái di động (đồng bộ nền Header để tránh camera / tai thỏ nổi lệch màu)
+            const metaThemeList = document.querySelectorAll('meta[name="theme-color"]');
+            metaThemeList.forEach(function (el) {
+                el.setAttribute('content', actualTheme === 'dark' ? '#0f172a' : '#ffffff');
+            });
 
             localStorage.setItem('theme', theme);
             this.updateIcons(actualTheme);

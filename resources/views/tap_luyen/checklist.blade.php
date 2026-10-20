@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Checklist Bài Tập - Life Planner</title>
 
     <!-- Anti-flicker Theme Script -->
@@ -37,6 +37,7 @@
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/tap-luyen.css') }}">
+    @include('layouts.pwa-head')
 
     <style>
         .checklist-item {

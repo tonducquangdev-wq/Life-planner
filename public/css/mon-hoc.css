@@ -1863,9 +1863,15 @@ body.modal-open {
 
 /* Small Smartphone Screens (<= 575.98px) */
 @media (max-width: 575.98px) {
-    /* 1. Topbar Navbar */
+    /* 1. Topbar Navbar (Tối ưu Tai thỏ / Dynamic Island / Camera trước) */
     .study-topbar {
-        padding: 10px 14px !important;
+        padding-top: max(env(safe-area-inset-top, 0px), 12px) !important;
+        padding-bottom: 10px !important;
+        padding-left: max(calc(16px + env(safe-area-inset-left, 0px)), 16px) !important;
+        padding-right: max(calc(16px + env(safe-area-inset-right, 0px)), 16px) !important;
+        min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+        height: auto !important;
+        box-sizing: border-box !important;
     }
 
     .study-navbar-inner {
