@@ -2047,6 +2047,7 @@ body:has(#scheduleConflictModal.show) .modal-backdrop.show,
    9. NEUMORPHIC FLOATING ACTION MENU & MOBILE NAVIGATION
    ========================================================================== */
 .floating-menu-container {
+    display: block !important;
     position: fixed;
     bottom: 24px;
     right: 24px;

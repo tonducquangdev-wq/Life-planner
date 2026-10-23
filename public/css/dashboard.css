@@ -775,8 +775,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         display: none !important;
     }
     .topbar-sidebar-toggle,
-    #sidebarToggle,
-    .floating-menu-container {
+    #sidebarToggle {
         display: none !important;
     }
     .main-wrapper {
@@ -1454,6 +1453,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
    8. NEUMORPHIC FLOATING ACTION MENU (GÓC PHẢI BÊN DƯỚI MÀN HÌNH)
    ========================================================================== */
 .floating-menu-container {
+    display: block !important;
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -1788,7 +1788,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         box-shadow: 0 -6px 20px rgba(163, 177, 198, 0.35);
         box-sizing: border-box !important;
     }
-    }
 
     [data-bs-theme="dark"] .mobile-bottom-nav {
         background: rgba(15, 23, 42, 0.96);
@@ -1906,9 +1905,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6) !important;
     }
 
-    /* 4. Ẩn Floating Menu trên Mobile vì đã có Bottom Nav */
+    /* 4. Bong bóng Floating Menu trên Mobile nổi phía trên Bottom Nav */
     .floating-menu-container {
-        display: none !important;
+        display: block !important;
+        bottom: 84px !important;
+        right: 18px !important;
     }
 
     /* Native Touch Feel */

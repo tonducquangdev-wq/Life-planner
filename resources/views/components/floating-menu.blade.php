@@ -1,6 +1,31 @@
 <!-- ==========================================================================
      FLOATING ACTION MENU - LIFE PLANNER (GÓC PHẢI BÊN DƯỚI)
      ========================================================================== -->
+<style>
+    /* BẢO ĐẢM NÚT ĐIỀU HƯỚNG BONG BÓNG LUÔN LUÔN HIỂN THỊ TRÊN MỌI MÀN HÌNH */
+    .floating-menu-container {
+        display: block !important;
+        position: fixed !important;
+        bottom: 28px !important;
+        right: 28px !important;
+        z-index: 1060 !important;
+    }
+    .floating-menu-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    @media (max-width: 767.98px) {
+        .floating-menu-container {
+            bottom: 84px !important;
+            right: 18px !important;
+        }
+    }
+</style>
+
 <div class="floating-menu-container" id="floatingMenuContainer">
     <!-- POPUP MENU -->
     <div class="floating-menu-popup" id="floatingMenuPopup" role="menu" aria-orientation="vertical">
